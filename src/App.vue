@@ -1,9 +1,17 @@
 <template>
   <div id="app">
     <router-view/>
+    <logout-btn />
   </div>
 </template>
-
+<script>
+import LogoutBtn from "@/components/LogoutBtn.vue";
+export default {
+  components: {
+    LogoutBtn
+  }
+}
+</script>
 <style>
 body {
   background: url("./assets/background.jpg");
@@ -28,6 +36,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 80vh;
+  max-width: 2000px;
+  margin: 0 auto;
   position: relative;
 }
 

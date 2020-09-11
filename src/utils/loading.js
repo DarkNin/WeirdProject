@@ -1,6 +1,7 @@
 import {Loading} from 'element-ui'
 import Bus from './eventBus'
 
+let loading;
 
 export const openLoading = () => {
   loading = Loading.service({

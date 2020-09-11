@@ -1,7 +1,10 @@
 import axios from 'axios';
 import Qs from 'qs';
 import router from '../router';
-import {alertDanger, alertWarning} from "../utils/modal";
+import {
+  alertDanger,
+  alertWarning
+} from "../utils/modal";
 
 axios.interceptors.request.use(
   config => {
@@ -16,16 +19,19 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   res => {
-    if (res.data.code === 500){
-      if(res.data.data === '权限不足！'){
+    if (res.data.code === 500) {
+      if (res.data.data === '权限不足！') {
         alertWarning('请检查所用角色或账号密码');
         window.localStorage.removeItem('info');
         window.localStorage.removeItem('isAdmin');
         router.push('/');
 
+      } else {
+        alertWarning(res.data.data);
       }
+    } else {
+      return res
     }
-    return res
   },
   error => {
     if (error.response) {

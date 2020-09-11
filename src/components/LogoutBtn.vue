@@ -21,6 +21,7 @@ export default {
 <style scoped>
 .logout-btn-wrap {
   width: 100%;
+  max-width: 2000px;
   position: fixed;
   padding: 1rem;
   box-sizing: border-box;

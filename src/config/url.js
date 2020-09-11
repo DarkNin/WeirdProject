@@ -18,6 +18,8 @@ const addPackageUrl = baseUrl + '/package/add';
 const editPackageNameUrl = baseUrl + '/package/update';
 //修改卡片名
 const editCardNameInPackageUrl = baseUrl + '/package/card/update';
+//查询卡包列表
+const queryCardPackageListUrl = baseUrl + '/package/list';
 
 //用户
 //新增用户
@@ -39,3 +41,21 @@ const queryDrawResultUrl = baseUrl + '/roll/list';
 //玩家端
 //尘转卡
 const transDustToCardUrl = baseUrl + '/user/change';
+
+export {
+    searchCardUrl,
+    editCardCountUrl,
+    addCardUrl,
+    searchOwningCardUrl,
+    addPackageUrl,
+    editPackageNameUrl,
+    editCardNameInPackageUrl,
+    queryCardPackageListUrl,
+    addUserUrl,
+    editDustUrl,
+    editAwardUrl,
+    searchUserUrl,
+    setDrawResultUrl,
+    queryDrawResultUrl,
+    transDustToCardUrl
+}
