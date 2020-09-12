@@ -1,6 +1,8 @@
+//const Url = require('./src/config/_url');
+import {searchCardUrl} from ('./src/config/url')
 module.exports = {
     interfaceList: [{
-            url: '/card/list/admin',
+            url: Url.searchCardUrl,
             response: {
                 "code": 200,
                 "data": {
@@ -33,27 +35,26 @@ module.exports = {
             }
         },
         {
-            url: '/card/add',
+            url: Url.addCardUrl,
             response: {
                 "code": 200,
                 "data": "添加成功！"
             }
         },
         {
-            url: '/card/update',
+            url: Url.editCardNameUrl,
             response: {
                 "code": 200,
                 "data": "修改成功！"
             }
         },
         {
-            url: '/card/list',
+            url: Url.searchOwningCardUrl,
             response: {
                 "code": 200,
                 "data": {
                     "currPage": 1,
-                    "dataList": [
-                        {
+                    "dataList": [{
                             "cardName": "一骑加势",
                             "count": 0,
                             "packageName": "再造的世界",
@@ -73,34 +74,186 @@ module.exports = {
                             "packageName": "再造的世界",
                             "rare": "UR",
                             "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "义豪灵蜥",
+                            "count": 0,
+                            "packageName": "再造的世界",
+                            "rare": "R",
+                            "userName": "test"
+                        },
+                        {
+                            "cardName": "除草兽",
+                            "count": 3,
+                            "packageName": "再造的世界",
+                            "rare": "UR",
+                            "userName": "test"
                         }
                     ],
                     "pageSize": 20,
-                    "totalCount": 3,
+                    "totalCount": 30,
                     "totalPage": 1
                 }
             }
         },
         {
-            url: '/package/add',
+            url: Url.searchEditedRecordUrl,
+            response: {
+                "code": 200,
+                "data": {
+                    "currPage": 1,
+                    "dataList": [{
+                            "createdTime": "2020-09-12 18:30:07",
+                            "newName": "草泥马",
+                            "oldName": "除草兽",
+                            "packageName": "再造的世界",
+                            "rare": "N"
+                        },
+                        {
+                            "createdTime": "2020-09-12 17:54:30",
+                            "newName": "除草兽",
+                            "oldName": "草",
+                            "packageName": "再造的世界",
+                            "rare": "N"
+                        }
+                    ],
+                    "pageSize": 20,
+                    "totalCount": 2,
+                    "totalPage": 1
+                }
+            }
+        },
+        {
+            url: Url.addPackageUrl,
             response: {
                 "code": 200,
                 "data": "新增成功！"
             }
         },
         {
-            url: '/package/update',
+            url: Url.editPackageNameUrl,
             response: {
                 "code": 200,
                 "data": "修改成功！"
             }
         },
         {
-            url: '/package/list',
-            response:{
+            url: Url.queryCardPackageListUrl,
+            response: {
                 "code": 200,
-                "data": [
-                    {
+                "data": [{
                         "packageId": 1,
                         "packageName": "咕咕咕1"
                     },
@@ -120,41 +273,40 @@ module.exports = {
             }
         },
         {
-            url: '/user/add',
+            url: Url.addUserUrl,
             response: {
                 "code": 200,
                 "data": "添加成功！"
             }
         },
         {
-            url: '/user/card/update',
+            url: Url.editCardCountUrl,
             response: {
                 "code": 200,
                 "data": "修改成功！"
             }
         },
         {
-            url: '/user/dust',
+            url: Url.editDustUrl,
             response: {
                 "code": 200,
                 "data": "修改成功！"
             }
         },
         {
-            url: '/user/award',
+            url: Url.editAwardUrl,
             response: {
                 "code": 200,
                 "data": "修改成功！"
             }
         },
         {
-            url: '/user/list',
+            url: Url.searchUserUrl,
             response: {
                 "code": 200,
                 "data": {
                     "currPage": 1,
-                    "dataList": [
-                        {
+                    "dataList": [{
                             "duelPoint": 0,
                             "dustCount": 0,
                             "nonawardCount": 0,
@@ -176,7 +328,7 @@ module.exports = {
             }
         },
         {
-            url: '/user/card/change',
+            url: Url.transDustToCardUrl,
             response: {
                 "code": 500,
                 "data": "转换失败！"
