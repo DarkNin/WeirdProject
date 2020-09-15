@@ -3,9 +3,8 @@ module.exports = {
     productionSourceMap: false,
     devServer: {
         before: function (app, server, complier) {
-            const serverPath = '/weird_project'
             MockConfig.interfaceList.forEach(item => {
-                app.all(serverPath + item.url, function (req, res) {
+                app.all(item.url, function (req, res) {
                     setTimeout(() => {
                         res.json(item.response)
                     }, 500)

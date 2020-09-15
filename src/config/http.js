@@ -3,6 +3,7 @@ import Qs from 'qs';
 import router from '../router';
 import {
   alertDanger,
+  alertSuccess,
   alertWarning
 } from "../utils/modal";
 import {closeLoading} from '../utils/loading'
@@ -39,6 +40,9 @@ axios.interceptors.response.use(
         alertWarning(res.data.data);
       }
     } else {
+      if (res.data.data === '修改成功！') {
+        alertSuccess(res.data.data)
+      }
       return res
     }
   },
