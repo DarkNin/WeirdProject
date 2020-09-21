@@ -440,6 +440,14 @@ export default {
       Object.assign(this.$data, this.$options.data());
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
+      let userInfo = this.userList.find(
+        (element) => element.userName === this.username
+      );
+      if (userInfo) {
+        this.duelPoint = userInfo.duelPoint;
+        this.leftDust = userInfo.dustCount;
+        this.leftAward = userInfo.nonawardCount;
+      }
       this.$closeLoading();
     },
 
@@ -578,26 +586,34 @@ export default {
       this.fusingCardData.card = "";
     },
     submitFusingCard() {
-      this.$openLoading();
-      let options = {
-        url: "",
-        data: {},
-      };
-      if (this.fusingCardType === "standard") {
-        options.url = transDustToCardUrl;
-        options.data.card = this.fusingCardData.card;
-      }
-      if (this.fusingCardType === "random") {
-        options.url = transDustToCardRandomUrl;
-        options.data.package = this.fusingCardData.package;
-      }
-      axiosFetch(options).then((res) => {
-        if (res.data.code === 200) {
-          this.isFusingCardInner = false;
-          this.isFusingCard = false;
-          this.reloadPage();
-        }
-      });
+      MessageBox.confirm("请确认是否合成", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$openLoading();
+          let options = {
+            url: "",
+            data: {},
+          };
+          if (this.fusingCardType === "standard") {
+            options.url = transDustToCardUrl;
+            options.data.card = this.fusingCardData.card;
+          }
+          if (this.fusingCardType === "random") {
+            options.url = transDustToCardRandomUrl;
+            options.data.package = this.fusingCardData.package;
+          }
+          axiosFetch(options).then((res) => {
+            if (res.data.code === 200) {
+              this.isFusingCardInner = false;
+              this.isFusingCard = false;
+              this.reloadPage();
+            }
+          });
+        })
+        .catch(() => {});
     },
   },
 };

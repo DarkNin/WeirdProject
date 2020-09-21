@@ -54,7 +54,7 @@ axios.interceptors.response.use(
         alertWarning(res.data.data);
       }
     } else {
-      if (res.data.data === '修改成功！') {
+      if (typeof res.data.data === 'string' && res.data.data.includes('成功')) {
         alertSuccess(res.data.data)
       }
     }

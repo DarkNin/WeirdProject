@@ -1201,7 +1201,6 @@ export default {
         }).then((res) => {
           if (res.data.code === 200) {
             this.isAddingCard = false;
-            this.$alertSuccess(res.data.data);
             this.reloadPage();
           }
         });
