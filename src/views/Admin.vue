@@ -141,6 +141,12 @@
                 <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
               </template>
             </el-table-column>
+
+            <el-table-column :key="'lib-column-' + 4" fixed="right" width="80">
+              <template slot-scope="scope">
+                <el-button size="mini" type="text" @click="editCard(scope.row.cardName)">编辑</el-button>
+              </template>
+            </el-table-column>
             <!-- <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column> -->
           </el-table>
           <div class="admin-main-content-table-pagination">
@@ -593,14 +599,12 @@
         <el-form-item label="是否记录" size="small">
           <el-checkbox v-model="editingCardData.show"></el-checkbox>
         </el-form-item>
-
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isEditingCard = false" size="small">取 消</el-button>
         <el-button type="primary" @click="submitEditingCard" size="small">确 定</el-button>
       </span>
     </el-dialog>
-
 
     <!-- 交换卡牌稀有度dialog -->
     <el-dialog
@@ -614,23 +618,23 @@
       <el-form label-position="top">
         <el-form-item label="卡1" size="small" required>
           <el-autocomplete
-              size="mini"
-              v-model="exchangingCardData.card1"
-              placeholder="请填写卡名"
-              clearable
-              :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
-            ></el-autocomplete>
+            size="mini"
+            v-model="exchangingCardData.card1"
+            placeholder="请填写卡名"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="卡2" size="small" required>
           <el-autocomplete
-              size="mini"
-              v-model="exchangingCardData.card2"
-              placeholder="请填写卡名"
-              clearable
-              :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
-            ></el-autocomplete>
+            size="mini"
+            v-model="exchangingCardData.card2"
+            placeholder="请填写卡名"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="是否记录" size="small">
           <el-checkbox v-model="exchangingCardData.show"></el-checkbox>
@@ -818,13 +822,15 @@
               class="stash-card-list-title"
               v-if="importingDrewCardsInfo.cards.length !== 0"
             >待添加结果列表</span>
-            <div 
+            <div
               v-for="(groupItem, groupIndex) in importingDrewCardsInfo.cards"
               :key="'stash-group-' + groupIndex"
             >
-              <el-tag size="small" v-for="(item, index) in groupItem" :key="'stash-item-' + index">
-                {{item}}
-              </el-tag>
+              <el-tag
+                size="small"
+                v-for="(item, index) in groupItem"
+                :key="'stash-item-' + index"
+              >{{item}}</el-tag>
             </div>
           </div>
         </el-form-item>
@@ -850,7 +856,9 @@ import {
   editCardCountUrl,
   editDustUrl,
   editAwardUrl,
-  setDrawResultUrl, importDrewResultUrl, exchangeCardsRareUrl
+  setDrawResultUrl,
+  importDrewResultUrl,
+  exchangeCardsRareUrl,
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 export default {
@@ -1599,8 +1607,8 @@ export default {
           url: importDrewResultUrl,
           data: {
             target: this.importingDrewCardsInfo.target,
-            cards: this.importingDrewCardsInfo.cards
-          }
+            cards: this.importingDrewCardsInfo.cards,
+          },
         }).then((res) => {
           if (res.data.code === 200) {
             this.isImportingDrewCards = false;
@@ -1648,7 +1656,7 @@ export default {
   margin-left: auto;
   font-size: 0.9rem;
 }
-.admin-info .el-button+.el-button {
+.admin-info .el-button + .el-button {
   margin-left: 10px;
 }
 
