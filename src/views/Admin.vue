@@ -67,6 +67,7 @@
                   layout="prev, pager, next"
                   :total="packageListContent[index] ? packageListContent[index]['pagination'].total : 0"
                   :page-size="packageListContent[index] ? packageListContent[index]['pagination'].pageSize : defaultPageSize"
+                  :current-page="packageListContent[index] ? packageListContent[index]['pagination'].page : 1"
                   @current-change="pageChange"
                 ></el-pagination>
               </div>
@@ -149,6 +150,7 @@
               layout="prev, pager, next"
               :total="libPagination.total"
               :page-size="libPagination.pageSize"
+              :current-page="libPagination.page"
               @current-change="libQueryCard"
             ></el-pagination>
           </div>
@@ -258,6 +260,7 @@
               layout="prev, pager, next"
               :total="userPagination.total"
               :page-size="userPagination.pageSize"
+              :current-page="userPagination.page"
               @current-change="userQuery"
             ></el-pagination>
           </div>
@@ -344,6 +347,7 @@
               layout="prev, pager, next"
               :total="drawRecordPagination.total"
               :page-size="drawRecordPagination.pageSize"
+              :current-page="drawRecordPagination.page"
               @current-change="drawRecordQuery"
             ></el-pagination>
           </div>
@@ -420,6 +424,7 @@
               layout="prev, pager, next"
               :total="recordPagination.total"
               :page-size="recordPagination.pageSize"
+              :current-page="recordPagination.page"
               @current-change="recordQuery"
             ></el-pagination>
           </div>
