@@ -2,8 +2,10 @@
   <div id="admin">
     <div class="admin-info">
       <p class="admin-info-tips">欢迎来到诡异云，{{username}}。</p>
-      <el-button type="text" @click="addPackage()" v-show="showTab === '1'">新增卡包</el-button>
-      <el-button type="text" @click="addUser()" v-show="showTab === '3'">新增玩家</el-button>
+      <el-button type="text" @click="addPackage()" v-if="showTab === '1'">新增卡包</el-button>
+      <el-button type="text" @click="exchangeCard()" v-if="showTab === '1'">交换稀有度</el-button>
+      <el-button type="text" @click="addUser()" v-if="showTab === '3'">新增玩家</el-button>
+      <el-button type="text" @click="importDrewCards()" v-if="showTab === '4'">导入记录</el-button>
     </div>
 
     <div class="admin-main">
@@ -25,7 +27,8 @@
             <div class="collapse-table-wrap">
               <div class="collapse-table-operation">
                 <el-button type="primary" size="mini" @click="editPackage(item.packageName)">编辑卡包</el-button>
-                <el-button type="primary" size="mini" @click="addCard(item.packageName)">新增卡片</el-button>
+                <el-button type="primary" size="mini" @click="addCard(item.packageName)">新增卡牌</el-button>
+                <el-button type="primary" size="mini" @click="batchAddCard(item.packageName)">批量新增</el-button>
               </div>
               <el-table
                 :data="packageListContent[index] ? packageListContent[index]['data'] : []"
@@ -53,11 +56,7 @@
                   width="80"
                 >
                   <template slot-scope="scope">
-                    <el-button
-                      size="mini"
-                      type="text"
-                      @click="editCard(item.packageName, scope.row.cardName)"
-                    >编辑</el-button>
+                    <el-button size="mini" type="text" @click="editCard(scope.row.cardName)">编辑</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -101,7 +100,7 @@
               <el-option label="HR" value="HR"></el-option>
             </el-select>
           </div>
-          <div class="admin-main-content-addition-item">
+          <!-- <div class="admin-main-content-addition-item">
             <el-select
               size="mini"
               v-model="libQueryAddition.userName"
@@ -115,9 +114,17 @@
                 :value="item.userName"
               ></el-option>
             </el-select>
-          </div>
+          </div>-->
           <div class="admin-main-content-addition-item">
-            <el-input size="mini" v-model="libQueryAddition.cardName" placeholder="请填写卡名" clearable></el-input>
+            <!-- <el-input size="mini" v-model="libQueryAddition.cardName" placeholder="请填写卡名" clearable></el-input> -->
+            <el-autocomplete
+              size="mini"
+              v-model="libQueryAddition.cardName"
+              placeholder="请填写卡名"
+              clearable
+              :trigger-on-focus="false"
+              :fetch-suggestions="querySearchCandicateCardList"
+            ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
             <el-button type="info" size="mini" @click="libClearAddition">清除条件</el-button>
@@ -133,7 +140,7 @@
                 <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
               </template>
             </el-table-column>
-            <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column>
+            <!-- <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column> -->
           </el-table>
           <div class="admin-main-content-table-pagination">
             <el-pagination
@@ -163,6 +170,9 @@
                 :value="item.userName"
               ></el-option>
             </el-select>
+          </div>
+          <div class="special-user-add" v-if="userQueryAddition.target">
+            <el-button type="primary" size="mini" @click="addUserCard">添加卡牌</el-button>
           </div>
           <div class="special-user-info" v-if="userQueryAddition.target">
             <span>
@@ -206,7 +216,15 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-input size="mini" v-model="userQueryAddition.card" placeholder="请填写卡名" clearable></el-input>
+            <!-- <el-input size="mini" v-model="userQueryAddition.card" placeholder="请填写卡名" clearable></el-input> -->
+            <el-autocomplete
+              size="mini"
+              v-model="userQueryAddition.card"
+              placeholder="请填写卡名"
+              clearable
+              :trigger-on-focus="false"
+              :fetch-suggestions="querySearchCandicateCardList"
+            ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
             <el-button type="info" size="mini" @click="userClearAddition">清除条件</el-button>
@@ -228,7 +246,7 @@
                 <el-button
                   size="mini"
                   type="text"
-                  @click="editCardCount(scope.row.packageName, scope.row.cardName, scope.row.userName)"
+                  @click="editCardCount(scope.row.cardName, scope.row.userName)"
                 >编辑数量</el-button>
               </template>
             </el-table-column>
@@ -363,12 +381,20 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-input
+            <!-- <el-input
               size="mini"
               v-model="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
-            ></el-input>
+            ></el-input>-->
+            <el-autocomplete
+              size="mini"
+              v-model="recordQueryAddition.cardName"
+              placeholder="请填写卡名"
+              clearable
+              :trigger-on-focus="false"
+              :fetch-suggestions="querySearchCandicateCardList"
+            ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
             <el-button type="info" size="mini" @click="recordClearAddition">清除条件</el-button>
@@ -454,9 +480,9 @@
       </span>
     </el-dialog>
 
-    <!-- 新增卡片dialog -->
+    <!-- 新增卡牌dialog -->
     <el-dialog
-      title="新增卡片"
+      title="新增卡牌"
       :visible.sync="isAddingCard"
       width="20rem"
       :close-on-click-modal="false"
@@ -491,9 +517,56 @@
       </span>
     </el-dialog>
 
-    <!-- 编辑卡片dialog -->
+    <!-- 批量新增卡牌dialog -->
     <el-dialog
-      title="编辑卡片"
+      title="批量新增卡牌"
+      :visible.sync="isBatchAddingCard"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelBatchAddingCard"
+    >
+      <el-form label-position="top">
+        <el-form-item label="卡包" size="small">
+          <el-input disabled v-model="batchAddingCardData.packageName" type="text"></el-input>
+        </el-form-item>
+
+        <el-form-item
+          :label="renderItem.label"
+          size="small"
+          v-for="(renderItem, renderIndex) in batchAddingMenuRenderOptions"
+          :key="'batch-add-card-render-' + renderIndex"
+        >
+          <el-input
+            type="textarea"
+            :rows="3"
+            :placeholder="`请输入${renderItem.label}卡列表, 以“|”分割, 不使用换行, 例：卡1|卡2`"
+            v-model="tempBatchAddingCardData
+[renderItem.dataKey]"
+          ></el-input>
+          <div class="stash-card-list">
+            <span
+              class="stash-card-list-title"
+              v-if="batchAddingCardData[renderItem.dataKey].length !== 0"
+            >待添加卡牌列表</span>
+            <el-tag
+              size="small"
+              v-for="(item, index) in batchAddingCardData[renderItem.dataKey]"
+              :key="renderItem.keyWord + index"
+            >{{item}}</el-tag>
+          </div>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isBatchAddingCard = false" size="small">取 消</el-button>
+        <el-button type="info" @click="analyseBatchAddingCardList" size="small">解 析</el-button>
+        <el-button type="primary" @click="submitBatchAddingCard" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 编辑卡牌dialog -->
+    <el-dialog
+      title="编辑卡牌"
       :visible.sync="isEditingCard"
       width="20rem"
       :close-on-click-modal="false"
@@ -501,9 +574,6 @@
       @close="cancelEditingCard"
     >
       <el-form label-position="top">
-        <el-form-item label="卡包" size="small">
-          <el-input disabled v-model="editingCardData.package" type="text"></el-input>
-        </el-form-item>
         <el-form-item label="旧卡名" size="small">
           <el-input disabled v-model="editingCardData.oldname" type="text"></el-input>
         </el-form-item>
@@ -518,19 +588,52 @@
         <el-form-item label="是否记录" size="small">
           <el-checkbox v-model="editingCardData.show"></el-checkbox>
         </el-form-item>
-        <!-- <el-form-item label="稀有度" size="small" required>
-          <el-select size="mini" v-model="editingCardData.rare" clearable>
-            <el-option label="N" value="N"></el-option>
-            <el-option label="R" value="R"></el-option>
-            <el-option label="SR" value="SR"></el-option>
-            <el-option label="UR" value="UR"></el-option>
-            <el-option label="HR" value="HR"></el-option>
-          </el-select>
-        </el-form-item>-->
+
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isEditingCard = false" size="small">取 消</el-button>
         <el-button type="primary" @click="submitEditingCard" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
+
+
+    <!-- 交换卡牌稀有度dialog -->
+    <el-dialog
+      title="交换稀有度"
+      :visible.sync="isExchangingCard"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelExchangeCard"
+    >
+      <el-form label-position="top">
+        <el-form-item label="卡1" size="small" required>
+          <el-autocomplete
+              size="mini"
+              v-model="exchangingCardData.card1"
+              placeholder="请填写卡名"
+              clearable
+              :trigger-on-focus="false"
+              :fetch-suggestions="querySearchCandicateCardList"
+            ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="卡2" size="small" required>
+          <el-autocomplete
+              size="mini"
+              v-model="exchangingCardData.card2"
+              placeholder="请填写卡名"
+              clearable
+              :trigger-on-focus="false"
+              :fetch-suggestions="querySearchCandicateCardList"
+            ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="是否记录" size="small">
+          <el-checkbox v-model="exchangingCardData.show"></el-checkbox>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isExchangingCard = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="submitExchangeCard" size="small">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -559,7 +662,7 @@
       </span>
     </el-dialog>
 
-    <!-- 修改用户卡片dialog -->
+    <!-- 修改用户卡牌dialog -->
     <el-dialog
       :title="editingCardCountTips"
       :visible.sync="isEditingCardCount"
@@ -580,6 +683,46 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isEditingCardCount = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="submitEditCardCount" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 新增用户卡牌dialog -->
+    <el-dialog
+      :title="addingUserCardTips"
+      :visible.sync="isAddingUserCard"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelEditCardCount"
+    >
+      <el-form label-position="top">
+        <el-form-item label="卡名" size="small" required>
+          <!-- <el-input
+            v-model.number="editingCardCountData.card"
+            type="text"
+            @keyup.enter.native="submitEditCardCount"
+            clearable
+          ></el-input>-->
+          <el-autocomplete
+            size="mini"
+            v-model="editingCardCountData.card"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="数量" size="small" required>
+          <el-input
+            v-model.number="editingCardCountData.count"
+            type="text"
+            @keyup.enter.native="submitEditCardCount"
+            clearable
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isAddingUserCard = false" size="small">取 消</el-button>
         <el-button type="primary" @click="submitEditCardCount" size="small">确 定</el-button>
       </span>
     </el-dialog>
@@ -631,6 +774,62 @@
         <el-button type="primary" @click="submitDrawStatus" size="small">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 导入抽卡记录dialog -->
+    <el-dialog
+      title="导入抽卡记录"
+      :visible.sync="isImportingDrewCards"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelImportDrewCards"
+    >
+      <el-form label-position="top">
+        <el-form-item label="玩家" size="small" required>
+          <el-select
+            size="mini"
+            v-model="importingDrewCardsInfo.target"
+            placeholder="请选择玩家"
+            clearable
+          >
+            <el-option
+              v-for="item in userList"
+              :key="'import-drew-' + item.userName + item.userId"
+              :label="item.userName"
+              :value="item.userName"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="抽卡结果" size="small" required>
+          <el-input
+            type="textarea"
+            :rows="4"
+            :placeholder="`请输入抽卡结果列表, 以“|”分割, 例：卡1|卡2\n卡3|卡4`"
+            v-model="tempDrewCardsInfo"
+          ></el-input>
+          <div class="stash-card-list">
+            <span
+              class="stash-card-list-title"
+              v-if="importingDrewCardsInfo.cards.length !== 0"
+            >待添加结果列表</span>
+            <div 
+              v-for="(groupItem, groupIndex) in importingDrewCardsInfo.cards"
+              :key="'stash-group-' + groupIndex"
+            >
+              <el-tag size="small" v-for="(item, index) in groupItem" :key="'stash-item-' + index">
+                {{item}}
+              </el-tag>
+            </div>
+          </div>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isImportingDrewCards = false" size="small">取 消</el-button>
+        <el-button type="info" @click="analyseImportDrewCards" size="small">解 析</el-button>
+        <el-button type="primary" @click="submitImportDrewCards" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -646,9 +845,9 @@ import {
   editCardCountUrl,
   editDustUrl,
   editAwardUrl,
-  setDrawResultUrl
+  setDrawResultUrl, importDrewResultUrl, exchangeCardsRareUrl
 } from "../config/url";
-import { axiosFetch } from "../utils/fetch";
+import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 export default {
   name: "Admin",
   mixins: [common],
@@ -658,6 +857,8 @@ export default {
 
       packageListContent: {},
       activeItemIndex: "",
+
+      cardCandicateList: [],
 
       //卡包页
       isAddingPackage: false,
@@ -675,11 +876,60 @@ export default {
         card: "",
         rare: "N",
       },
+      isBatchAddingCard: false,
+      batchAddingMenuRenderOptions: [
+        {
+          label: "N",
+          keyWord: "stash-n-",
+          dataKey: "nList",
+        },
+        {
+          label: "R",
+          keyWord: "stash-r-",
+          dataKey: "rList",
+        },
+        {
+          label: "SR",
+          keyWord: "stash-sr-",
+          dataKey: "srList",
+        },
+        {
+          label: "UR",
+          keyWord: "stash-ur-",
+          dataKey: "urList",
+        },
+        {
+          label: "HR",
+          keyWord: "stash-hr-",
+          dataKey: "hrList",
+        },
+      ],
+      tempBatchAddingCardData: {
+        nList: "",
+        rList: "",
+        srList: "",
+        hrList: "",
+        urList: "",
+      },
+      batchAddingCardData: {
+        packageName: "",
+        nList: [],
+        rList: [],
+        srList: [],
+        hrList: [],
+        urList: [],
+      },
       isEditingCard: false,
       editingCardData: {
-        package: "",
         oldname: "",
         newname: "",
+        show: false,
+      },
+
+      isExchangingCard: false,
+      exchangingCardData: {
+        card1: "",
+        card2: "",
         show: false,
       },
 
@@ -729,12 +979,13 @@ export default {
       userTableData: [],
 
       isEditingCardCount: false,
+      isAddingUserCard: false, //利用相同接口做新增卡
       editingCardCountData: {
-        package: "",
         card: "",
         target: "",
         count: null,
       },
+      addingUserCardTips: "",
       editingCardCountTips: "",
 
       //修改记录
@@ -766,9 +1017,19 @@ export default {
         status: 0,
         id: null,
       },
+
+      isImportingDrewCards: false,
+      importingDrewCardsInfo: {
+        target: "",
+        cards: [],
+      },
+      tempDrewCardsInfo: "",
     };
   },
 
+  mounted() {
+    this.generateCandicateCardList();
+  },
   methods: {
     handleSelect(index) {
       this.showTab = index;
@@ -780,31 +1041,38 @@ export default {
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
       this.$closeLoading();
+      this.generateCandicateCardList();
     },
 
-    //查询卡片列表
-    queryCardList(page, pageSize, _package, card, rare, target) {
-      return new Promise((resolve) => {
-        axiosFetch({
-          url: searchCardUrl,
-          data: {
-            package: _package,
-            card: card,
-            rare: rare,
-            target: target,
-            page: page || this.defaultPage,
-            pageSize: pageSize || this.defaultPageSize,
-          },
-        }).then((res) => {
-          resolve({
-            pagination: {
-              page: res.data.data.currPage,
-              total: res.data.data.totalCount,
-            },
-            data: res.data.data.dataList,
-          });
-        });
+    //生成输入卡片名字时的输入建议列表
+    async generateCandicateCardList() {
+      let cardList = await this._queryCardList(
+        1,
+        65535,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "admin_search"
+      );
+      this.cardCandicateList = cardList.data.map((item) => {
+        return {
+          value: item.cardName,
+        };
       });
+    },
+
+    querySearchCandicateCardList(queryString, callback) {
+      let result = queryString
+        ? this.cardCandicateList.filter(this.listFilter(queryString))
+        : this.cardCandicateList;
+      callback(result);
+    },
+
+    listFilter(queryString) {
+      return (item) => {
+        return item.value.indexOf(queryString) === 0;
+      };
     },
 
     //情报页面点击手风琴面板时触发
@@ -813,10 +1081,14 @@ export default {
         return;
       }
       this.$openLoading();
-      let packageData = await this.queryCardList(
+      let packageData = await this._queryCardList(
         undefined,
         undefined,
-        this.cardPackageList[itemIndex]["packageName"]
+        this.cardPackageList[itemIndex]["packageName"],
+        undefined,
+        undefined,
+        undefined,
+        "admin_package"
       );
       this.$set(this.packageListContent, itemIndex, packageData);
       this.$closeLoading();
@@ -825,10 +1097,14 @@ export default {
     //情报页面表格分页切换
     pageChange(page) {
       this.$openLoading();
-      this.queryCardList(
+      this._queryCardList(
         page,
         this.defaultPageSize,
-        this.cardPackageList[this.activeItemIndex]["packageName"]
+        this.cardPackageList[this.activeItemIndex]["packageName"],
+        undefined,
+        undefined,
+        undefined,
+        "admin_package"
       ).then((data) => {
         this.$set(this.packageListContent, this.activeItemIndex, data);
         this.$closeLoading();
@@ -902,7 +1178,7 @@ export default {
     submitAddingCard() {
       if (this.addingCardData.card) {
         this.$openLoading();
-        axiosFetch({
+        axiosGet({
           url: addCardUrl,
           data: {
             package: this.addingCardData.package,
@@ -912,20 +1188,61 @@ export default {
         }).then((res) => {
           if (res.data.code === 200) {
             this.isAddingCard = false;
+            this.$alertSuccess(res.data.data);
             this.reloadPage();
           }
         });
       }
     },
 
-    editCard(packageName, cardName) {
-      this.editingCardData.package = packageName;
+    batchAddCard(packageName) {
+      this.batchAddingCardData.packageName = packageName;
+      this.isBatchAddingCard = true;
+    },
+    cancelBatchAddingCard() {
+      Object.assign(
+        this.$data.batchAddingCardData,
+        this.$options.data().batchAddingCardData
+      );
+      Object.assign(
+        this.$data.tempBatchAddingCardData,
+        this.$options.data().tempBatchAddingCardData
+      );
+    },
+    analyseBatchAddingCardList() {
+      ["nList", "rList", "srList", "hrList", "urList"].forEach((item) => {
+        this.batchAddingCardData[item] = this.tempBatchAddingCardData[item]
+          ? this.tempBatchAddingCardData[item].split("|").map((t) => t.trim())
+          : [];
+      });
+    },
+
+    submitBatchAddingCard() {
+      this.$openLoading();
+      axiosPostAsJSON({
+        url: addCardUrl,
+        data: {
+          packageName: this.batchAddingCardData.packageName,
+          nList: this.batchAddingCardData.nList,
+          rList: this.batchAddingCardData.rList,
+          srList: this.batchAddingCardData.srList,
+          hrList: this.batchAddingCardData.hrList,
+          urList: this.batchAddingCardData.urList,
+        },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          this.isBatchAddingCard = false;
+          this.$alertSuccess(res.data.data);
+          this.reloadPage();
+        }
+      });
+    },
+    editCard(cardName) {
       this.editingCardData.oldname = cardName;
       this.isEditingCard = true;
     },
 
     cancelEditingCard() {
-      this.editingCardData.package = "";
       this.editingCardData.oldname = "";
       this.editingCardData.newname = "";
       this.editingCardData.show = false;
@@ -937,14 +1254,42 @@ export default {
         axiosFetch({
           url: editCardNameUrl,
           data: {
-            package: this.editingCardData.package,
             oldname: this.editingCardData.oldname,
             newname: this.editingCardData.newname,
-            show: this.editingCardData.rare || undefined,
+            show: Number(this.editingCardData.show) || undefined,
           },
         }).then((res) => {
           if (res.data.code === 200) {
             this.isEditingCard = false;
+            this.reloadPage();
+          }
+        });
+      }
+    },
+    //互换卡片稀有度
+    exchangeCard() {
+      this.isExchangingCard = true;
+    },
+
+    cancelExchangeCard() {
+      this.exchangingCardData.card1 = "";
+      this.exchangingCardData.card2 = "";
+      this.exchangingCardData.show = false;
+    },
+
+    submitExchangeCard() {
+      if (this.exchangingCardData.card1 && this.exchangingCardData.card2) {
+        this.$openLoading();
+        axiosFetch({
+          url: exchangeCardsRareUrl,
+          data: {
+            card1: this.exchangingCardData.card1,
+            card2: this.exchangingCardData.card2,
+            show: Number(this.exchangingCardData.show) || undefined,
+          },
+        }).then((res) => {
+          if (res.data.code === 200) {
+            this.isExchangingCard = false;
             this.reloadPage();
           }
         });
@@ -970,7 +1315,8 @@ export default {
         this.libQueryAddition.packageName || undefined,
         this.libQueryAddition.cardName || undefined,
         this.libQueryAddition.rare || undefined,
-        this.libQueryAddition.userName || undefined
+        this.libQueryAddition.userName || undefined,
+        "admin_search"
       ).then((data) => {
         this.libPagination.page = data.pagination.page;
         this.libPagination.total = data.pagination.total;
@@ -1058,7 +1404,8 @@ export default {
         this.userQueryAddition.package || undefined,
         this.userQueryAddition.card || undefined,
         this.userQueryAddition.rare || undefined,
-        this.userQueryAddition.target || undefined
+        this.userQueryAddition.target || undefined,
+        "player_lib"
       ).then((data) => {
         this.userPagination.page = data.pagination.page;
         this.userPagination.total = data.pagination.total;
@@ -1067,30 +1414,35 @@ export default {
       });
     },
 
-    editCardCount(_package, card, target) {
-      this.editingCardCountData.package = _package;
+    editCardCount(card, target) {
       this.editingCardCountData.card = card;
       this.editingCardCountData.target = target;
       this.editingCardCountTips = `正在编辑玩家【${target}】的【${card}】`;
       this.isEditingCardCount = true;
     },
+    //利用相同接口新增卡牌
+    addUserCard() {
+      this.editingCardCountData.target = this.userQueryAddition.target;
+      this.addingUserCardTips = `正在为玩家【${this.userQueryAddition.target}】新增卡牌`;
+      this.isAddingUserCard = true;
+    },
     cancelEditCardCount() {
-      this.editingCardCountData.package = "";
       this.editingCardCountData.card = "";
       this.editingCardCountData.target = "";
       this.editingCardCountData.count = null;
       this.editingCardCountTips = "";
+      this.addingUserCardTips = "";
     },
     submitEditCardCount() {
       if (
         typeof this.editingCardCountData.count === "number" &&
-        this.editingCardCountData.count >= 0
+        this.editingCardCountData.count >= 0 &&
+        !!this.editingCardCountData.card
       ) {
         this.$openLoading();
         axiosFetch({
           url: editCardCountUrl,
           data: {
-            package: this.editingCardCountData.package,
             card: this.editingCardCountData.card,
             target: this.editingCardCountData.target,
             count: this.editingCardCountData.count,
@@ -1137,15 +1489,16 @@ export default {
           url: "",
           data: {
             target: this.userQueryAddition.target,
-            count: this.editingUserInfoItemCount,
           },
         };
         switch (this.editingUserInfoItemType) {
           case "月见黑":
             options.url = editAwardUrl;
+            options.data.award = this.editingUserInfoItemCount;
             break;
           case "剩余尘数":
             options.url = editDustUrl;
+            options.data.count = this.editingUserInfoItemCount;
             break;
         }
         axiosFetch(options).then((res) => {
@@ -1208,6 +1561,49 @@ export default {
         }
       });
     },
+
+    importDrewCards() {
+      this.isImportingDrewCards = true;
+    },
+    cancelImportDrewCards() {
+      Object.assign(
+        this.$data.importingDrewCardsInfo,
+        this.$options.data().importingDrewCardsInfo
+      );
+      this.tempDrewCardsInfo = "";
+    },
+    analyseImportDrewCards() {
+      let regx = /\||\n\r|\r|\n/g;
+      let tempArray = this.tempDrewCardsInfo
+        .split(regx)
+        .filter((t) => !!t)
+        .map((t) => t.trim());
+      let result = [];
+      for (let i = 0; i < tempArray.length; i += 3) {
+        result.push(tempArray.slice(i, i + 3));
+      }
+      this.importingDrewCardsInfo.cards = result;
+    },
+    submitImportDrewCards() {
+      if (
+        this.importingDrewCardsInfo.target &&
+        this.importingDrewCardsInfo.cards.length > 0
+      ) {
+        this.$openLoading();
+        axiosPostAsJSON({
+          url: importDrewResultUrl,
+          data: {
+            target: this.importingDrewCardsInfo.target,
+            cards: this.importingDrewCardsInfo.cards
+          }
+        }).then((res) => {
+          if (res.data.code === 200) {
+            this.isImportingDrewCards = false;
+            this.reloadPage();
+          }
+        });
+      }
+    },
   },
 };
 </script>
@@ -1215,10 +1611,12 @@ export default {
 <style scoped>
 #admin {
   width: 100%;
-  height: 3rem;
+  height: 100%;
   padding: 1rem;
   box-sizing: border-box;
   font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
 }
 .admin-info {
   background: #ffffff;
@@ -1226,6 +1624,7 @@ export default {
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
   height: 3rem;
+  flex: initial;
   padding: 0 1rem;
   box-sizing: border-box;
   display: flex;
@@ -1244,22 +1643,30 @@ export default {
   margin-left: auto;
   font-size: 0.9rem;
 }
+.admin-info .el-button+.el-button {
+  margin-left: 10px;
+}
 
 .admin-main {
   background: #ffffff;
   border-radius: 0.5rem;
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
-  height: 80vh;
+  flex: auto;
   min-height: 500px;
   padding: 0 1rem;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.admin-main .el-menu {
+  flex: initial;
 }
 
 .admin-main-content {
   box-sizing: border-box;
   padding: 1rem;
-  height: 70vh;
+  flex: auto;
   overflow-y: auto;
 }
 
@@ -1310,23 +1717,26 @@ export default {
   min-height: 30px;
   width: 10rem;
 }
+.special-user-add {
+  margin-left: auto;
+  margin-right: 10px;
+}
 .special-user-info {
   color: #606266;
   font-size: 0.7rem;
   border-radius: 0.3rem;
   border: 1px solid #dcdfe6;
-  height: 30px;
+  height: 26px;
   width: auto;
   padding: 0 0.5rem;
-  margin-left: auto;
 }
 .special-user-info .el-button {
   padding: 0;
   font-size: 0.7rem;
 }
 .special-user-info span {
-  height: 30px;
-  line-height: 30px;
+  height: 26px;
+  line-height: 26px;
 }
 .special-user-info span + span {
   margin-left: 10px;
@@ -1380,7 +1790,17 @@ export default {
   color: #c5b314;
 }
 
-.el-dialog .el-select {
+.el-dialog .el-select,
+.el-dialog .el-autocomplete {
   width: 100%;
+}
+
+.stash-card-list-title {
+  display: block;
+  line-height: 32px;
+}
+
+.stash-card-list .el-tag {
+  margin-right: 5px;
 }
 </style>

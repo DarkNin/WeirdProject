@@ -5,7 +5,7 @@ const Url = {
     //全卡片搜索
     searchCardUrl: BASE_URL + '/card/list/admin',
     //添加卡片信息
-    addCardUrl: BASE_URL + '/package/card/add',
+    addCardUrl: BASE_URL + '/card/add',
     //修改卡片名
     editCardNameUrl: BASE_URL + '/card/update',
     //卡片拥有情况搜索

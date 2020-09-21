@@ -1,19 +1,22 @@
 //修改mock数据请同步修改mock.config.js
 
 const BASE_URL = '/weird_project';
+//const BASE_URL = '';
 
 //管理端
 //卡片列表
 //全卡片搜索
-const searchCardUrl = BASE_URL + '/card/list/admin';
+const searchCardUrl = BASE_URL + '/card/list';
 //添加卡片信息
-const addCardUrl = BASE_URL + '/package/card/add';
+const addCardUrl = BASE_URL + '/card/add';
 //修改卡片名
 const editCardNameUrl = BASE_URL + '/card/update';
 //卡片拥有情况搜索
-const searchOwningCardUrl = BASE_URL + '/card/list';
+const searchOwningCardUrl = BASE_URL + '/card/ownlist';
 //卡片修改记录搜索
 const searchEditedRecordUrl = BASE_URL + '/card/history';
+//互换卡片稀有度
+const exchangeCardsRareUrl = BASE_URL + '/card/exchange';
 
 //卡包
 //新增卡包
@@ -34,17 +37,24 @@ const editDustUrl = BASE_URL + '/user/dust';
 const editAwardUrl = BASE_URL + '/user/award';
 //查询用户信息
 const searchUserUrl = BASE_URL + '/user/list';
-
+//编辑用户密码
+const editUserPasswordUrl = BASE_URL + '/user/pw';
+//验证用户权限
+const validateUserUrl = BASE_URL + '/user/check';
 //抽卡
 //设置抽卡结果
 const setDrawResultUrl = BASE_URL + '/roll/set';
 //查询抽卡结果
 const queryDrawResultUrl = BASE_URL + '/roll/list';
+//导入抽卡结果
+const importDrewResultUrl = BASE_URL + '/roll/add';
 
 
 //玩家端
 //尘转卡
 const transDustToCardUrl = BASE_URL + '/user/card/change';
+//随机尘转卡
+const transDustToCardRandomUrl = BASE_URL + '/user/card/random';
 
 
 
@@ -53,6 +63,7 @@ const urlNeededValidate = [
     searchCardUrl,
     addCardUrl,
     editCardNameUrl,
+    exchangeCardsRareUrl,
 
     addPackageUrl,
     editPackageNameUrl,
@@ -63,8 +74,10 @@ const urlNeededValidate = [
     editDustUrl,
     editAwardUrl,
     setDrawResultUrl,
+    importDrewResultUrl,
 
-    transDustToCardUrl
+    transDustToCardUrl,
+    transDustToCardRandomUrl
 ]
 
 
@@ -76,6 +89,7 @@ export {
     editCardNameUrl,
     searchOwningCardUrl,
     searchEditedRecordUrl,
+    exchangeCardsRareUrl,
     addPackageUrl,
     editPackageNameUrl,
     queryCardPackageListUrl,
@@ -83,10 +97,14 @@ export {
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,
+    editUserPasswordUrl,
+    validateUserUrl,
     searchUserUrl,
     setDrawResultUrl,
     queryDrawResultUrl,
+    importDrewResultUrl,
     transDustToCardUrl,
+    transDustToCardRandomUrl,
 
     urlNeededValidate
 }

@@ -6,18 +6,31 @@ import {
   alertSuccess,
   alertWarning
 } from "../utils/modal";
-import {closeLoading} from '../utils/loading'
-import {urlNeededValidate} from '../config/url'
+import {
+  closeLoading
+} from '../utils/loading'
+import {
+  urlNeededValidate
+} from '../config/url'
 
 //过滤器统一对需要用户权限的URL添加信息
 axios.interceptors.request.use(
   config => {
     if (urlNeededValidate.includes(config.url)) {
-      let configData = Qs.parse(config.data);
       let localUserConfig = JSON.parse(window.localStorage.getItem('info'));
-      configData.name = localUserConfig.u;
-      configData.password = localUserConfig.p;
-      config.data = Qs.stringify(configData);
+      if (config.method === 'post' && config.headers['Content-Type'].includes('application/x-www-form-urlencoded')) {
+        let configData = Qs.parse(config.data);
+        configData.name = localUserConfig.u;
+        configData.password = localUserConfig.p;
+        config.data = Qs.stringify(configData);
+      } else if(config.method === 'post' && config.headers['Content-Type'].includes('application/json')) {
+        config.data.name = localUserConfig.u;
+        config.data.password = localUserConfig.p;
+      } else if (config.method === 'get') {
+        config.params.name = localUserConfig.u;
+        config.params.password = localUserConfig.p;
+      }
+
     }
     return config;
   },
@@ -30,6 +43,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   res => {
     if (res.data.code === 500) {
+      closeLoading();
       if (res.data.data === '权限不足！') {
         alertWarning('请检查所用角色或账号密码');
         window.localStorage.removeItem('info');
@@ -43,8 +57,8 @@ axios.interceptors.response.use(
       if (res.data.data === '修改成功！') {
         alertSuccess(res.data.data)
       }
-      return res
     }
+    return res
   },
   error => {
     if (error.response) {

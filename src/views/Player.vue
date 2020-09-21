@@ -8,7 +8,7 @@
         <p>剩余尘数: {{leftDust}}</p>
       </span>
 
-      <el-button type="text">合成</el-button>
+      <el-button type="text" @click="fuseCard">合成</el-button>
     </div>
     <div class="player-main">
       <el-menu mode="horizontal" default-active="1" @select="handleSelect">
@@ -119,6 +119,7 @@
               </template>
             </el-table-column>
             <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column>
+            <el-table-column :key="'lib-column-' + 5" prop="count" label="拥有数量"></el-table-column>
           </el-table>
           <div class="player-main-content-table-pagination">
             <el-pagination
@@ -180,7 +181,12 @@
                 <div>{{scope.row.isDisabled ? '无效' : '有效'}}</div>
               </template>
             </el-table-column>
-            <el-table-column :key="'draw-record-column-' + 5" prop="rollResult" label="抽卡结果" min-width="200">
+            <el-table-column
+              :key="'draw-record-column-' + 5"
+              prop="rollResult"
+              label="抽卡结果"
+              min-width="200"
+            >
               <template slot-scope="scope">
                 <div
                   class="table-tag-draw"
@@ -274,12 +280,66 @@
         </div>
       </div>
     </div>
+
+    <!-- 尘转dialog -->
+    <el-dialog
+      title="转卡"
+      :visible.sync="isFusingCard"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelFusingCard"
+    >
+      <div class="fusion-wrap">
+        <el-button
+          class="fusion-btn"
+          type="primary"
+          size="mini"
+          @click="fuseCardInner('standard')"
+        >指定卡</el-button>
+        <el-button
+          class="fusion-btn"
+          type="primary"
+          size="mini"
+          @click="fuseCardInner('random')"
+        >随机抽取</el-button>
+      </div>
+      <el-dialog
+        width="20rem"
+        :visible.sync="isFusingCardInner"
+        append-to-body
+        @close="cancelFusingCard"
+      >
+        <el-form label-position="top">
+          <el-form-item label="卡名" size="small" required v-if="fusingCardType === 'standard'">
+            <el-input v-model="fusingCardData.card" type="text" clearable></el-input>
+          </el-form-item>
+          <el-form-item label="卡包" size="small" required v-else-if="fusingCardType === 'random'">
+            <el-select size="mini" v-model="fusingCardData.package" placeholder="请选择卡包" clearable>
+              <el-option
+                v-for="item in cardPackageList"
+                :key="'fuse-card-' + item.packageName + item.packageId"
+                :label="item.packageName"
+                :value="item.packageName"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="isFusingCardInner = false" size="small">取 消</el-button>
+          <el-button type="primary" @click="submitFusingCard" size="small">确 定</el-button>
+        </span>
+      </el-dialog>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { axiosFetch } from "@/utils/fetch.js";
 import common from "./mixins/common";
+import MD5 from "crypto-js/md5";
+import { MessageBox } from "element-ui";
+import { transDustToCardUrl, transDustToCardRandomUrl } from "@/config/url.js";
 export default {
   name: "Player",
   mixins: [common],
@@ -329,22 +389,55 @@ export default {
         user: "",
       },
       drawRecordTableData: [],
+
+      //合成卡片
+      isFusingCard: false,
+      isFusingCardInner: false,
+      fusingCardType: "", //'standard' 'random'
+      fusingCardData: {
+        package: "",
+        card: "",
+      },
     };
   },
-  mounted() {
-    let userInfo = this.userList.find(
-      (element) => element.userName === this.username
-    );
-    if (userInfo) {
-      this.duelPoint = userInfo.duelPoint;
-      this.leftDust = userInfo.dustCount;
-      this.leftAward = userInfo.nonawardCount;
-    }
+  async mounted() {
+    this.$on("preloaded", () => {
+      let userInfo = this.userList.find(
+        (element) => element.userName === this.username
+      );
+      if (userInfo) {
+        this.duelPoint = userInfo.duelPoint;
+        this.leftDust = userInfo.dustCount;
+        this.leftAward = userInfo.nonawardCount;
+      }
+      if (
+        JSON.parse(window.localStorage.getItem("info")).p ===
+        MD5("123456").toString()
+      ) {
+        MessageBox.confirm("正在使用默认密码，是否修改？", "提示", {
+          confirmButtonText: "前往修改",
+          cancelButtonText: "暂不",
+          type: "info",
+        })
+          .then(() => {
+            this.$router.push("/edit_password");
+          })
+          .catch(() => {});
+      }
+    });
+
   },
 
   methods: {
     handleSelect(index) {
       this.showTab = index;
+    },
+    async reloadPage() {
+      this.$openLoading();
+      Object.assign(this.$data, this.$options.data());
+      this.cardPackageList = await this._queryPackageList();
+      this.userList = await this._queryUserList();
+      this.$closeLoading();
     },
 
     //情报页面点击手风琴面板时触发
@@ -356,7 +449,11 @@ export default {
       let packageData = await this._queryCardList(
         undefined,
         undefined,
-        this.cardPackageList[itemIndex]["packageName"]
+        this.cardPackageList[itemIndex]["packageName"],
+        undefined,
+        undefined,
+        undefined,
+        "player_info"
       );
       this.$set(this.packageListContent, itemIndex, packageData);
       this.$closeLoading();
@@ -368,7 +465,11 @@ export default {
       this._queryCardList(
         page,
         this.defaultPageSize,
-        this.cardPackageList[this.activeItemIndex]["packageName"]
+        this.cardPackageList[this.activeItemIndex]["packageName"],
+        undefined,
+        undefined,
+        undefined,
+        "player_info"
       ).then((data) => {
         this.$set(this.packageListContent, this.activeItemIndex, data);
         this.$closeLoading();
@@ -394,7 +495,8 @@ export default {
         this.libQueryAddition.packageName || undefined,
         this.libQueryAddition.cardName || undefined,
         this.libQueryAddition.rare || undefined,
-        this.libQueryAddition.userName || undefined
+        this.libQueryAddition.userName || undefined,
+        "player_lib"
       ).then((data) => {
         this.libPagination.page = data.pagination.page;
         this.libPagination.total = data.pagination.total;
@@ -458,6 +560,42 @@ export default {
       this.drawRecordQueryAddition.user = this.username;
       this.drawRecordQuery();
     },
+
+    fuseCard() {
+      this.isFusingCard = true;
+    },
+    fuseCardInner(type) {
+      this.isFusingCardInner = true;
+      this.fusingCardType = type;
+    },
+
+    cancelFusingCard() {
+      this.fusingCardType = "";
+      this.fusingCardData.package = "";
+      this.fusingCardData.card = "";
+    },
+    submitFusingCard() {
+      this.$openLoading();
+      let options = {
+        url: "",
+        data: {},
+      };
+      if (this.fusingCardType === "standard") {
+        options.url = transDustToCardUrl;
+        options.data.card = this.fusingCardData.card;
+      }
+      if (this.fusingCardType === "random") {
+        options.url = transDustToCardRandomUrl;
+        options.data.package = this.fusingCardData.package;
+      }
+      axiosFetch(options).then((res) => {
+        if (res.data.code === 200) {
+          this.isFusingCardInner = false;
+          this.isFusingCard = false;
+          this.reloadPage();
+        }
+      });
+    },
   },
 };
 </script>
@@ -465,17 +603,19 @@ export default {
 <style scoped>
 #player {
   width: 100%;
-  height: 3rem;
+  height: 100%;
   padding: 1rem;
   box-sizing: border-box;
   font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
 }
 .player-info {
   background: #ffffff;
   border-radius: 0.5rem;
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
-  min-height: 3rem;
+  flex: initial;
   padding: 0 1rem;
   box-sizing: border-box;
   display: flex;
@@ -508,16 +648,21 @@ export default {
   border-radius: 0.5rem;
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
-  height: 80vh;
+  flex: auto;
   min-height: 500px;
   padding: 0 1rem;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.player-main .el-menu {
+  flex: initial;
 }
 
 .player-main-content {
   box-sizing: border-box;
   padding: 1rem;
-  height: 70vh;
+  flex: auto;
   overflow-y: auto;
 }
 
@@ -604,5 +749,20 @@ export default {
 .table-tag-draw .color-ultra-rare {
   background-color: #ffe3a7;
   color: #c5b314;
+}
+
+.el-dialog .fusion-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 5rem;
+  justify-content: space-around;
+}
+
+.fusion-wrap .fusion-btn {
+  margin: 0;
+}
+
+.el-dialog .el-select {
+  width: 100%;
 }
 </style>

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Admin from '../views/Admin.vue'
 import Player from '../views/Player.vue'
+import EditPassword from '../views/EditPassword.vue'
 
 Vue.use(VueRouter)
 
@@ -27,6 +28,14 @@ const routes = [
       requireAuth: true,
     },
     component: Player
+  },
+  {
+    path: '/edit_password',
+    name: 'EditPassword',
+    meta: {
+      requireAuth: true,
+    },
+    component: EditPassword
   }
 ]
 

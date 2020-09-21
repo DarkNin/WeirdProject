@@ -18,12 +18,7 @@
       :close-on-press-escape="false"
       :show-close="false"
     >
-      <el-form
-        label-position="top"
-        :model="userInfo"
-        :rules="formRules"
-        ref="loginForm"
-      >
+      <el-form label-position="top" :model="userInfo" :rules="formRules" ref="loginForm">
         <el-form-item label="用户名" size="small" prop="username">
           <el-input v-model="userInfo.username" type="text" @keyup.enter.native="submitLogin"></el-input>
         </el-form-item>
@@ -44,6 +39,8 @@
 
 <script>
 import MD5 from "crypto-js/md5";
+import { validateUserUrl } from "@/config/url.js";
+import { axiosFetch } from "../utils/fetch";
 export default {
   name: "Home",
   data() {
@@ -85,15 +82,32 @@ export default {
     submitLogin() {
       this.$refs["loginForm"].validate((valid) => {
         if (valid) {
-          if (this.userInfo.isRemember) {
-            let info = JSON.stringify({
-              u: this.userInfo.username,
-              p: MD5(this.userInfo.password).toString(),
-            });
-            window.localStorage.setItem("info", info);
-            window.localStorage.setItem("isAdmin", this.isAdmin);
-          }
-          this.$router.push(this.isAdmin ? "/admin" : "/player");
+          this.$openLoading();
+          let pwd = MD5(this.userInfo.password).toString();
+          axiosFetch({
+            url: validateUserUrl,
+            data: {
+              name: this.userInfo.username,
+              password: pwd,
+            },
+          }).then((res) => {
+            this.$closeLoading();
+            if (res.data.code === 200) {
+              if (res.data.data === "UNLOGIN") {
+                this.$alertInfo("账号或密码错误");
+              } else {
+                if (this.userInfo.isRemember) {
+                  let info = JSON.stringify({
+                    u: this.userInfo.username,
+                    p: pwd,
+                  });
+                  window.localStorage.setItem("info", info);
+                  window.localStorage.setItem("isAdmin", this.isAdmin);
+                }
+                this.$router.push(this.isAdmin ? "/admin" : "/player");
+              }
+            }
+          });
         }
       });
     },
