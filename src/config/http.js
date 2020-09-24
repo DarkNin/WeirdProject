@@ -23,7 +23,7 @@ axios.interceptors.request.use(
         configData.name = localUserConfig.u;
         configData.password = localUserConfig.p;
         config.data = Qs.stringify(configData);
-      } else if(config.method === 'post' && config.headers['Content-Type'].includes('application/json')) {
+      } else if (config.method === 'post' && config.headers['Content-Type'].includes('application/json')) {
         config.data.name = localUserConfig.u;
         config.data.password = localUserConfig.p;
       } else if (config.method === 'get') {
@@ -54,7 +54,7 @@ axios.interceptors.response.use(
         alertWarning(res.data.data);
       }
     } else {
-      if (typeof res.data.data === 'string' && res.data.data.includes('成功')) {
+      if (typeof res.data.data === 'string' && !['ADMIN', 'UNLOGIN', 'NORMAL'].includes(res.data.data)) {
         alertSuccess(res.data.data)
       }
     }

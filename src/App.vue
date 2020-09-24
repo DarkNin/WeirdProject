@@ -27,6 +27,10 @@ body {
     background-position: 512px -512px;
   }
 }
+.el-notification__content {
+  white-space: pre-wrap;
+}
+
 
 </style>
 

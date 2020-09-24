@@ -43,9 +43,11 @@ export default {
   padding: 1rem;
   box-sizing: border-box;
   bottom: 0;
+  pointer-events: none;
 }
 
 .logout-btn-wrap .el-dropdown {
   float: right;
+  pointer-events: auto;
 }
 </style>

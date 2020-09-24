@@ -23,6 +23,33 @@ export default {
             cardPackageList: [],
             defaultPage: 1,
             defaultPageSize: 20,
+            pickerOptions: {
+                shortcuts: [{
+                  text: '最近24小时',
+                  onClick(picker) {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24);
+                    picker.$emit('pick', [start, end]);
+                  }
+                }, {
+                  text: '最近3天',
+                  onClick(picker) {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 3);
+                    picker.$emit('pick', [start, end]);
+                  }
+                }, {
+                  text: '最近1周',
+                  onClick(picker) {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                    picker.$emit('pick', [start, end]);
+                  }
+                }]
+              },
         }
 
     },
@@ -131,7 +158,7 @@ export default {
         },
 
         //查询记录列表
-        _queryDrawRecordList(page, pageSize, _package, user) {
+        _queryDrawRecordList(page, pageSize, _package, user, startTime, endTime) {
             return new Promise((resolve) => {
                 axiosFetch({
                     url: queryDrawResultUrl,
@@ -140,6 +167,8 @@ export default {
                         user: user,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
+                        start: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
+                        end: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined
                     },
                 }).then((res) => {
                     resolve({

@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import {Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag} from 'element-ui'
+import {Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker} from 'element-ui'
 import {openLoading, closeLoading} from './utils/loading'
 import {alertDanger, alertInfo, alertSuccess, alertWarning} from './utils/modal'
 Vue.config.productionTip = false
 
-let compArray = [Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag];
+let compArray = [Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker];
 compArray.forEach(item => {
   Vue.use(item)
 })

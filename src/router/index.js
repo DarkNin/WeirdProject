@@ -1,14 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Admin from '../views/Admin.vue'
-import Player from '../views/Player.vue'
-import EditPassword from '../views/EditPassword.vue'
+const Home = () => import('../views/Home.vue')
+const Admin = () => import('../views/Admin.vue')
+const Player = () => import('../views/Player.vue')
+const EditPassword = () => import('../views/EditPassword.vue')
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'Home',
     component: Home,

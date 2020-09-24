@@ -125,6 +125,7 @@
               clearable
               :trigger-on-focus="false"
               :fetch-suggestions="querySearchCandicateCardList"
+              @keyup.enter.native="libQueryCard"
             ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
@@ -232,6 +233,7 @@
               clearable
               :trigger-on-focus="false"
               :fetch-suggestions="querySearchCandicateCardList"
+              @keyup.enter.native="userQuery"
             ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
@@ -305,7 +307,19 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="recordClearAddition">清除条件</el-button>
+            <el-date-picker
+              size="mini"
+              v-model="drawRecordQueryAddition.dateRange"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :picker-options="pickerOptions"
+              clearable
+            ></el-date-picker>
+          </div>
+          <div class="admin-main-content-addition-item special">
+            <el-button type="info" size="mini" @click="drawRecordClearAddition">清除条件</el-button>
             <el-button type="primary" size="mini" @click="drawRecordQuery">查询</el-button>
           </div>
         </div>
@@ -314,8 +328,11 @@
             <el-table-column :key="'draw-record-column-' + 1" prop="rollPackageName" label="卡包名"></el-table-column>
             <el-table-column :key="'draw-record-column-' + 2" prop="rollUserName" label="抽卡人"></el-table-column>
             <el-table-column :key="'draw-record-column-' + 3" prop="time" label="抽卡时间"></el-table-column>
+            <el-table-column :key="'draw-record-column-' + 4" prop="isDisabled" label="状态">
+              <template slot-scope="scope">{{scope.row.isDisabled ? '无效' : '有效'}}</template>
+            </el-table-column>
             <el-table-column
-              :key="'draw-record-column-' + 4"
+              :key="'draw-record-column-' + 5"
               prop="rollResult"
               label="抽卡结果"
               min-width="200"
@@ -331,12 +348,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column
-              fixed="right"
-              :key="'draw-record-column-' + 5"
-              prop="isDisabled"
-              label="操作"
-            >
+            <el-table-column fixed="right" :key="'draw-record-column-' + 6" label="操作">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -404,6 +416,7 @@
               clearable
               :trigger-on-focus="false"
               :fetch-suggestions="querySearchCandicateCardList"
+              @keyup.enter.native="recordQuery"
             ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
@@ -773,8 +786,8 @@
       <el-form label-position="top">
         <el-form-item label="状态" size="small" required>
           <el-select v-model="drawRecordStatusData.status">
-            <el-option label="可用" :value="0"></el-option>
-            <el-option label="禁用" :value="1"></el-option>
+            <el-option label="有效" :value="0"></el-option>
+            <el-option label="无效" :value="1"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -814,7 +827,7 @@
           <el-input
             type="textarea"
             :rows="4"
-            :placeholder="`请输入抽卡结果列表, 以“|”分割, 例：卡1|卡2\n卡3|卡4`"
+            :placeholder="`请输入抽卡结果列表, 以“|”分割, 例：卡1|卡2|卡3\n卡4|卡5|卡6`"
             v-model="tempDrewCardsInfo"
           ></el-input>
           <div class="stash-card-list">
@@ -823,6 +836,7 @@
               v-if="importingDrewCardsInfo.cards.length !== 0"
             >待添加结果列表</span>
             <div
+              class="stash-import-group"
               v-for="(groupItem, groupIndex) in importingDrewCardsInfo.cards"
               :key="'stash-group-' + groupIndex"
             >
@@ -1022,6 +1036,7 @@ export default {
       drawRecordQueryAddition: {
         package: "",
         user: "",
+        dateRange: null,
       },
       drawRecordTableData: [],
 
@@ -1452,7 +1467,7 @@ export default {
         !!this.editingCardCountData.card
       ) {
         this.$openLoading();
-        axiosFetch({
+        axiosGet({
           url: editCardCountUrl,
           data: {
             card: this.editingCardCountData.card,
@@ -1462,6 +1477,7 @@ export default {
         }).then((res) => {
           if (res.data.code === 200) {
             this.isEditingCardCount = false;
+            this.isAddingUserCard = false;
             this.userQuery(1);
           }
         });
@@ -1513,10 +1529,13 @@ export default {
             options.data.count = this.editingUserInfoItemCount;
             break;
         }
-        axiosFetch(options).then((res) => {
+        axiosFetch(options).then(async (res) => {
           if (res.data.code === 200) {
             this.isEditingUserInfoItem = false;
-            this.reloadPage();
+            this.userList = await this._queryUserList();
+            this.setUserInfo(this.userQueryAddition.target);
+            this.$closeLoading();
+            //this.reloadPage();
           }
         });
       }
@@ -1538,7 +1557,13 @@ export default {
         currPage || this.defaultPage,
         this.defaultPageSize,
         this.drawRecordQueryAddition.packageName || undefined,
-        this.drawRecordQueryAddition.user || undefined
+        this.drawRecordQueryAddition.user || undefined,
+        this.drawRecordQueryAddition.dateRange
+          ? this.drawRecordQueryAddition.dateRange[0]
+          : undefined,
+        this.drawRecordQueryAddition.dateRange
+          ? this.drawRecordQueryAddition.dateRange[1]
+          : undefined
       ).then((data) => {
         this.drawRecordPagination.page = data.pagination.page;
         this.drawRecordPagination.total = data.pagination.total;
@@ -1566,10 +1591,12 @@ export default {
           status: this.drawRecordStatusData.status,
           id: this.drawRecordStatusData.id,
         },
-      }).then((res) => {
+      }).then(async (res) => {
         if (res.data.code === 200) {
           this.isSettingDrawRecord = false;
-          this.reloadPage();
+          this.drawRecordQuery(1);
+          this.userList = await this._queryUserList();
+          //this.reloadPage();
         }
       });
     },
@@ -1608,10 +1635,12 @@ export default {
             target: this.importingDrewCardsInfo.target,
             cards: this.importingDrewCardsInfo.cards,
           },
-        }).then((res) => {
+        }).then(async (res) => {
           if (res.data.code === 200) {
             this.isImportingDrewCards = false;
-            this.reloadPage();
+            this.drawRecordQuery(1);
+            this.userList = await this._queryUserList();
+            //this.reloadPage();
           }
         });
       }
@@ -1814,5 +1843,13 @@ export default {
 
 .stash-card-list .el-tag {
   margin-right: 5px;
+}
+
+.stash-import-group {
+  box-sizing: border-box;
+  padding: 0 5px;
+  border: 1px solid #eeeeee;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
 </style>

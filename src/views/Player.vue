@@ -103,10 +103,11 @@
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
-            <el-input size="mini" v-model="libQueryAddition.cardName" placeholder="请填写卡名" clearable></el-input>
+            <el-input size="mini" v-model="libQueryAddition.cardName" placeholder="请填写卡名" clearable @keyup.enter.native="libQueryCard"></el-input>
           </div>
-          <div class="player-main-content-addition-item">
+          <div class="player-main-content-addition-item special">
             <el-button type="info" size="mini" @click="libClearAddition">清除条件</el-button>
+            <el-button type="primary" size="mini" @click="setToMineInLib">查询自己</el-button>
             <el-button type="primary" size="mini" @click="libQueryCard">查询</el-button>
           </div>
         </div>
@@ -168,8 +169,20 @@
             </el-select>
           </div>
           <div class="player-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="recordClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="setToMine">查询自己</el-button>
+            <el-date-picker
+              size="mini"
+              v-model="drawRecordQueryAddition.dateRange"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :picker-options="pickerOptions"
+              clearable
+            ></el-date-picker>
+          </div>
+          <div class="player-main-content-addition-item special">
+            <el-button type="info" size="mini" @click="drawRecordClearAddition">清除条件</el-button>
+            <el-button type="primary" size="mini" @click="setToMineInRecord">查询自己</el-button>
             <el-button type="primary" size="mini" @click="drawRecordQuery">查询</el-button>
           </div>
         </div>
@@ -251,6 +264,7 @@
               v-model="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
+              @keyup.enter.native="recordQuery"
             ></el-input>
           </div>
           <div class="player-main-content-addition-item">
@@ -391,6 +405,7 @@ export default {
       drawRecordQueryAddition: {
         package: "",
         user: "",
+        dateRange: null,
       },
       drawRecordTableData: [],
 
@@ -516,6 +531,11 @@ export default {
       });
     },
 
+    setToMineInLib() {
+      this.libQueryAddition.userName = this.username;
+      this.libQueryCard();
+    },
+
     //记录页面 清除条件
     recordClearAddition() {
       Object.assign(
@@ -559,7 +579,13 @@ export default {
         currPage || this.defaultPage,
         this.defaultPageSize,
         this.drawRecordQueryAddition.packageName || undefined,
-        this.drawRecordQueryAddition.user || undefined
+        this.drawRecordQueryAddition.user || undefined,
+        this.drawRecordQueryAddition.dateRange
+          ? this.drawRecordQueryAddition.dateRange[0]
+          : undefined,
+        this.drawRecordQueryAddition.dateRange
+          ? this.drawRecordQueryAddition.dateRange[1]
+          : undefined
       ).then((data) => {
         this.drawRecordPagination.page = data.pagination.page;
         this.drawRecordPagination.total = data.pagination.total;
@@ -567,7 +593,7 @@ export default {
         this.$closeLoading();
       });
     },
-    setToMine() {
+    setToMineInRecord() {
       this.drawRecordQueryAddition.user = this.username;
       this.drawRecordQuery();
     },
@@ -586,6 +612,7 @@ export default {
       this.fusingCardData.card = "";
     },
     submitFusingCard() {
+      if (!this.fusingCardData.card) return;
       MessageBox.confirm("请确认是否合成", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
