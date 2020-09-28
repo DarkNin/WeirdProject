@@ -1,11 +1,11 @@
 <template>
   <div id="player">
     <div class="player-info">
-      <p class="player-info-tips">欢迎来到诡异云，{{username}}。</p>
+      <p class="player-info-tips">欢迎来到诡异云，{{ username }}。</p>
       <span class="player-info-item">
-        <p>DP: {{duelPoint}}</p>
-        <p>月见黑: {{leftAward}}</p>
-        <p>剩余尘数: {{leftDust}}</p>
+        <p>DP: {{ duelPoint }}</p>
+        <p>月见黑: {{ leftAward }}</p>
+        <p>剩余尘数: {{ leftDust }}</p>
       </span>
 
       <el-button type="text" @click="fuseCard">合成</el-button>
@@ -18,7 +18,11 @@
         <el-menu-item index="4">修改记录</el-menu-item>
       </el-menu>
       <div class="player-main-content" v-if="showTab === '1'">
-        <el-collapse v-model="activeItemIndex" @change="handleItemChange" accordion>
+        <el-collapse
+          v-model="activeItemIndex"
+          @change="handleItemChange"
+          accordion
+        >
           <el-collapse-item
             v-for="(item, index) in cardPackageList"
             :key="index"
@@ -27,7 +31,11 @@
           >
             <div class="collapse-table-wrap">
               <el-table
-                :data="packageListContent[index] ? packageListContent[index]['data'] : []"
+                :data="
+                  packageListContent[index]
+                    ? packageListContent[index]['data']
+                    : []
+                "
                 size="mini"
                 height="48vh"
               >
@@ -42,7 +50,42 @@
                   label="稀有度"
                 >
                   <template slot-scope="scope">
-                    <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                    <div
+                      class="table-tag"
+                      :class="_getRareColor(scope.row.rare)"
+                    >
+                      {{ scope.row.rare }}
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  :key="'package-' + item.packageName + '-3'"
+                  prop="desc"
+                  label="预览"
+                  width="54"
+                >
+                  <template slot-scope="scope">
+                    <el-button
+                      class="table-preview-btn"
+                      icon="el-icon-caret-right"
+                      size="mini"
+                      @mouseenter.native="
+                        _showCardDescHover(
+                          $event,
+                          scope.row.desc,
+                          scope.row.picId
+                        )
+                      "
+                      @click="
+                        _showCardDescClick(
+                          $event,
+                          scope.row.desc,
+                          scope.row.picId
+                        )
+                      "
+                      @mouseleave.native="_closeCardDesc"
+                      circle
+                    ></el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -51,9 +94,21 @@
                   small
                   background
                   layout="prev, pager, next"
-                  :total="packageListContent[index] ? packageListContent[index]['pagination'].total : 0"
-                  :page-size="packageListContent[index] ? packageListContent[index]['pagination'].pageSize : defaultPageSize"
-                  :current-page="packageListContent[index] ? packageListContent[index]['pagination'].page : 1"
+                  :total="
+                    packageListContent[index]
+                      ? packageListContent[index]['pagination'].total
+                      : 0
+                  "
+                  :page-size="
+                    packageListContent[index]
+                      ? packageListContent[index]['pagination'].pageSize
+                      : defaultPageSize
+                  "
+                  :current-page="
+                    packageListContent[index]
+                      ? packageListContent[index]['pagination'].page
+                      : 1
+                  "
                   @current-change="pageChange"
                 ></el-pagination>
               </div>
@@ -79,7 +134,12 @@
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
-            <el-select size="mini" v-model="libQueryAddition.rare" placeholder="请选择稀有度" clearable>
+            <el-select
+              size="mini"
+              v-model="libQueryAddition.rare"
+              placeholder="请选择稀有度"
+              clearable
+            >
               <el-option label="N" value="N"></el-option>
               <el-option label="R" value="R"></el-option>
               <el-option label="SR" value="SR"></el-option>
@@ -103,25 +163,81 @@
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
-            <el-input size="mini" v-model="libQueryAddition.cardName" placeholder="请填写卡名" clearable @keyup.enter.native="libQueryCard"></el-input>
+            <el-input
+              size="mini"
+              v-model="libQueryAddition.cardName"
+              placeholder="请填写卡名"
+              clearable
+              @keyup.enter.native="libQueryCard"
+            ></el-input>
           </div>
           <div class="player-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="libClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="setToMineInLib">查询自己</el-button>
-            <el-button type="primary" size="mini" @click="libQueryCard">查询</el-button>
+            <el-button type="info" size="mini" @click="libClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="setToMineInLib"
+              >查询自己</el-button
+            >
+            <el-button type="primary" size="mini" @click="libQueryCard"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="player-main-content-table-wrap">
           <el-table :data="libTableData" size="mini" height="48vh">
-            <el-table-column :key="'lib-column-' + 1" prop="cardName" label="卡名"></el-table-column>
-            <el-table-column :key="'lib-column-' + 2" prop="packageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'lib-column-' + 3" prop="rare" label="稀有度">
+            <el-table-column
+              :key="'lib-column-' + 1"
+              prop="cardName"
+              label="卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 2"
+              prop="packageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 3"
+              prop="rare"
+              label="稀有度"
+            >
               <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                  {{ scope.row.rare }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column>
-            <el-table-column :key="'lib-column-' + 5" prop="count" label="拥有数量"></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 4"
+              prop="userName"
+              label="拥有者"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 5"
+              prop="count"
+              label="拥有数量"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 6"
+              prop="desc"
+              label="预览"
+              width="54"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  class="table-preview-btn"
+                  icon="el-icon-caret-right"
+                  size="mini"
+                  @mouseenter.native="
+                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                  "
+                  @click="
+                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                  "
+                  @mouseleave.native="_closeCardDesc"
+                  circle
+                ></el-button>
+              </template>
+            </el-table-column>
           </el-table>
           <div class="player-main-content-table-pagination">
             <el-pagination
@@ -181,19 +297,51 @@
             ></el-date-picker>
           </div>
           <div class="player-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="drawRecordClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="setToMineInRecord">查询自己</el-button>
-            <el-button type="primary" size="mini" @click="drawRecordQuery">查询</el-button>
+            <el-button type="info" size="mini" @click="drawRecordClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="setToMineInRecord"
+              >查询自己</el-button
+            >
+            <el-button type="primary" size="mini" @click="drawRecordQuery"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="player-main-content-table-wrap">
           <el-table :data="drawRecordTableData" size="mini" height="48vh">
-            <el-table-column :key="'draw-record-column-' + 1" prop="rollPackageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'draw-record-column-' + 2" prop="rollUserName" label="抽卡人"></el-table-column>
-            <el-table-column :key="'draw-record-column-' + 3" prop="time" label="抽卡时间"></el-table-column>
-            <el-table-column :key="'draw-record-column-' + 4" prop="isDisabled" label="是否有效">
+            <el-table-column :key="'draw-record-column-' + 0" type="expand">
               <template slot-scope="scope">
-                <div>{{scope.row.isDisabled ? '无效' : '有效'}}</div>
+                <div class="table-expand-desc-box"
+                  v-for="(item, index) in scope.row.rollResult"
+                  :key="'draw-result-desc-' + index"
+                >
+                 {{ item.desc }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 1"
+              prop="rollPackageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 2"
+              prop="rollUserName"
+              label="抽卡人"
+            ></el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 3"
+              prop="time"
+              label="抽卡时间"
+            ></el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 4"
+              prop="isDisabled"
+              label="是否有效"
+            >
+              <template slot-scope="scope">
+                <div>{{ scope.row.isDisabled ? "无效" : "有效" }}</div>
               </template>
             </el-table-column>
             <el-table-column
@@ -208,8 +356,12 @@
                   v-for="(item, index) in scope.row.rollResult"
                   :key="'draw-result-' + index"
                 >
-                  <span class="draw-result-rare" :class="_getRareColor(item.rare)">{{item.rare}}</span>
-                  <span class="draw-result-name">{{item.cardName}}</span>
+                  <span
+                    class="draw-result-rare"
+                    :class="_getRareColor(item.rare)"
+                    >{{ item.rare }}</span
+                  >
+                  <span class="draw-result-name">{{ item.cardName }}</span>
                 </div>
               </template>
             </el-table-column>
@@ -268,21 +420,57 @@
             ></el-input>
           </div>
           <div class="player-main-content-addition-item">
-            <el-button type="info" size="mini" @click="recordClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="recordQuery">查询</el-button>
+            <el-button type="info" size="mini" @click="recordClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="recordQuery"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="player-main-content-table-wrap">
           <el-table :data="recordTableData" size="mini" height="48vh">
-            <el-table-column :key="'record-column-' + 1" prop="packageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'record-column-' + 2" prop="oldName" label="旧卡名"></el-table-column>
-            <el-table-column :key="'record-column-' + 3" prop="newName" label="新卡名"></el-table-column>
-            <el-table-column :key="'record-column-' + 4" prop="rare" label="稀有度">
+            <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                <div class="table-expand-desc-box">
+                 {{ scope.row.oldDesc }}
+                </div>
+                <div class="table-expand-desc-box">
+                 {{ scope.row.newDesc }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column :key="'record-column-' + 5" prop="createdTime" label="添加时间"></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 1"
+              prop="packageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 2"
+              prop="oldName"
+              label="旧卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 3"
+              prop="newName"
+              label="新卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 4"
+              prop="rare"
+              label="稀有度"
+            >
+              <template slot-scope="scope">
+                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                  {{ scope.row.rare }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'record-column-' + 5"
+              prop="createdTime"
+              label="添加时间"
+            ></el-table-column>
           </el-table>
           <div class="player-main-content-table-pagination">
             <el-pagination
@@ -314,13 +502,15 @@
           type="primary"
           size="mini"
           @click="fuseCardInner('standard')"
-        >指定卡</el-button>
+          >指定卡</el-button
+        >
         <el-button
           class="fusion-btn"
           type="primary"
           size="mini"
           @click="fuseCardInner('random')"
-        >随机抽取</el-button>
+          >随机抽取</el-button
+        >
       </div>
       <el-dialog
         width="20rem"
@@ -329,11 +519,30 @@
         @close="cancelFusingCard"
       >
         <el-form label-position="top">
-          <el-form-item label="卡名" size="small" required v-if="fusingCardType === 'standard'">
-            <el-input v-model="fusingCardData.card" type="text" clearable></el-input>
+          <el-form-item
+            label="卡名"
+            size="small"
+            required
+            v-if="fusingCardType === 'standard'"
+          >
+            <el-input
+              v-model="fusingCardData.card"
+              type="text"
+              clearable
+            ></el-input>
           </el-form-item>
-          <el-form-item label="卡包" size="small" required v-else-if="fusingCardType === 'random'">
-            <el-select size="mini" v-model="fusingCardData.package" placeholder="请选择卡包" clearable>
+          <el-form-item
+            label="卡包"
+            size="small"
+            required
+            v-else-if="fusingCardType === 'random'"
+          >
+            <el-select
+              size="mini"
+              v-model="fusingCardData.package"
+              placeholder="请选择卡包"
+              clearable
+            >
               <el-option
                 v-for="item in cardPackageList"
                 :key="'fuse-card-' + item.packageName + item.packageId"
@@ -344,11 +553,24 @@
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="isFusingCardInner = false" size="small">取 消</el-button>
-          <el-button type="primary" @click="submitFusingCard" size="small">确 定</el-button>
+          <el-button @click="isFusingCardInner = false" size="small"
+            >取 消</el-button
+          >
+          <el-button type="primary" @click="submitFusingCard" size="small"
+            >确 定</el-button
+          >
         </span>
       </el-dialog>
     </el-dialog>
+    
+    <card-desc
+      :visible.sync="isShowingCardDesc"
+      :posX="cardDesc.x"
+      :posY="cardDesc.y"
+      :picId="cardDesc.picId"
+      :desc="cardDesc.desc"
+      :is-show-on-mobile="_checkIfMobile()"
+    ></card-desc>
   </div>
 </template>
 
@@ -358,9 +580,13 @@ import common from "./mixins/common";
 import MD5 from "crypto-js/md5";
 import { MessageBox } from "element-ui";
 import { transDustToCardUrl, transDustToCardRandomUrl } from "@/config/url.js";
+import CardDesc from "@/components/CardDesc";
 export default {
   name: "Player",
   mixins: [common],
+  components: {
+    CardDesc,
+  },
   data() {
     return {
       leftDust: 0,
@@ -612,7 +838,8 @@ export default {
       this.fusingCardData.card = "";
     },
     submitFusingCard() {
-      if (!this.fusingCardData.card) return;
+      if (this.fusingCardType === 'standard' && !this.fusingCardData.card) return;
+      if (this.fusingCardType === 'random' && !this.fusingCardData.package) return;
       MessageBox.confirm("请确认是否合成", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
@@ -810,5 +1037,18 @@ export default {
 
 .el-dialog .el-select {
   width: 100%;
+}
+
+
+.table-preview-btn {
+  font-size: 1.2rem;
+  padding: 2px;
+  border-radius: 5px;
+  color: #66b1ff;
+}
+
+.table-expand-desc-box {
+  white-space: pre-wrap;
+  margin-bottom: 10px;
 }
 </style>

@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <router-view/>
-    <account-btn v-if="$route.path !== '/'"/>
+    <router-view />
+    <account-btn v-if="$route.path !== '/'" />
   </div>
 </template>
 <script>
 import AccountBtn from "@/components/AccountBtn.vue";
 export default {
   components: {
-    AccountBtn
-  }
-}
+    AccountBtn,
+  },
+};
 </script>
 <style>
 body {
@@ -30,8 +30,22 @@ body {
 .el-notification__content {
   white-space: pre-wrap;
 }
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
 
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  /*-webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);*/
+  background: rgba(225, 225, 225, 0.93);
+}
 
+*::-webkit-scrollbar-track {
+  /*-webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);*/
+  border-radius: 10px;
+  background: rgba(246, 246, 246, 0.59);
+}
 </style>
 
 <style scoped>
@@ -44,5 +58,4 @@ body {
   margin: 0 auto;
   position: relative;
 }
-
 </style>

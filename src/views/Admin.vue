@@ -1,23 +1,37 @@
 <template>
   <div id="admin">
     <div class="admin-info">
-      <p class="admin-info-tips">欢迎来到诡异云，{{username}}。</p>
-      <el-button type="text" @click="addPackage()" v-if="showTab === '1'">新增卡包</el-button>
-      <el-button type="text" @click="exchangeCard()" v-if="showTab === '1'">交换稀有度</el-button>
-      <el-button type="text" @click="addUser()" v-if="showTab === '3'">新增玩家</el-button>
-      <el-button type="text" @click="importDrewCards()" v-if="showTab === '4'">导入记录</el-button>
+      <p class="admin-info-tips">欢迎来到诡异云，{{ username }}。</p>
+      <el-button type="text" @click="addPackage()" v-if="showTab === '1'"
+        >新增卡包</el-button
+      >
+      <el-button type="text" @click="exchangeCard()" v-if="showTab === '1'"
+        >交换稀有度</el-button
+      >
+      <el-button type="text" @click="addUser()" v-if="showTab === '4'"
+        >新增玩家</el-button
+      >
+      <el-button type="text" @click="importDrewCards()" v-if="showTab === '5'"
+        >导入记录</el-button
+      >
     </div>
 
     <div class="admin-main">
       <el-menu mode="horizontal" default-active="1" @select="handleSelect">
         <el-menu-item index="1">卡包</el-menu-item>
         <el-menu-item index="2">检索</el-menu-item>
-        <el-menu-item index="3">玩家</el-menu-item>
-        <el-menu-item index="4">抽卡记录</el-menu-item>
-        <el-menu-item index="5">修改记录</el-menu-item>
+        <el-menu-item index="3">卡池</el-menu-item>
+        <el-menu-item index="4">玩家</el-menu-item>
+        <el-menu-item index="5">抽卡记录</el-menu-item>
+        <el-menu-item index="6">修改记录</el-menu-item>
       </el-menu>
+      <!-- 卡包查询 -->
       <div class="admin-main-content" v-if="showTab === '1'">
-        <el-collapse v-model="activeItemIndex" @change="handleItemChange" accordion>
+        <el-collapse
+          v-model="activeItemIndex"
+          @change="handleItemChange"
+          accordion
+        >
           <el-collapse-item
             v-for="(item, index) in cardPackageList"
             :key="index"
@@ -26,12 +40,31 @@
           >
             <div class="collapse-table-wrap">
               <div class="collapse-table-operation">
-                <el-button type="primary" size="mini" @click="editPackage(item.packageName)">编辑卡包</el-button>
-                <el-button type="primary" size="mini" @click="addCard(item.packageName)">新增卡牌</el-button>
-                <el-button type="primary" size="mini" @click="batchAddCard(item.packageName)">批量新增</el-button>
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="editPackage(item.packageName)"
+                  >编辑卡包</el-button
+                >
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="addCard(item.packageName)"
+                  >新增卡牌</el-button
+                >
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="batchAddCard(item.packageName)"
+                  >批量新增</el-button
+                >
               </div>
               <el-table
-                :data="packageListContent[index] ? packageListContent[index]['data'] : []"
+                :data="
+                  packageListContent[index]
+                    ? packageListContent[index]['data']
+                    : []
+                "
                 size="mini"
                 height="44vh"
               >
@@ -47,16 +80,56 @@
                   label="稀有度"
                 >
                   <template slot-scope="scope">
-                    <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                    <div
+                      class="table-tag"
+                      :class="_getRareColor(scope.row.rare)"
+                    >
+                      {{ scope.row.rare }}
+                    </div>
                   </template>
                 </el-table-column>
                 <el-table-column
                   :key="'package-' + item.packageName + '-3'"
+                  prop="desc"
+                  label="预览"
+                  width="54"
+                >
+                  <template slot-scope="scope">
+                    <el-button
+                      class="table-preview-btn"
+                      icon="el-icon-caret-right"
+                      size="mini"
+                      @mouseenter.native="
+                        _showCardDescHover(
+                          $event,
+                          scope.row.desc,
+                          scope.row.picId
+                        )
+                      "
+                      @click="
+                        _showCardDescClick(
+                          $event,
+                          scope.row.desc,
+                          scope.row.picId
+                        )
+                      "
+                      @mouseleave.native="_closeCardDesc"
+                      circle
+                    ></el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  :key="'package-' + item.packageName + '-4'"
                   fixed="right"
                   width="80"
                 >
                   <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="editCard(scope.row.cardName)">编辑</el-button>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      @click="editCard(scope.row.cardName)"
+                      >编辑</el-button
+                    >
                   </template>
                 </el-table-column>
               </el-table>
@@ -65,9 +138,21 @@
                   small
                   background
                   layout="prev, pager, next"
-                  :total="packageListContent[index] ? packageListContent[index]['pagination'].total : 0"
-                  :page-size="packageListContent[index] ? packageListContent[index]['pagination'].pageSize : defaultPageSize"
-                  :current-page="packageListContent[index] ? packageListContent[index]['pagination'].page : 1"
+                  :total="
+                    packageListContent[index]
+                      ? packageListContent[index]['pagination'].total
+                      : 0
+                  "
+                  :page-size="
+                    packageListContent[index]
+                      ? packageListContent[index]['pagination'].pageSize
+                      : defaultPageSize
+                  "
+                  :current-page="
+                    packageListContent[index]
+                      ? packageListContent[index]['pagination'].page
+                      : 1
+                  "
                   @current-change="pageChange"
                 ></el-pagination>
               </div>
@@ -75,6 +160,7 @@
           </el-collapse-item>
         </el-collapse>
       </div>
+      <!-- 全卡检索 -->
       <div class="admin-main-content" v-else-if="showTab === '2'">
         <div class="admin-main-content-addition">
           <div class="admin-main-content-addition-item">
@@ -93,7 +179,12 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-select size="mini" v-model="libQueryAddition.rare" placeholder="请选择稀有度" clearable>
+            <el-select
+              size="mini"
+              v-model="libQueryAddition.rare"
+              placeholder="请选择稀有度"
+              clearable
+            >
               <el-option label="N" value="N"></el-option>
               <el-option label="R" value="R"></el-option>
               <el-option label="SR" value="SR"></el-option>
@@ -129,23 +220,68 @@
             ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-button type="info" size="mini" @click="libClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="libQueryCard">查询</el-button>
+            <el-button type="info" size="mini" @click="libClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="libQueryCard"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="admin-main-content-table-wrap">
           <el-table :data="libTableData" size="mini" height="48vh">
-            <el-table-column :key="'lib-column-' + 1" prop="cardName" label="卡名"></el-table-column>
-            <el-table-column :key="'lib-column-' + 2" prop="packageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'lib-column-' + 3" prop="rare" label="稀有度">
+            <el-table-column
+              :key="'lib-column-' + 1"
+              prop="cardName"
+              label="卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 2"
+              prop="packageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 3"
+              prop="rare"
+              label="稀有度"
+            >
               <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                  {{ scope.row.rare }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 4"
+              prop="desc"
+              label="预览"
+              width="54"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  class="table-preview-btn"
+                  icon="el-icon-caret-right"
+                  size="mini"
+                  @mouseenter.native="
+                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                  "
+                  @click="
+                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                  "
+                  @mouseleave.native="_closeCardDesc"
+                  circle
+                ></el-button>
               </template>
             </el-table-column>
 
-            <el-table-column :key="'lib-column-' + 4" fixed="right" width="80">
+            <el-table-column :key="'lib-column-' + 5" fixed="right" width="80">
               <template slot-scope="scope">
-                <el-button size="mini" type="text" @click="editCard(scope.row.cardName)">编辑</el-button>
+                <el-button
+                  size="mini"
+                  type="text"
+                  @click="editCard(scope.row.cardName)"
+                  >编辑</el-button
+                >
               </template>
             </el-table-column>
             <!-- <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column> -->
@@ -163,7 +299,155 @@
           </div>
         </div>
       </div>
+      <!-- 玩家卡库 -->
       <div class="admin-main-content" v-else-if="showTab === '3'">
+        <div class="admin-main-content-addition">
+          <div class="admin-main-content-addition-item">
+            <el-select
+              size="mini"
+              v-model="playerLibQueryAddition.packageName"
+              placeholder="请选择卡包"
+              clearable
+            >
+              <el-option
+                v-for="item in cardPackageList"
+                :key="'player-lib' + item.packageName + item.packageId"
+                :label="item.packageName"
+                :value="item.packageName"
+              ></el-option>
+            </el-select>
+          </div>
+          <div class="admin-main-content-addition-item">
+            <el-select
+              size="mini"
+              v-model="playerLibQueryAddition.rare"
+              placeholder="请选择稀有度"
+              clearable
+            >
+              <el-option label="N" value="N"></el-option>
+              <el-option label="R" value="R"></el-option>
+              <el-option label="SR" value="SR"></el-option>
+              <el-option label="UR" value="UR"></el-option>
+              <el-option label="HR" value="HR"></el-option>
+            </el-select>
+          </div>
+          <div class="admin-main-content-addition-item">
+            <el-select
+              size="mini"
+              v-model="playerLibQueryAddition.userName"
+              placeholder="请选择玩家"
+              clearable
+            >
+              <el-option
+                v-for="item in userList"
+                :key="'player-lib' + item.userName + item.userId"
+                :label="item.userName"
+                :value="item.userName"
+              ></el-option>
+            </el-select>
+          </div>
+          <div class="admin-main-content-addition-item">
+            <el-input
+              size="mini"
+              v-model="playerLibQueryAddition.cardName"
+              placeholder="请填写卡名"
+              clearable
+              @keyup.enter.native="playerLibQueryCard"
+            ></el-input>
+          </div>
+          <div class="admin-main-content-addition-item special">
+            <el-button type="info" size="mini" @click="playerLibClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="playerLibQueryCard"
+              >查询</el-button
+            >
+          </div>
+        </div>
+        <div class="admin-main-content-table-wrap">
+          <el-table :data="playerLibTableData" size="mini" height="48vh">
+            <el-table-column
+              :key="'player-lib-column-' + 1"
+              prop="cardName"
+              label="卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 2"
+              prop="packageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 3"
+              prop="rare"
+              label="稀有度"
+            >
+              <template slot-scope="scope">
+                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                  {{ scope.row.rare }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 4"
+              prop="userName"
+              label="拥有者"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 5"
+              prop="count"
+              label="拥有数量"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 6"
+              prop="desc"
+              label="预览"
+              width="54"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  class="table-preview-btn"
+                  icon="el-icon-caret-right"
+                  size="mini"
+                  @mouseenter.native="
+                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                  "
+                  @click="
+                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                  "
+                  @mouseleave.native="_closeCardDesc"
+                  circle
+                ></el-button>
+              </template>
+            </el-table-column>
+            
+            <el-table-column :key="'player-lib-column-' + 7" fixed="right" width="80">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  type="text"
+                  @click="editCardCount(scope.row.cardName, scope.row.userName)"
+                  >编辑数量</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="admin-main-content-table-pagination">
+            <el-pagination
+              small
+              background
+              layout="prev, pager, next"
+              :total="playerLibPagination.total"
+              :page-size="playerLibPagination.pageSize"
+              :current-page="playerLibPagination.page"
+              @current-change="playerLibQueryCard"
+            ></el-pagination>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- 玩家操作 -->
+      <div class="admin-main-content" v-else-if="showTab === '4'">
         <div class="admin-main-content-addition seperate">
           <div class="admin-main-content-addition-special">
             <el-select
@@ -181,25 +465,34 @@
             </el-select>
           </div>
           <div class="special-user-add" v-if="userQueryAddition.target">
-            <el-button type="primary" size="mini" @click="addUserCard">添加卡牌</el-button>
+            <el-button type="primary" size="mini" @click="addUserCard"
+              >添加卡牌</el-button
+            >
           </div>
           <div class="special-user-info" v-if="userQueryAddition.target">
             <span>
               DP:
               <!-- <el-button type="text" @click="editUserInfo('DP')">{{userSelectedInfo.duelPoint}}</el-button> -->
-              {{userSelectedInfo.duelPoint}}
+              {{ userSelectedInfo.duelPoint }}
             </span>
             <span>
               月见黑:
-              <el-button type="text" @click="editUserInfo('月见黑')">{{userSelectedInfo.award}}</el-button>
+              <el-button type="text" @click="editUserInfo('月见黑')">{{
+                userSelectedInfo.award
+              }}</el-button>
             </span>
             <span>
               剩余尘数:
-              <el-button type="text" @click="editUserInfo('剩余尘数')">{{userSelectedInfo.dust}}</el-button>
+              <el-button type="text" @click="editUserInfo('剩余尘数')">{{
+                userSelectedInfo.dust
+              }}</el-button>
             </span>
           </div>
         </div>
-        <div class="admin-main-content-addition" v-if="userQueryAddition.target">
+        <div
+          class="admin-main-content-addition"
+          v-if="userQueryAddition.target"
+        >
           <div class="admin-main-content-addition-item">
             <el-select
               size="mini"
@@ -216,7 +509,12 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-select size="mini" v-model="userQueryAddition.rare" placeholder="请选择稀有度" clearable>
+            <el-select
+              size="mini"
+              v-model="userQueryAddition.rare"
+              placeholder="请选择稀有度"
+              clearable
+            >
               <el-option label="N" value="N"></el-option>
               <el-option label="R" value="R"></el-option>
               <el-option label="SR" value="SR"></el-option>
@@ -237,27 +535,73 @@
             ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-button type="info" size="mini" @click="userClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="userQuery">查询</el-button>
+            <el-button type="info" size="mini" @click="userClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="userQuery"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="admin-main-content-table-wrap">
           <el-table :data="userTableData" size="mini" height="48vh">
-            <el-table-column :key="'user-column-' + 1" prop="packageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'user-column-' + 2" prop="cardName" label="卡名"></el-table-column>
-            <el-table-column :key="'user-column-' + 3" prop="rare" label="稀有度">
+            <el-table-column
+              :key="'user-column-' + 1"
+              prop="packageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'user-column-' + 2"
+              prop="cardName"
+              label="卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'user-column-' + 3"
+              prop="rare"
+              label="稀有度"
+            >
               <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                  {{ scope.row.rare }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column :key="'user-column-' + 4" prop="count" label="持有数量"></el-table-column>
-            <el-table-column :key="'user-column-' + 5" fixed="right" width="80">
+            <el-table-column
+              :key="'user-column-' + 4"
+              prop="count"
+              label="持有数量"
+            ></el-table-column>
+
+            <el-table-column
+              :key="'user-column-' + 5"
+              prop="desc"
+              label="预览"
+              width="54"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  class="table-preview-btn"
+                  icon="el-icon-caret-right"
+                  size="mini"
+                  @mouseenter.native="
+                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                  "
+                  @click="
+                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                  "
+                  @mouseleave.native="_closeCardDesc"
+                  circle
+                ></el-button>
+              </template>
+            </el-table-column>
+            <el-table-column :key="'user-column-' + 6" fixed="right" width="80">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
                   type="text"
                   @click="editCardCount(scope.row.cardName, scope.row.userName)"
-                >编辑数量</el-button>
+                  >编辑数量</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -274,7 +618,8 @@
           </div>
         </div>
       </div>
-      <div class="admin-main-content" v-else-if="showTab === '4'">
+      <!-- 抽卡记录 -->
+      <div class="admin-main-content" v-else-if="showTab === '5'">
         <div class="admin-main-content-addition">
           <div class="admin-main-content-addition-item">
             <el-select
@@ -319,17 +664,49 @@
             ></el-date-picker>
           </div>
           <div class="admin-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="drawRecordClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="drawRecordQuery">查询</el-button>
+            <el-button type="info" size="mini" @click="drawRecordClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="drawRecordQuery"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="admin-main-content-table-wrap">
           <el-table :data="drawRecordTableData" size="mini" height="48vh">
-            <el-table-column :key="'draw-record-column-' + 1" prop="rollPackageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'draw-record-column-' + 2" prop="rollUserName" label="抽卡人"></el-table-column>
-            <el-table-column :key="'draw-record-column-' + 3" prop="time" label="抽卡时间"></el-table-column>
-            <el-table-column :key="'draw-record-column-' + 4" prop="isDisabled" label="状态">
-              <template slot-scope="scope">{{scope.row.isDisabled ? '无效' : '有效'}}</template>
+            <el-table-column :key="'draw-record-column-' + 0" type="expand">
+              <template slot-scope="scope">
+                <div class="table-expand-desc-box"
+                  v-for="(item, index) in scope.row.rollResult"
+                  :key="'draw-result-desc-' + index"
+                >
+                 {{ item.desc }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 1"
+              prop="rollPackageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 2"
+              prop="rollUserName"
+              label="抽卡人"
+            ></el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 3"
+              prop="time"
+              label="抽卡时间"
+            ></el-table-column>
+            <el-table-column
+              :key="'draw-record-column-' + 4"
+              prop="isDisabled"
+              label="状态"
+            >
+              <template slot-scope="scope">{{
+                scope.row.isDisabled ? "无效" : "有效"
+              }}</template>
             </el-table-column>
             <el-table-column
               :key="'draw-record-column-' + 5"
@@ -343,18 +720,27 @@
                   v-for="(item, index) in scope.row.rollResult"
                   :key="'draw-result-' + index"
                 >
-                  <span class="draw-result-rare" :class="_getRareColor(item.rare)">{{item.rare}}</span>
-                  <span class="draw-result-name">{{item.cardName}}</span>
+                  <span
+                    class="draw-result-rare"
+                    :class="_getRareColor(item.rare)"
+                    >{{ item.rare }}</span
+                  >
+                  <span class="draw-result-name">{{ item.cardName }}</span>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column fixed="right" :key="'draw-record-column-' + 6" label="操作">
+            <el-table-column
+              fixed="right"
+              :key="'draw-record-column-' + 6"
+              label="操作"
+            >
               <template slot-scope="scope">
                 <el-button
                   type="text"
                   size="mini"
                   @click="setDrawStatus(scope.row.rollId, scope.row.isDisabled)"
-                >设置</el-button>
+                  >设置</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -371,7 +757,8 @@
           </div>
         </div>
       </div>
-      <div class="admin-main-content" v-else-if="showTab === '5'">
+      <!-- 修改记录 -->
+      <div class="admin-main-content" v-else-if="showTab === '6'">
         <div class="admin-main-content-addition">
           <div class="admin-main-content-addition-item">
             <el-select
@@ -420,21 +807,57 @@
             ></el-autocomplete>
           </div>
           <div class="admin-main-content-addition-item">
-            <el-button type="info" size="mini" @click="recordClearAddition">清除条件</el-button>
-            <el-button type="primary" size="mini" @click="recordQuery">查询</el-button>
+            <el-button type="info" size="mini" @click="recordClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="recordQuery"
+              >查询</el-button
+            >
           </div>
         </div>
         <div class="admin-main-content-table-wrap">
           <el-table :data="recordTableData" size="mini" height="48vh">
-            <el-table-column :key="'record-column-' + 1" prop="packageName" label="卡包名"></el-table-column>
-            <el-table-column :key="'record-column-' + 2" prop="oldName" label="旧卡名"></el-table-column>
-            <el-table-column :key="'record-column-' + 3" prop="newName" label="新卡名"></el-table-column>
-            <el-table-column :key="'record-column-' + 4" prop="rare" label="稀有度">
+            <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">{{scope.row.rare}}</div>
+                <div class="table-expand-desc-box">
+                 {{ scope.row.oldDesc }}
+                </div>
+                <div class="table-expand-desc-box">
+                 {{ scope.row.newDesc }}
+                </div>
               </template>
             </el-table-column>
-            <el-table-column :key="'record-column-' + 5" prop="createdTime" label="添加时间"></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 1"
+              prop="packageName"
+              label="卡包名"
+            ></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 2"
+              prop="oldName"
+              label="旧卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 3"
+              prop="newName"
+              label="新卡名"
+            ></el-table-column>
+            <el-table-column
+              :key="'record-column-' + 4"
+              prop="rare"
+              label="稀有度"
+            >
+              <template slot-scope="scope">
+                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                  {{ scope.row.rare }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'record-column-' + 5"
+              prop="createdTime"
+              label="添加时间"
+            ></el-table-column>
           </el-table>
           <div class="admin-main-content-table-pagination">
             <el-pagination
@@ -471,8 +894,12 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isAddingPackage = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitAddingPackage" size="small">确 定</el-button>
+        <el-button @click="isAddingPackage = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitAddingPackage" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -487,7 +914,11 @@
     >
       <el-form label-position="top">
         <el-form-item label="原卡包名" size="small">
-          <el-input disabled v-model="editingPackageData.oldname" type="text"></el-input>
+          <el-input
+            disabled
+            v-model="editingPackageData.oldname"
+            type="text"
+          ></el-input>
         </el-form-item>
         <el-form-item label="新卡包名" size="small" required>
           <el-input
@@ -499,8 +930,12 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isEditingPackage = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitEditingPackage" size="small">确 定</el-button>
+        <el-button @click="isEditingPackage = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditingPackage" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -515,7 +950,11 @@
     >
       <el-form label-position="top">
         <el-form-item label="卡包" size="small">
-          <el-input disabled v-model="addingCardData.package" type="text"></el-input>
+          <el-input
+            disabled
+            v-model="addingCardData.package"
+            type="text"
+          ></el-input>
         </el-form-item>
         <el-form-item label="卡名" size="small" required>
           <el-input
@@ -537,7 +976,9 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isAddingCard = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitAddingCard" size="small">确 定</el-button>
+        <el-button type="primary" @click="submitAddingCard" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -552,7 +993,11 @@
     >
       <el-form label-position="top">
         <el-form-item label="卡包" size="small">
-          <el-input disabled v-model="batchAddingCardData.packageName" type="text"></el-input>
+          <el-input
+            disabled
+            v-model="batchAddingCardData.packageName"
+            type="text"
+          ></el-input>
         </el-form-item>
 
         <el-form-item
@@ -565,26 +1010,33 @@
             type="textarea"
             :rows="3"
             :placeholder="`请输入${renderItem.label}卡列表, 以“|”分割, 不使用换行, 例：卡1|卡2`"
-            v-model="tempBatchAddingCardData
-[renderItem.dataKey]"
+            v-model="tempBatchAddingCardData[renderItem.dataKey]"
           ></el-input>
           <div class="stash-card-list">
             <span
               class="stash-card-list-title"
               v-if="batchAddingCardData[renderItem.dataKey].length !== 0"
-            >待添加卡牌列表</span>
+              >待添加卡牌列表</span
+            >
             <el-tag
               size="small"
               v-for="(item, index) in batchAddingCardData[renderItem.dataKey]"
               :key="renderItem.keyWord + index"
-            >{{item}}</el-tag>
+              >{{ item }}</el-tag
+            >
           </div>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isBatchAddingCard = false" size="small">取 消</el-button>
-        <el-button type="info" @click="analyseBatchAddingCardList" size="small">解 析</el-button>
-        <el-button type="primary" @click="submitBatchAddingCard" size="small">确 定</el-button>
+        <el-button @click="isBatchAddingCard = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="info" @click="analyseBatchAddingCardList" size="small"
+          >解 析</el-button
+        >
+        <el-button type="primary" @click="submitBatchAddingCard" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -599,7 +1051,11 @@
     >
       <el-form label-position="top">
         <el-form-item label="旧卡名" size="small">
-          <el-input disabled v-model="editingCardData.oldname" type="text"></el-input>
+          <el-input
+            disabled
+            v-model="editingCardData.oldname"
+            type="text"
+          ></el-input>
         </el-form-item>
         <el-form-item label="新卡名" size="small" required>
           <el-input
@@ -615,7 +1071,9 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isEditingCard = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitEditingCard" size="small">确 定</el-button>
+        <el-button type="primary" @click="submitEditingCard" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -654,8 +1112,12 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isExchangingCard = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitExchangeCard" size="small">确 定</el-button>
+        <el-button @click="isExchangingCard = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitExchangeCard" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -680,7 +1142,9 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isAddingUser = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitAddingUser" size="small">确 定</el-button>
+        <el-button type="primary" @click="submitAddingUser" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -698,14 +1162,18 @@
           <el-input
             v-model.number="editingCardCountData.count"
             type="text"
-            @keyup.enter.native="submitEditCardCount"
+            @keyup.enter.native="submitEditCardCount_"
             clearable
           ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isEditingCardCount = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitEditCardCount" size="small">确 定</el-button>
+        <el-button @click="isEditingCardCount = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditCardCount_" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -723,7 +1191,7 @@
           <!-- <el-input
             v-model.number="editingCardCountData.card"
             type="text"
-            @keyup.enter.native="submitEditCardCount"
+            @keyup.enter.native="submitEditCardCount_"
             clearable
           ></el-input>-->
           <el-autocomplete
@@ -738,14 +1206,18 @@
           <el-input
             v-model.number="editingCardCountData.count"
             type="text"
-            @keyup.enter.native="submitEditCardCount"
+            @keyup.enter.native="submitEditCardCount_"
             clearable
           ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isAddingUserCard = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitEditCardCount" size="small">确 定</el-button>
+        <el-button @click="isAddingUserCard = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditCardCount_" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -769,8 +1241,12 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isEditingUserInfoItem = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitEditUserInfo" size="small">确 定</el-button>
+        <el-button @click="isEditingUserInfoItem = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditUserInfo" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -792,8 +1268,12 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isSettingDrawRecord = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="submitDrawStatus" size="small">确 定</el-button>
+        <el-button @click="isSettingDrawRecord = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitDrawStatus" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -834,7 +1314,8 @@
             <span
               class="stash-card-list-title"
               v-if="importingDrewCardsInfo.cards.length !== 0"
-            >待添加结果列表</span>
+              >待添加结果列表</span
+            >
             <div
               class="stash-import-group"
               v-for="(groupItem, groupIndex) in importingDrewCardsInfo.cards"
@@ -844,17 +1325,33 @@
                 size="small"
                 v-for="(item, index) in groupItem"
                 :key="'stash-item-' + index"
-              >{{item}}</el-tag>
+                >{{ item }}</el-tag
+              >
             </div>
           </div>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isImportingDrewCards = false" size="small">取 消</el-button>
-        <el-button type="info" @click="analyseImportDrewCards" size="small">解 析</el-button>
-        <el-button type="primary" @click="submitImportDrewCards" size="small">确 定</el-button>
+        <el-button @click="isImportingDrewCards = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="info" @click="analyseImportDrewCards" size="small"
+          >解 析</el-button
+        >
+        <el-button type="primary" @click="submitImportDrewCards" size="small"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
+
+    <card-desc
+      :visible.sync="isShowingCardDesc"
+      :posX="cardDesc.x"
+      :posY="cardDesc.y"
+      :picId="cardDesc.picId"
+      :desc="cardDesc.desc"
+      :is-show-on-mobile="_checkIfMobile()"
+    ></card-desc>
   </div>
 </template>
 
@@ -875,9 +1372,13 @@ import {
   exchangeCardsRareUrl,
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
+import CardDesc from "@/components/CardDesc";
 export default {
   name: "Admin",
   mixins: [common],
+  components: {
+    CardDesc,
+  },
   data() {
     return {
       showTab: "1",
@@ -973,6 +1474,19 @@ export default {
         rare: "",
       },
       libTableData: [],
+      //玩家卡库
+      playerLibPagination: {
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
+      playerLibQueryAddition: {
+        packageName: "",
+        cardName: "",
+        userName: "",
+        rare: "",
+      },
+      playerLibTableData: [],
 
       //玩家页
       isAddingUser: false,
@@ -1351,6 +1865,34 @@ export default {
         this.$closeLoading();
       });
     },
+    //玩家卡库页面 清除条件
+    playerLibClearAddition() {
+      Object.assign(
+        this.$data.playerLibQueryAddition,
+        this.$options.data().playerLibQueryAddition
+      );
+    },
+
+    //玩家卡库查询 && 分页切换
+    playerLibQueryCard(page) {
+      this.$openLoading();
+      //排除默认鼠标事件参数
+      let currPage = typeof page === "number" ? page : undefined;
+      this._queryCardList(
+        currPage || this.defaultPage,
+        this.defaultPageSize,
+        this.playerLibQueryAddition.packageName || undefined,
+        this.playerLibQueryAddition.cardName || undefined,
+        this.playerLibQueryAddition.rare || undefined,
+        this.playerLibQueryAddition.userName || undefined,
+        "player_lib"
+      ).then((data) => {
+        this.playerLibPagination.page = data.pagination.page;
+        this.playerLibPagination.total = data.pagination.total;
+        this.playerLibTableData = data.data;
+        this.$closeLoading();
+      });
+    },
 
     //记录页面 清除条件
     recordClearAddition() {
@@ -1460,7 +2002,14 @@ export default {
       this.editingCardCountTips = "";
       this.addingUserCardTips = "";
     },
-    submitEditCardCount() {
+    submitEditCardCount_() {
+      if (this.showTab === '3') {
+        this.submitEditCardCount(this.playerLibQueryCard, 1);
+      } else if (this.showTab === '4') {
+        this.submitEditCardCount(this.userQuery, 1);
+      }
+    },
+    submitEditCardCount(callback, arg) {
       if (
         typeof this.editingCardCountData.count === "number" &&
         this.editingCardCountData.count >= 0 &&
@@ -1478,7 +2027,7 @@ export default {
           if (res.data.code === 200) {
             this.isEditingCardCount = false;
             this.isAddingUserCard = false;
-            this.userQuery(1);
+            callback(arg)
           }
         });
       }
@@ -1724,6 +2273,12 @@ export default {
   justify-content: flex-end;
   margin: 0.5rem 0;
 }
+.table-preview-btn {
+  font-size: 1.2rem;
+  padding: 2px;
+  border-radius: 5px;
+  color: #66b1ff;
+}
 .table-tag {
   display: inline-block;
   width: 2rem;
@@ -1851,5 +2406,10 @@ export default {
   border: 1px solid #eeeeee;
   border-radius: 5px;
   margin-bottom: 5px;
+}
+
+.table-expand-desc-box {
+  white-space: pre-wrap;
+  margin-bottom: 10px;
 }
 </style>

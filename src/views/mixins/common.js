@@ -25,31 +25,39 @@ export default {
             defaultPageSize: 20,
             pickerOptions: {
                 shortcuts: [{
-                  text: '最近24小时',
-                  onClick(picker) {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24);
-                    picker.$emit('pick', [start, end]);
-                  }
+                    text: '最近24小时',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24);
+                        picker.$emit('pick', [start, end]);
+                    }
                 }, {
-                  text: '最近3天',
-                  onClick(picker) {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 3);
-                    picker.$emit('pick', [start, end]);
-                  }
+                    text: '最近3天',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 3);
+                        picker.$emit('pick', [start, end]);
+                    }
                 }, {
-                  text: '最近1周',
-                  onClick(picker) {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                    picker.$emit('pick', [start, end]);
-                  }
+                    text: '最近1周',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                    }
                 }]
-              },
+            },
+
+            isShowingCardDesc: false,
+            cardDesc: {
+                x: 0,
+                y: 0,
+                desc: "",
+                picId: 0,
+            },
         }
 
     },
@@ -195,6 +203,33 @@ export default {
                 case "HR":
                     return "color-ultra-rare";
             }
+        },
+
+
+        _checkIfMobile() {
+            return 'ontouchend' in document.body;
+        },
+
+
+        _showCardDescHover(event, desc, pid) {
+            if (this._checkIfMobile()) return;
+            let tarRect = event.target.getBoundingClientRect();
+            this.cardDesc.x = Math.ceil(tarRect.x);
+            this.cardDesc.y = Math.floor(tarRect.y + tarRect.height);
+            this.cardDesc.desc = desc;
+            this.cardDesc.picId = pid;
+            this.isShowingCardDesc = true;
+        },
+
+        _showCardDescClick(event, desc, pid) {
+            if (!this._checkIfMobile()) return;
+            this.cardDesc.desc = desc;
+            this.cardDesc.picId = pid;
+            this.isShowingCardDesc = true;
+        },
+
+        _closeCardDesc() {
+            this.isShowingCardDesc = false;
         },
     }
 }
