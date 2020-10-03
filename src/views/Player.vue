@@ -804,7 +804,7 @@ export default {
       this._queryDrawRecordList(
         currPage || this.defaultPage,
         this.defaultPageSize,
-        this.drawRecordQueryAddition.packageName || undefined,
+        this.drawRecordQueryAddition.package || undefined,
         this.drawRecordQueryAddition.user || undefined,
         this.drawRecordQueryAddition.dateRange
           ? this.drawRecordQueryAddition.dateRange[0]
