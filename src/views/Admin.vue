@@ -2,32 +2,65 @@
   <div id="admin">
     <div class="admin-info">
       <p class="admin-info-tips">欢迎来到诡异云，{{ username }}。</p>
-      <el-button type="text" @click="addPackage()" v-if="showTab === '1'"
-        >新增卡包</el-button
-      >
-      <el-button type="text" @click="exchangeCard()" v-if="showTab === '1'"
-        >交换稀有度</el-button
-      >
-      <el-button type="text" @click="addUser()" v-if="showTab === '4'"
-        >新增玩家</el-button
-      >
-      <el-button type="text" @click="importDrewCards()" v-if="showTab === '5'"
-        >导入记录</el-button
-      >
     </div>
 
     <div class="admin-main">
-      <el-menu mode="horizontal" default-active="1" @select="handleSelect">
-        <el-menu-item index="1">卡包</el-menu-item>
-        <el-menu-item index="2">检索</el-menu-item>
-        <el-menu-item index="3">卡池</el-menu-item>
-        <el-menu-item index="4">玩家</el-menu-item>
-        <el-menu-item index="5">抽卡记录</el-menu-item>
-        <el-menu-item index="6">修改记录</el-menu-item>
-      </el-menu>
+      <div class="admin-main-menu">
+        <el-menu mode="horizontal" default-active="1" @select="handleSelect">
+          <el-menu-item index="1">卡包</el-menu-item>
+          <el-menu-item index="2">检索</el-menu-item>
+          <el-menu-item index="3">卡池</el-menu-item>
+          <el-menu-item index="4">玩家</el-menu-item>
+          <el-menu-item index="5">抽卡记录</el-menu-item>
+          <el-menu-item index="6">修改记录</el-menu-item>
+        </el-menu>
+        <div class="admin-main-menu-control">
+          <el-button
+            type="text"
+            @click="editPackageOrder()"
+            v-if="showTab === '1' && !isEditingPackageOrder"
+            >排序</el-button
+          >
+          <el-button
+            type="text"
+            @click="addPackage()"
+            v-if="showTab === '1' && !isEditingPackageOrder"
+            >新增卡包</el-button
+          >
+          <el-button
+            type="text"
+            @click="exchangeCard()"
+            v-if="showTab === '1' && !isEditingPackageOrder"
+            >交换稀有度</el-button
+          >
+          <el-button
+            type="text"
+            @click="cancelEditingPackageOrder()"
+            v-if="showTab === '1' && isEditingPackageOrder"
+            >取消</el-button
+          >
+          <el-button
+            type="text"
+            @click="submitEditingPackageOrder()"
+            v-if="showTab === '1' && isEditingPackageOrder"
+            >确认</el-button
+          >
+          <el-button type="text" @click="addUser()" v-if="showTab === '4'"
+            >新增玩家</el-button
+          >
+          <el-button
+            type="text"
+            @click="importDrewCards()"
+            v-if="showTab === '5'"
+            >导入记录</el-button
+          >
+        </div>
+      </div>
+
       <!-- 卡包查询 -->
       <div class="admin-main-content" v-if="showTab === '1'">
         <el-collapse
+          v-if="!isEditingPackageOrder"
           v-model="activeItemIndex"
           @change="handleItemChange"
           accordion
@@ -159,6 +192,30 @@
             </div>
           </el-collapse-item>
         </el-collapse>
+        <draggable
+          v-if="isEditingPackageOrder"
+          class="package-order-list"
+          tag="ul"
+          v-model="editingPackageOrderList"
+          @start="isDragging = true"
+          @end="isDragging = false"
+          :ghostClass="'package-order-list-item-ghost'"
+          :animation="100"
+        >
+          <transition-group
+            type="transition"
+            :name="!isDragging ? 'flip-list' : null"
+          >
+            <li
+              class="package-order-list-item"
+              v-for="element in editingPackageOrderList"
+              :key="element.order"
+            >
+              {{ element.name }}
+             <i class="el-icon-d-caret"></i>
+            </li>
+          </transition-group>
+        </draggable>
       </div>
       <!-- 全卡检索 -->
       <div class="admin-main-content" v-else-if="showTab === '2'">
@@ -419,8 +476,12 @@
                 ></el-button>
               </template>
             </el-table-column>
-            
-            <el-table-column :key="'player-lib-column-' + 7" fixed="right" width="80">
+
+            <el-table-column
+              :key="'player-lib-column-' + 7"
+              fixed="right"
+              width="80"
+            >
               <template slot-scope="scope">
                 <el-button
                   size="mini"
@@ -444,7 +505,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- 玩家操作 -->
       <div class="admin-main-content" v-else-if="showTab === '4'">
@@ -676,11 +736,12 @@
           <el-table :data="drawRecordTableData" size="mini" height="48vh">
             <el-table-column :key="'draw-record-column-' + 0" type="expand">
               <template slot-scope="scope">
-                <div class="table-expand-desc-box"
+                <div
+                  class="table-expand-desc-box"
                   v-for="(item, index) in scope.row.rollResult"
                   :key="'draw-result-desc-' + index"
                 >
-                 {{ item.desc }}
+                  {{ item.desc }}
                 </div>
               </template>
             </el-table-column>
@@ -820,10 +881,10 @@
             <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div class="table-expand-desc-box">
-                 {{ scope.row.oldDesc }}
+                  {{ scope.row.oldDesc }}
                 </div>
                 <div class="table-expand-desc-box">
-                 {{ scope.row.newDesc }}
+                  {{ scope.row.newDesc }}
                 </div>
               </template>
             </el-table-column>
@@ -1370,14 +1431,17 @@ import {
   setDrawResultUrl,
   importDrewResultUrl,
   exchangeCardsRareUrl,
+  editPackageOrderUrl,
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
+import draggable from "vuedraggable";
 export default {
   name: "Admin",
   mixins: [common],
   components: {
     CardDesc,
+    draggable,
   },
   data() {
     return {
@@ -1566,6 +1630,10 @@ export default {
         cards: [],
       },
       tempDrewCardsInfo: "",
+
+      isEditingPackageOrder: false,
+      editingPackageOrderList: [],
+      isDragging: false,
     };
   },
 
@@ -2003,9 +2071,9 @@ export default {
       this.addingUserCardTips = "";
     },
     submitEditCardCount_() {
-      if (this.showTab === '3') {
+      if (this.showTab === "3") {
         this.submitEditCardCount(this.playerLibQueryCard, 1);
-      } else if (this.showTab === '4') {
+      } else if (this.showTab === "4") {
         this.submitEditCardCount(this.userQuery, 1);
       }
     },
@@ -2027,7 +2095,7 @@ export default {
           if (res.data.code === 200) {
             this.isEditingCardCount = false;
             this.isAddingUserCard = false;
-            callback(arg)
+            callback(arg);
           }
         });
       }
@@ -2194,6 +2262,33 @@ export default {
         });
       }
     },
+
+    editPackageOrder() {
+      this.isEditingPackageOrder = true;
+      this.editingPackageOrderList = this.cardPackageList.map((item) => {
+        return {
+          name: item["packageName"],
+          order: item["packageId"],
+        };
+      });
+    },
+    cancelEditingPackageOrder() {
+      this.isEditingPackageOrder = false;
+      this.editingPackageOrderList = [];
+    },
+    submitEditingPackageOrder() {
+      this.$openLoading();
+      axiosPostAsJSON({
+        url: editPackageOrderUrl,
+        data: {
+          packageIndexList: this.editingPackageOrderList.map(i => i.order)
+        },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          this.reloadPage();
+        }
+      });
+    },
   },
 };
 </script>
@@ -2249,8 +2344,26 @@ export default {
   display: flex;
   flex-direction: column;
 }
-.admin-main .el-menu {
+.admin-main-menu {
+  width: 100%;
   flex: initial;
+  display: flex;
+}
+.admin-main .el-menu {
+  flex: auto;
+}
+.admin-main-menu-control {
+  flex: initial;
+  border-bottom: solid 1px #e6e6e6;
+  display: flex;
+  align-content: center;
+}
+.admin-main-menu-control .el-button {
+  opacity: 0.4;
+}
+
+.admin-main-menu-control .el-button:hover {
+  opacity: 1;
 }
 
 .admin-main-content {
@@ -2411,5 +2524,40 @@ export default {
 .table-expand-desc-box {
   white-space: pre-wrap;
   margin-bottom: 10px;
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+
+.package-order-list {
+  list-style: none;
+  border-top: 1px solid #ebeef5;
+  padding: 0;
+  margin: 0;
+}
+.package-order-list-item {
+  color: #66b1ff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  line-height: 48px;
+  background-color: #fff;
+  border-bottom: 1px solid #ebeef5;
+  font-size: 13px;
+  transition: border-bottom-color 0.3s;
+  outline: 0;
+  cursor: move;
+}
+.package-order-list-item i {
+  margin-left: auto;
+}
+.package-order-list-item-ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
 </style>

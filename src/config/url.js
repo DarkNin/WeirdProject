@@ -25,6 +25,8 @@ const addPackageUrl = BASE_URL + '/package/add';
 const editPackageNameUrl = BASE_URL + '/package/update';
 //查询卡包列表
 const queryCardPackageListUrl = BASE_URL + '/package/list';
+//编辑卡包排序
+const editPackageOrderUrl = BASE_URL + '/package/sort';
 
 //用户
 //新增用户
@@ -67,6 +69,7 @@ const urlNeededValidate = [
 
     addPackageUrl,
     editPackageNameUrl,
+    editPackageOrderUrl,
 
 
     addUserUrl,
@@ -93,6 +96,7 @@ export {
     addPackageUrl,
     editPackageNameUrl,
     queryCardPackageListUrl,
+    editPackageOrderUrl,
     addUserUrl,
     editCardCountUrl,
     editDustUrl,
