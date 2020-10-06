@@ -2348,6 +2348,7 @@ export default {
   width: 100%;
   flex: initial;
   display: flex;
+  flex-wrap: wrap;
 }
 .admin-main .el-menu {
   flex: auto;
@@ -2357,6 +2358,7 @@ export default {
   border-bottom: solid 1px #e6e6e6;
   display: flex;
   align-content: center;
+  margin-left: auto;
 }
 .admin-main-menu-control .el-button {
   opacity: 0.4;
