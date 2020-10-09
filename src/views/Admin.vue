@@ -48,6 +48,9 @@
           <el-button type="text" @click="addUser()" v-if="showTab === '4'"
             >新增玩家</el-button
           >
+          <el-button type="text" @click="swapUserCards()" v-if="showTab === '4'"
+            >换卡</el-button
+          >
           <el-button
             type="text"
             @click="importDrewCards()"
@@ -212,7 +215,7 @@
               :key="element.order"
             >
               {{ element.name }}
-             <i class="el-icon-d-caret"></i>
+              <i class="el-icon-d-caret"></i>
             </li>
           </transition-group>
         </draggable>
@@ -249,26 +252,10 @@
               <el-option label="HR" value="HR"></el-option>
             </el-select>
           </div>
-          <!-- <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="libQueryAddition.userName"
-              placeholder="请选择玩家"
-              clearable
-            >
-              <el-option
-                v-for="item in userList"
-                :key="'lib' + item.userName + item.userId"
-                :label="item.userName"
-                :value="item.userName"
-              ></el-option>
-            </el-select>
-          </div>-->
           <div class="admin-main-content-addition-item">
-            <!-- <el-input size="mini" v-model="libQueryAddition.cardName" placeholder="请填写卡名" clearable></el-input> -->
             <el-autocomplete
               size="mini"
-              v-model="libQueryAddition.cardName"
+              v-model.trim="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -406,7 +393,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model="playerLibQueryAddition.cardName"
+              v-model.trim="playerLibQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               @keyup.enter.native="playerLibQueryCard"
@@ -583,10 +570,9 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
-            <!-- <el-input size="mini" v-model="userQueryAddition.card" placeholder="请填写卡名" clearable></el-input> -->
             <el-autocomplete
               size="mini"
-              v-model="userQueryAddition.card"
+              v-model.trim="userQueryAddition.card"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -851,15 +837,9 @@
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
-            <!-- <el-input
-              size="mini"
-              v-model="recordQueryAddition.cardName"
-              placeholder="请填写卡名"
-              clearable
-            ></el-input>-->
             <el-autocomplete
               size="mini"
-              v-model="recordQueryAddition.cardName"
+              v-model.trim="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -947,7 +927,7 @@
       <el-form label-position="top">
         <el-form-item label="卡包名" size="small" required>
           <el-input
-            v-model="addingPackageData.package"
+            v-model.trim="addingPackageData.package"
             type="text"
             @keyup.enter.native="submitAddingPackage"
             clearable
@@ -977,13 +957,13 @@
         <el-form-item label="原卡包名" size="small">
           <el-input
             disabled
-            v-model="editingPackageData.oldname"
+            v-model.trim="editingPackageData.oldname"
             type="text"
           ></el-input>
         </el-form-item>
         <el-form-item label="新卡包名" size="small" required>
           <el-input
-            v-model="editingPackageData.newname"
+            v-model.trim="editingPackageData.newname"
             type="text"
             @keyup.enter.native="submitEditingPackage"
             clearable
@@ -1013,13 +993,13 @@
         <el-form-item label="卡包" size="small">
           <el-input
             disabled
-            v-model="addingCardData.package"
+            v-model.trim="addingCardData.package"
             type="text"
           ></el-input>
         </el-form-item>
         <el-form-item label="卡名" size="small" required>
           <el-input
-            v-model="addingCardData.card"
+            v-model.trim="addingCardData.card"
             type="text"
             @keyup.enter.native="submitAddingCard"
             clearable
@@ -1056,7 +1036,7 @@
         <el-form-item label="卡包" size="small">
           <el-input
             disabled
-            v-model="batchAddingCardData.packageName"
+            v-model.trim="batchAddingCardData.packageName"
             type="text"
           ></el-input>
         </el-form-item>
@@ -1114,13 +1094,13 @@
         <el-form-item label="旧卡名" size="small">
           <el-input
             disabled
-            v-model="editingCardData.oldname"
+            v-model.trim="editingCardData.oldname"
             type="text"
           ></el-input>
         </el-form-item>
         <el-form-item label="新卡名" size="small" required>
           <el-input
-            v-model="editingCardData.newname"
+            v-model.trim="editingCardData.newname"
             type="text"
             @keyup.enter.native="submitEditingCard"
             clearable
@@ -1151,7 +1131,7 @@
         <el-form-item label="卡1" size="small" required>
           <el-autocomplete
             size="mini"
-            v-model="exchangingCardData.card1"
+            v-model.trim="exchangingCardData.card1"
             placeholder="请填写卡名"
             clearable
             :trigger-on-focus="false"
@@ -1161,7 +1141,7 @@
         <el-form-item label="卡2" size="small" required>
           <el-autocomplete
             size="mini"
-            v-model="exchangingCardData.card2"
+            v-model.trim="exchangingCardData.card2"
             placeholder="请填写卡名"
             clearable
             :trigger-on-focus="false"
@@ -1194,7 +1174,7 @@
       <el-form label-position="top">
         <el-form-item label="玩家名" size="small" required>
           <el-input
-            v-model="addingUserData.target"
+            v-model.trim="addingUserData.target"
             type="text"
             @keyup.enter.native="submitAddingUser"
             clearable
@@ -1249,15 +1229,9 @@
     >
       <el-form label-position="top">
         <el-form-item label="卡名" size="small" required>
-          <!-- <el-input
-            v-model.number="editingCardCountData.card"
-            type="text"
-            @keyup.enter.native="submitEditCardCount_"
-            clearable
-          ></el-input>-->
           <el-autocomplete
             size="mini"
-            v-model="editingCardCountData.card"
+            v-model.trim="editingCardCountData.card"
             clearable
             :trigger-on-focus="false"
             :fetch-suggestions="querySearchCandicateCardList"
@@ -1306,6 +1280,79 @@
           >取 消</el-button
         >
         <el-button type="primary" @click="submitEditUserInfo" size="small"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <!-- 交换两用户卡片 -->
+    <el-dialog
+      title="换卡"
+      :visible.sync="isSwappingUserCards"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelSwapUserCards"
+    >
+      <el-form label-position="top">
+        <el-form-item label="玩家1" size="small" required>
+          <el-select
+            size="mini"
+            v-model="swappingCardsDetails.userA"
+            placeholder="请选择玩家"
+            clearable
+          >
+            <el-option
+              v-for="item in userList"
+              :key="'swap-card-a-' + item.userName + item.userId"
+              :label="item.userName"
+              :value="item.userName"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item size="small" required>
+          <el-autocomplete
+            size="mini"
+            v-model.trim="swappingCardsDetails.cardA"
+            placeholder="请填写卡名"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+            @keyup.enter.native="submitSwapUserCards"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="玩家2" size="small" required>
+          <el-select
+            size="mini"
+            v-model="swappingCardsDetails.userB"
+            placeholder="请选择玩家"
+            clearable
+          >
+            <el-option
+              v-for="item in userList"
+              :key="'swap-card-b-' + item.userName + item.userId"
+              :label="item.userName"
+              :value="item.userName"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item size="small" required>
+          <el-autocomplete
+            size="mini"
+            v-model.trim="swappingCardsDetails.cardB"
+            placeholder="请填写卡名"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+            @keyup.enter.native="submitSwapUserCards"
+          ></el-autocomplete>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isSwappingUserCards = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitSwapUserCards" size="small"
           >确 定</el-button
         >
       </span>
@@ -1432,6 +1479,7 @@ import {
   importDrewResultUrl,
   exchangeCardsRareUrl,
   editPackageOrderUrl,
+  swapUserOwnCardUrl,
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
@@ -1452,22 +1500,25 @@ export default {
 
       cardCandicateList: [],
 
-      //卡包页
+      //新增卡包
       isAddingPackage: false,
       addingPackageData: {
         package: "",
       },
+      //编辑卡包
       isEditingPackage: false,
       editingPackageData: {
         oldname: "",
         newname: "",
       },
+      //新增卡片
       isAddingCard: false,
       addingCardData: {
         package: "",
         card: "",
         rare: "N",
       },
+      //批量新增卡片
       isBatchAddingCard: false,
       batchAddingMenuRenderOptions: [
         {
@@ -1511,6 +1562,7 @@ export default {
         hrList: [],
         urList: [],
       },
+      //编辑卡片
       isEditingCard: false,
       editingCardData: {
         oldname: "",
@@ -1518,6 +1570,7 @@ export default {
         show: false,
       },
 
+      //交换两卡片稀有度
       isExchangingCard: false,
       exchangingCardData: {
         card1: "",
@@ -1525,7 +1578,7 @@ export default {
         show: false,
       },
 
-      //卡库
+      //卡库查询
       libPagination: {
         page: 1,
         pageSize: 20,
@@ -1538,7 +1591,7 @@ export default {
         rare: "",
       },
       libTableData: [],
-      //玩家卡库
+      //玩家卡库查询
       playerLibPagination: {
         page: 1,
         pageSize: 20,
@@ -1553,11 +1606,12 @@ export default {
       playerLibTableData: [],
 
       //玩家页
+      //新增玩家
       isAddingUser: false,
       addingUserData: {
         target: "",
       },
-
+      //玩家查询
       userQueryAddition: {
         target: "",
         package: "",
@@ -1570,7 +1624,7 @@ export default {
         award: 0,
         duelPoint: 0,
       },
-
+      //编辑玩家数据
       isEditingUserInfoItem: false,
       editingUserInfoItemType: "",
       editingUserInfoItemCount: "",
@@ -1583,6 +1637,7 @@ export default {
       },
       userTableData: [],
 
+      //编辑玩家卡数量
       isEditingCardCount: false,
       isAddingUserCard: false, //利用相同接口做新增卡
       editingCardCountData: {
@@ -1593,7 +1648,7 @@ export default {
       addingUserCardTips: "",
       editingCardCountTips: "",
 
-      //修改记录
+      //修改记录查询
       recordPagination: {
         page: 1,
         pageSize: 20,
@@ -1606,6 +1661,7 @@ export default {
       },
       recordTableData: [],
 
+      //抽卡记录查询
       drawRecordPagination: {
         page: 1,
         pageSize: 20,
@@ -1618,22 +1674,32 @@ export default {
       },
       drawRecordTableData: [],
 
+      //设置抽卡记录状态
       isSettingDrawRecord: false,
       drawRecordStatusData: {
         status: 0,
         id: null,
       },
-
+      //导入抽卡记录
       isImportingDrewCards: false,
       importingDrewCardsInfo: {
         target: "",
         cards: [],
       },
       tempDrewCardsInfo: "",
-
+      //编辑卡包排序
       isEditingPackageOrder: false,
       editingPackageOrderList: [],
       isDragging: false,
+
+      //交换两玩家卡片
+      isSwappingUserCards: false,
+      swappingCardsDetails: {
+        userA: "",
+        cardA: "",
+        userB: "",
+        cardB: "",
+      },
     };
   },
 
@@ -2189,6 +2255,7 @@ export default {
       });
     },
 
+    //设置抽卡结果是否生效
     setDrawStatus(id, status) {
       this.drawRecordStatusData.status = status;
       this.drawRecordStatusData.id = id;
@@ -2218,6 +2285,7 @@ export default {
       });
     },
 
+    //导入已抽得的卡
     importDrewCards() {
       this.isImportingDrewCards = true;
     },
@@ -2263,6 +2331,7 @@ export default {
       }
     },
 
+    //编辑卡包排序
     editPackageOrder() {
       this.isEditingPackageOrder = true;
       this.editingPackageOrderList = this.cardPackageList.map((item) => {
@@ -2281,13 +2350,45 @@ export default {
       axiosPostAsJSON({
         url: editPackageOrderUrl,
         data: {
-          packageIndexList: this.editingPackageOrderList.map(i => i.order)
+          packageIndexList: this.editingPackageOrderList.map((i) => i.order),
         },
       }).then((res) => {
         if (res.data.code === 200) {
           this.reloadPage();
         }
       });
+    },
+
+    //交换玩家持有的卡片
+    swapUserCards() {
+      this.isSwappingUserCards = true;
+    },
+
+    cancelSwapUserCards() {
+      Object.assign(
+        this.$data.swappingCardsDetails,
+        this.$options.data().swappingCardsDetails
+      );
+    },
+
+    submitSwapUserCards() {
+      let temp = this.swappingCardsDetails;
+      if (temp.cardA && temp.cardB && temp.userA && temp.userB) {
+        this.$openLoading();
+        axiosPostAsJSON({
+          url: swapUserOwnCardUrl,
+          data: {
+            userA: temp.userA,
+            cardA: temp.cardA,
+            userB: temp.userB,
+            cardB: temp.cardB,
+          },
+        }).then((res) => {
+          if (res.data.code === 200) {
+            this.reloadPage();
+          }
+        });
+      }
     },
   },
 };

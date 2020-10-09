@@ -6,7 +6,7 @@
           <el-form-item label="原密码" prop="orgPassword">
             <el-input
               type="password"
-              v-model="editInfos.orgPassword"
+              v-model.trim="editInfos.orgPassword"
               ref="edit-input"
               autocomplete="off"
               show-password
@@ -16,7 +16,7 @@
           <el-form-item label="新密码" prop="password">
             <el-input
               type="password"
-              v-model="editInfos.password"
+              v-model.trim="editInfos.password"
               autocomplete="off"
               show-password
               size="small"
@@ -25,7 +25,7 @@
           <el-form-item label="确认新密码" prop="ensurePassword">
             <el-input
               type="password"
-              v-model="editInfos.ensurePassword"
+              v-model.trim="editInfos.ensurePassword"
               autocomplete="off"
               show-password
               size="small"

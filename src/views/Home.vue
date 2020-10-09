@@ -20,10 +20,10 @@
     >
       <el-form label-position="top" :model="userInfo" :rules="formRules" ref="loginForm">
         <el-form-item label="用户名" size="small" prop="username">
-          <el-input v-model="userInfo.username" type="text" @keyup.enter.native="submitLogin"></el-input>
+          <el-input v-model.trim="userInfo.username" type="text" @keyup.enter.native="submitLogin"></el-input>
         </el-form-item>
         <el-form-item label="密码" size="small" prop="password">
-          <el-input v-model="userInfo.password" type="password" @keyup.enter.native="submitLogin"></el-input>
+          <el-input v-model.trim="userInfo.password" type="password" @keyup.enter.native="submitLogin"></el-input>
         </el-form-item>
         <el-form-item size="small">
           <el-checkbox v-model="userInfo.isRemember" disabled>记住所选角色及密码</el-checkbox>

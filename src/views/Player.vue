@@ -165,7 +165,7 @@
           <div class="player-main-content-addition-item">
             <el-input
               size="mini"
-              v-model="libQueryAddition.cardName"
+              v-model.trim="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               @keyup.enter.native="libQueryCard"
@@ -413,7 +413,7 @@
           <div class="player-main-content-addition-item">
             <el-input
               size="mini"
-              v-model="recordQueryAddition.cardName"
+              v-model.trim="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               @keyup.enter.native="recordQuery"
@@ -526,7 +526,7 @@
             v-if="fusingCardType === 'standard'"
           >
             <el-input
-              v-model="fusingCardData.card"
+              v-model.trim="fusingCardData.card"
               type="text"
               clearable
             ></el-input>

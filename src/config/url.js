@@ -50,6 +50,8 @@ const setDrawResultUrl = BASE_URL + '/roll/set';
 const queryDrawResultUrl = BASE_URL + '/roll/list';
 //导入抽卡结果
 const importDrewResultUrl = BASE_URL + '/roll/add';
+//交换玩家持卡
+const swapUserOwnCardUrl = BASE_URL + '/user/card/swapasdasdads';
 
 
 //玩家端
@@ -78,6 +80,7 @@ const urlNeededValidate = [
     editAwardUrl,
     setDrawResultUrl,
     importDrewResultUrl,
+    swapUserOwnCardUrl,
 
     transDustToCardUrl,
     transDustToCardRandomUrl
@@ -107,6 +110,7 @@ export {
     setDrawResultUrl,
     queryDrawResultUrl,
     importDrewResultUrl,
+    swapUserOwnCardUrl,
     transDustToCardUrl,
     transDustToCardRandomUrl,
 
