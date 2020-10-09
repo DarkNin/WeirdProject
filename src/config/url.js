@@ -51,7 +51,7 @@ const queryDrawResultUrl = BASE_URL + '/roll/list';
 //导入抽卡结果
 const importDrewResultUrl = BASE_URL + '/roll/add';
 //交换玩家持卡
-const swapUserOwnCardUrl = BASE_URL + '/user/card/swapasdasdads';
+const swapUserOwnCardUrl = BASE_URL + '/user/card/swap';
 
 
 //玩家端
