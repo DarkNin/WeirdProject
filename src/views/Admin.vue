@@ -406,6 +406,9 @@
             <el-button type="primary" size="mini" @click="playerLibQueryCard"
               >查询</el-button
             >
+            <el-button type="primary" size="mini" @click="playerLibExport"
+              >导出</el-button
+            >
           </div>
         </div>
         <div class="admin-main-content-table-wrap">
@@ -580,12 +583,15 @@
               @keyup.enter.native="userQuery"
             ></el-autocomplete>
           </div>
-          <div class="admin-main-content-addition-item">
+          <div class="admin-main-content-addition-item special">
             <el-button type="info" size="mini" @click="userClearAddition"
               >清除条件</el-button
             >
             <el-button type="primary" size="mini" @click="userQuery"
               >查询</el-button
+            >
+            <el-button type="primary" size="mini" @click="userOwnExport"
+              >导出</el-button
             >
           </div>
         </div>
@@ -772,7 +778,11 @@
                     :class="_getRareColor(item.rare)"
                     >{{ item.rare }}</span
                   >
-                  <span class="draw-result-name">{{ item.cardName }}</span>
+                  <span
+                    class="draw-result-name"
+                    :class="{ grey: !item.isDust }"
+                    >{{ item.cardName }}</span
+                  >
                 </div>
               </template>
             </el-table-column>
@@ -1202,7 +1212,7 @@
         <el-form-item label="持卡数量" size="small" required>
           <el-input
             v-model.number="editingCardCountData.count"
-            type="text"
+            type="number"
             @keyup.enter.native="submitEditCardCount_"
             clearable
           ></el-input>
@@ -1240,7 +1250,7 @@
         <el-form-item label="数量" size="small" required>
           <el-input
             v-model.number="editingCardCountData.count"
-            type="text"
+            type="number"
             @keyup.enter.native="submitEditCardCount_"
             clearable
           ></el-input>
@@ -1269,7 +1279,7 @@
         <el-form-item :label="editingUserInfoItemType" size="small" required>
           <el-input
             v-model.number="editingUserInfoItemCount"
-            type="text"
+            type="number"
             @keyup.enter.native="submitEditUserInfo"
             clearable
           ></el-input>
@@ -1484,6 +1494,8 @@ import {
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
 import draggable from "vuedraggable";
+import { MessageBox } from "element-ui";
+import { exportToExcelByJson } from "@/utils/xlsx";
 export default {
   name: "Admin",
   mixins: [common],
@@ -2027,6 +2039,37 @@ export default {
         this.$closeLoading();
       });
     },
+    playerLibExport() {
+      MessageBox.confirm("请确认是否以当前条件导出Excel文档", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$openLoading();
+          this._queryCardList(
+            1,
+            2147483647,
+            this.playerLibQueryAddition.packageName || undefined,
+            this.playerLibQueryAddition.cardName || undefined,
+            this.playerLibQueryAddition.rare || undefined,
+            this.playerLibQueryAddition.userName || undefined,
+            "player_lib"
+          ).then((data) => {
+            let fileData = this._generateLibDataForExport(data.data);
+            exportToExcelByJson(fileData.data, fileData.fileName)
+              .then((_res) => {
+                this.$alertSuccess(_res);
+              })
+              .catch((_err) => {
+                this.$alertWarning(_err);
+              });
+
+            this.$closeLoading();
+          });
+        })
+        .catch(() => {});
+    },
 
     //记录页面 清除条件
     recordClearAddition() {
@@ -2115,6 +2158,38 @@ export default {
         this.userTableData = data.data;
         this.$closeLoading();
       });
+    },
+
+    userOwnExport() {
+      MessageBox.confirm("请确认是否以当前条件导出Excel文档", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$openLoading();
+          this._queryCardList(
+            1,
+            2147483647,
+            this.userQueryAddition.package || undefined,
+            this.userQueryAddition.card || undefined,
+            this.userQueryAddition.rare || undefined,
+            this.userQueryAddition.target || undefined,
+            "player_lib"
+          ).then((data) => {
+            let fileData = this._generateLibDataForExport(data.data);
+            exportToExcelByJson(fileData.data, fileData.fileName)
+              .then((_res) => {
+                this.$alertSuccess(_res);
+              })
+              .catch((_err) => {
+                this.$alertWarning(_err);
+              });
+
+            this.$closeLoading();
+          });
+        })
+        .catch(() => {});
     },
 
     editCardCount(card, target) {
@@ -2601,7 +2676,9 @@ export default {
   background-color: #ffe3a7;
   color: #c5b314;
 }
-
+.draw-result-name.grey {
+  color: #cacaca;
+}
 .el-dialog .el-select,
 .el-dialog .el-autocomplete {
   width: 100%;

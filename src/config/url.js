@@ -59,6 +59,8 @@ const swapUserOwnCardUrl = BASE_URL + '/user/card/swap';
 const transDustToCardUrl = BASE_URL + '/user/card/change';
 //随机尘转卡
 const transDustToCardRandomUrl = BASE_URL + '/user/card/random';
+//闪卡转尘
+const transCardToDustUrl = BASE_URL + '/user/card/todust';
 
 
 
@@ -83,7 +85,8 @@ const urlNeededValidate = [
     swapUserOwnCardUrl,
 
     transDustToCardUrl,
-    transDustToCardRandomUrl
+    transDustToCardRandomUrl,
+    transCardToDustUrl
 ]
 
 
@@ -113,6 +116,7 @@ export {
     swapUserOwnCardUrl,
     transDustToCardUrl,
     transDustToCardRandomUrl,
+    transCardToDustUrl,
 
     urlNeededValidate
 }

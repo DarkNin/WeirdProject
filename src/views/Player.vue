@@ -181,6 +181,9 @@
             <el-button type="primary" size="mini" @click="libQueryCard"
               >查询</el-button
             >
+            <el-button type="primary" size="mini" @click="libExport"
+              >导出</el-button
+            >
           </div>
         </div>
         <div class="player-main-content-table-wrap">
@@ -236,6 +239,20 @@
                   @mouseleave.native="_closeCardDesc"
                   circle
                 ></el-button>
+              </template>
+            </el-table-column>
+            <el-table-column :key="'lib-column-' + 7" width="64">
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="turnToDust(scope.row)"
+                  v-if="
+                    libQueryAddition.userName === username &&
+                    checkIfTurnColumnShow(scope.row)
+                  "
+                  >转化</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -312,11 +329,12 @@
           <el-table :data="drawRecordTableData" size="mini" height="48vh">
             <el-table-column :key="'draw-record-column-' + 0" type="expand">
               <template slot-scope="scope">
-                <div class="table-expand-desc-box"
+                <div
+                  class="table-expand-desc-box"
                   v-for="(item, index) in scope.row.rollResult"
                   :key="'draw-result-desc-' + index"
                 >
-                 {{ item.desc }}
+                  {{ item.desc }}
                 </div>
               </template>
             </el-table-column>
@@ -361,7 +379,11 @@
                     :class="_getRareColor(item.rare)"
                     >{{ item.rare }}</span
                   >
-                  <span class="draw-result-name">{{ item.cardName }}</span>
+                  <span
+                    class="draw-result-name"
+                    :class="{ grey: !item.isDust }"
+                    >{{ item.cardName }}</span
+                  >
                 </div>
               </template>
             </el-table-column>
@@ -433,10 +455,10 @@
             <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div class="table-expand-desc-box">
-                 {{ scope.row.oldDesc }}
+                  {{ scope.row.oldDesc }}
                 </div>
                 <div class="table-expand-desc-box">
-                 {{ scope.row.newDesc }}
+                  {{ scope.row.newDesc }}
                 </div>
               </template>
             </el-table-column>
@@ -562,7 +584,40 @@
         </span>
       </el-dialog>
     </el-dialog>
-    
+
+    <!-- 转尘dialog -->
+    <el-dialog
+      title="转尘"
+      :visible.sync="isTurningToDust"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelTurnToDust"
+    >
+      <el-form label-position="top" :model="turnToDustInfo">
+        <el-form-item label="卡名" size="small">
+          <el-input
+            v-model="turnToDustInfo.card"
+            type="text"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="数量" size="small" required prop="count">
+          <el-input
+            v-model.number="turnToDustInfo.count"
+            type="number"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isTurningToDust = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitTurnToDust" size="small"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
     <card-desc
       :visible.sync="isShowingCardDesc"
       :posX="cardDesc.x"
@@ -575,12 +630,17 @@
 </template>
 
 <script>
-import { axiosFetch } from "@/utils/fetch.js";
+import { axiosFetch, axiosGet } from "@/utils/fetch.js";
 import common from "./mixins/common";
 import MD5 from "crypto-js/md5";
 import { MessageBox } from "element-ui";
-import { transDustToCardUrl, transDustToCardRandomUrl } from "@/config/url.js";
+import {
+  transDustToCardUrl,
+  transDustToCardRandomUrl,
+  transCardToDustUrl,
+} from "@/config/url.js";
 import CardDesc from "@/components/CardDesc";
+import { exportToExcelByJson } from "@/utils/xlsx";
 export default {
   name: "Player",
   mixins: [common],
@@ -642,6 +702,14 @@ export default {
       fusingCardData: {
         package: "",
         card: "",
+      },
+
+      //卡转尘
+      isTurningToDust: false,
+      turnToDustInfo: {
+        card: "",
+        count: null,
+        basicCount: null,
       },
     };
   },
@@ -761,7 +829,37 @@ export default {
       this.libQueryAddition.userName = this.username;
       this.libQueryCard();
     },
+    libExport() {
+      MessageBox.confirm("请确认是否以当前条件导出Excel文档", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$openLoading();
+          this._queryCardList(
+            1,
+            2147483647,
+            this.libQueryAddition.packageName || undefined,
+            this.libQueryAddition.cardName || undefined,
+            this.libQueryAddition.rare || undefined,
+            this.libQueryAddition.userName || undefined,
+            "player_lib"
+          ).then((data) => {
+            let fileData = this._generateLibDataForExport(data.data);
+            exportToExcelByJson(fileData.data, fileData.fileName)
+              .then((_res) => {
+                this.$alertSuccess(_res);
+              })
+              .catch((_err) => {
+                this.$alertWarning(_err);
+              });
 
+            this.$closeLoading();
+          });
+        })
+        .catch(() => {});
+    },
     //记录页面 清除条件
     recordClearAddition() {
       Object.assign(
@@ -838,8 +936,10 @@ export default {
       this.fusingCardData.card = "";
     },
     submitFusingCard() {
-      if (this.fusingCardType === 'standard' && !this.fusingCardData.card) return;
-      if (this.fusingCardType === 'random' && !this.fusingCardData.package) return;
+      if (this.fusingCardType === "standard" && !this.fusingCardData.card)
+        return;
+      if (this.fusingCardType === "random" && !this.fusingCardData.package)
+        return;
       MessageBox.confirm("请确认是否合成", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
@@ -863,6 +963,55 @@ export default {
             if (res.data.code === 200) {
               this.isFusingCardInner = false;
               this.isFusingCard = false;
+              this.reloadPage();
+            }
+          });
+        })
+        .catch(() => {});
+    },
+
+    //转化多余闪为尘
+    checkIfTurnColumnShow(row) {
+      return row.count > 3 && ["UR", "SR", "HR"].includes(row.rare);
+    },
+    turnToDust(row) {
+      this.turnToDustInfo.card = row.cardName;
+      this.turnToDustInfo.count = row.count - 3;
+      this.turnToDustInfo.basicCount = row.count;
+      this.isTurningToDust = true;
+    },
+    cancelTurnToDust() {
+      this.turnToDustInfo.card = "";
+      this.turnToDustInfo.count = null;
+      this.turnToDustInfo.basicCount = null;
+    },
+    submitTurnToDust() {
+      let temp = this.turnToDustInfo;
+      let regx = /^[1-9]+$/;
+      if (!regx.test(temp.count) || temp.count > temp.basicCount - 3) {
+        this.$alertInfo("请输入合适的数量");
+        return;
+      }
+      MessageBox.confirm(
+        `是否将${temp.count}张【${temp.card}】转化为尘？`,
+        "提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$openLoading();
+          axiosGet({
+            url: transCardToDustUrl,
+            data: {
+              card: temp.card,
+              count: temp.count,
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              this.isTurningToDust = false;
               this.reloadPage();
             }
           });
@@ -1023,7 +1172,9 @@ export default {
   background-color: #ffe3a7;
   color: #c5b314;
 }
-
+.draw-result-name.grey {
+  color: #cacaca;
+}
 .el-dialog .fusion-wrap {
   display: flex;
   flex-direction: column;
@@ -1038,7 +1189,6 @@ export default {
 .el-dialog .el-select {
   width: 100%;
 }
-
 
 .table-preview-btn {
   font-size: 1.2rem;

@@ -13,7 +13,7 @@ import {
     openLoading,
     closeLoading
 } from '@/utils/loading';
-
+import Moment from 'moment'
 
 export default {
     data() {
@@ -205,12 +205,12 @@ export default {
             }
         },
 
-
+        //检测是否移动端应用
         _checkIfMobile() {
             return 'ontouchend' in document.body;
         },
 
-
+        //PC-鼠标悬浮时显示卡片描述
         _showCardDescHover(event, desc, pid) {
             if (this._checkIfMobile()) return;
             let tarRect = event.target.getBoundingClientRect();
@@ -221,15 +221,29 @@ export default {
             this.isShowingCardDesc = true;
         },
 
+        //移动端-点击时显示卡片描述
         _showCardDescClick(event, desc, pid) {
             if (!this._checkIfMobile()) return;
             this.cardDesc.desc = desc;
             this.cardDesc.picId = pid;
             this.isShowingCardDesc = true;
         },
-
+        //关闭卡片描述
         _closeCardDesc() {
             this.isShowingCardDesc = false;
         },
+
+        //根据查询得数据生成用于导出的数据
+        // 返回 {data: 列表数组, fileName: 文件名(不含后缀)}
+        _generateLibDataForExport(data) {
+            let sheetHeader = ['卡包名', '卡名', '稀有度', '持有者', '持有数']
+            let sheet = data.map(item => [item.packageName, item.cardName, item.rare, item.userName, item.count]);
+            sheet.unshift(sheetHeader);
+            return {
+                data: sheet,
+                fileName: `诡异-导出-${Moment().format('YYYYMMDDhhmmss')}`
+            }
+        }
+
     }
 }
