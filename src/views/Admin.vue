@@ -243,6 +243,8 @@
               size="mini"
               v-model="libQueryAddition.rare"
               placeholder="请选择稀有度"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option label="N" value="N"></el-option>
@@ -366,6 +368,8 @@
               size="mini"
               v-model="playerLibQueryAddition.rare"
               placeholder="请选择稀有度"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option label="N" value="N"></el-option>
@@ -563,6 +567,8 @@
               size="mini"
               v-model="userQueryAddition.rare"
               placeholder="请选择稀有度"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option label="N" value="N"></el-option>
@@ -780,7 +786,7 @@
                   >
                   <span
                     class="draw-result-name"
-                    :class="{ grey: !item.isDust }"
+                    :class="{ grey: item.isDust }"
                     >{{ item.cardName }}</span
                   >
                 </div>
@@ -837,6 +843,8 @@
               size="mini"
               v-model="recordQueryAddition.rare"
               placeholder="请选择稀有度"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option label="N" value="N"></el-option>
@@ -2001,7 +2009,7 @@ export default {
         this.defaultPageSize,
         this.libQueryAddition.packageName || undefined,
         this.libQueryAddition.cardName || undefined,
-        this.libQueryAddition.rare || undefined,
+        this.libQueryAddition.rare.length > 0 ? this.libQueryAddition.rare : undefined,
         this.libQueryAddition.userName || undefined,
         "admin_search"
       ).then((data) => {
@@ -2029,7 +2037,7 @@ export default {
         this.defaultPageSize,
         this.playerLibQueryAddition.packageName || undefined,
         this.playerLibQueryAddition.cardName || undefined,
-        this.playerLibQueryAddition.rare || undefined,
+        this.playerLibQueryAddition.rare.length > 0 ? this.playerLibQueryAddition.rare : undefined,
         this.playerLibQueryAddition.userName || undefined,
         "player_lib"
       ).then((data) => {
@@ -2052,7 +2060,7 @@ export default {
             2147483647,
             this.playerLibQueryAddition.packageName || undefined,
             this.playerLibQueryAddition.cardName || undefined,
-            this.playerLibQueryAddition.rare || undefined,
+            this.playerLibQueryAddition.rare.length > 0 ? this.playerLibQueryAddition.rare : undefined,
             this.playerLibQueryAddition.userName || undefined,
             "player_lib"
           ).then((data) => {
@@ -2149,7 +2157,7 @@ export default {
         this.defaultPageSize,
         this.userQueryAddition.package || undefined,
         this.userQueryAddition.card || undefined,
-        this.userQueryAddition.rare || undefined,
+        this.userQueryAddition.rare.length > 0 ? this.userQueryAddition.rare : undefined,
         this.userQueryAddition.target || undefined,
         "player_lib"
       ).then((data) => {
@@ -2173,7 +2181,7 @@ export default {
             2147483647,
             this.userQueryAddition.package || undefined,
             this.userQueryAddition.card || undefined,
-            this.userQueryAddition.rare || undefined,
+            this.userQueryAddition.rare.length > 0 ? this.userQueryAddition.rare : undefined,
             this.userQueryAddition.target || undefined,
             "player_lib"
           ).then((data) => {
@@ -2372,15 +2380,15 @@ export default {
       this.tempDrewCardsInfo = "";
     },
     analyseImportDrewCards() {
-      let regx = /\||\n\r|\r|\n/g;
+      let regx = /\n\r|\r|\n/g;
       let tempArray = this.tempDrewCardsInfo
         .split(regx)
         .filter((t) => !!t)
         .map((t) => t.trim());
       let result = [];
-      for (let i = 0; i < tempArray.length; i += 3) {
-        result.push(tempArray.slice(i, i + 3));
-      }
+      tempArray.forEach(item => {
+        result.push(item.split('|').map((t) => t.trim()))
+      })
       this.importingDrewCardsInfo.cards = result;
     },
     submitImportDrewCards() {

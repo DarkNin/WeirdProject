@@ -1,5 +1,7 @@
 import {
-    axiosFetch
+    axiosFetch,
+    axiosGet,
+    axiosPostAsJSON
 } from '@/utils/fetch'
 import {
     searchOwningCardUrl,
@@ -117,13 +119,13 @@ export default {
         },
         _queryList(page, pageSize, _package, card, rare, target, url) {
             return new Promise((resolve) => {
-                axiosFetch({
+                axiosPostAsJSON({
                     url: url,
                     data: {
-                        package: _package,
-                        card: card,
-                        rare: rare,
-                        target: target,
+                        packageName: _package,
+                        cardName: card,
+                        rareList: rare,
+                        targetUser: target,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                     },
@@ -143,12 +145,12 @@ export default {
         //查询记录列表
         _queryRecordList(page, pageSize, _package, card, rare) {
             return new Promise((resolve) => {
-                axiosFetch({
+                axiosPostAsJSON({
                     url: searchEditedRecordUrl,
                     data: {
-                        package: _package,
-                        card: card,
-                        rare: rare,
+                        packageName: _package,
+                        cardName: card,
+                        rareList: rare,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                     },

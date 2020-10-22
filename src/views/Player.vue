@@ -138,6 +138,8 @@
               size="mini"
               v-model="libQueryAddition.rare"
               placeholder="请选择稀有度"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option label="N" value="N"></el-option>
@@ -381,7 +383,7 @@
                   >
                   <span
                     class="draw-result-name"
-                    :class="{ grey: !item.isDust }"
+                    :class="{ grey: item.isDust }"
                     >{{ item.cardName }}</span
                   >
                 </div>
@@ -423,6 +425,8 @@
               size="mini"
               v-model="recordQueryAddition.rare"
               placeholder="请选择稀有度"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option label="N" value="N"></el-option>
@@ -572,6 +576,9 @@
                 :value="item.packageName"
               ></el-option>
             </el-select>
+            <el-checkbox size="mini" v-model="fusingCardData.dustFirst"
+              >优先使用尘</el-checkbox
+            >
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -702,6 +709,7 @@ export default {
       fusingCardData: {
         package: "",
         card: "",
+        dustFirst: false,
       },
 
       //卡转尘
@@ -934,6 +942,7 @@ export default {
       this.fusingCardType = "";
       this.fusingCardData.package = "";
       this.fusingCardData.card = "";
+      this.fusingCardData.dustFirst = false;
     },
     submitFusingCard() {
       if (this.fusingCardType === "standard" && !this.fusingCardData.card)
@@ -958,6 +967,7 @@ export default {
           if (this.fusingCardType === "random") {
             options.url = transDustToCardRandomUrl;
             options.data.package = this.fusingCardData.package;
+            options.data.dustFirst = Number(this.fusingCardData.dustFirst);
           }
           axiosFetch(options).then((res) => {
             if (res.data.code === 200) {
