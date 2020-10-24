@@ -17,6 +17,20 @@ import {
 } from '@/utils/loading';
 import Moment from 'moment'
 
+//格式化传参时稀有度列表的顺序
+const formatRareListSeq = (arr) => {
+    if (arr === undefined) {
+        return undefined;
+    }
+    let tempArr = [];
+    ["N", "R", "SR", "UR", "HR"].forEach(item => {
+        if (arr.indexOf(item) >= 0) {
+            tempArr.push(item)
+        }
+    })
+    return tempArr;
+}
+
 export default {
     data() {
         return {
@@ -124,7 +138,7 @@ export default {
                     data: {
                         packageName: _package,
                         cardName: card,
-                        rareList: rare,
+                        rareList: formatRareListSeq(rare),
                         targetUser: target,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
@@ -150,7 +164,7 @@ export default {
                     data: {
                         packageName: _package,
                         cardName: card,
-                        rareList: rare,
+                        rareList: formatRareListSeq(rare),
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                     },
