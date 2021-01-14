@@ -228,6 +228,8 @@
               size="mini"
               v-model="libQueryAddition.packageName"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -2610,7 +2612,7 @@ export default {
 
 .admin-main-content-addition-special {
   min-height: 30px;
-  width: 10rem;
+  width: 12rem;
 }
 .special-user-add {
   margin-left: auto;
@@ -2649,12 +2651,19 @@ export default {
 }
 
 .admin-main-content-addition-item {
-  width: 10rem;
+  width: 12rem;
   height: 3rem;
   margin-right: 0.6rem;
 }
 .admin-main-content-addition-item.special {
   width: auto;
+}
+.admin-main-content-addition-special /deep/ .el-tag,
+.admin-main-content-addition-item /deep/ .el-tag {
+  overflow: hidden;
+  max-width: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .table-tag-draw {
   display: inline-block;
@@ -2748,4 +2757,6 @@ export default {
   opacity: 0.5;
   background: #c8ebfb;
 }
+
+
 </style>
