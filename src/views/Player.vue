@@ -308,19 +308,19 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="libTableData" size="mini" height="48vh">
+          <el-table :data="playerLibTableData" size="mini" height="48vh">
             <el-table-column
-              :key="'lib-column-' + 1"
+              :key="'player-lib-column-' + 1"
               prop="cardName"
               label="卡名"
             ></el-table-column>
             <el-table-column
-              :key="'lib-column-' + 2"
+              :key="'player-lib-column-' + 2"
               prop="packageName"
               label="卡包名"
             ></el-table-column>
             <el-table-column
-              :key="'lib-column-' + 3"
+              :key="'player-lib-column-' + 3"
               prop="rare"
               label="稀有度"
             >
@@ -331,17 +331,17 @@
               </template>
             </el-table-column>
             <el-table-column
-              :key="'lib-column-' + 4"
+              :key="'player-lib-column-' + 4"
               prop="userName"
               label="拥有者"
             ></el-table-column>
             <el-table-column
-              :key="'lib-column-' + 5"
+              :key="'player-lib-column-' + 5"
               prop="count"
               label="拥有数量"
             ></el-table-column>
             <el-table-column
-              :key="'lib-column-' + 6"
+              :key="'player-lib-column-' + 6"
               prop="desc"
               label="预览"
               width="54"
@@ -362,7 +362,7 @@
                 ></el-button>
               </template>
             </el-table-column>
-            <el-table-column :key="'lib-column-' + 7" width="64">
+            <el-table-column :key="'player-lib-column-' + 7" width="64">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -382,9 +382,9 @@
               small
               background
               layout="prev, pager, next"
-              :total="libPagination.total"
-              :page-size="libPagination.pageSize"
-              :current-page="libPagination.page"
+              :total="playerLibPagination.total"
+              :page-size="playerLibPagination.pageSize"
+              :current-page="playerLibPagination.page"
               @current-change="libQueryCard"
             ></el-pagination>
           </div>
@@ -798,6 +798,19 @@ export default {
         rare: "",
       },
       libTableData: [],
+      //玩家卡库查询
+      playerLibPagination: {
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
+      playerLibQueryAddition: {
+        packageName: "",
+        cardName: "",
+        userName: "",
+        rare: "",
+      },
+      playerLibTableData: [],
 
       recordPagination: {
         page: 1,
@@ -947,9 +960,9 @@ export default {
         this.libQueryAddition.userName || undefined,
         "player_lib"
       ).then((data) => {
-        this.libPagination.page = data.pagination.page;
-        this.libPagination.total = data.pagination.total;
-        this.libTableData = data.data;
+        this.playerLibPagination.page = data.pagination.page;
+        this.playerLibPagination.total = data.pagination.total;
+        this.playerLibTableData = data.data;
         this.$closeLoading();
       });
     },

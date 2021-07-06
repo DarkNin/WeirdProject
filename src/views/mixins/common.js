@@ -139,7 +139,7 @@ export default {
                         packageNameList: _package,
                         cardName: card,
                         rareList: formatRareListSeq(rare),
-                        targetUser: target,
+                        targetUserList: target,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                     },
