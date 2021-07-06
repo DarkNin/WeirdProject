@@ -329,7 +329,7 @@
                 <el-button
                   size="mini"
                   type="text"
-                  @click="editCard(scope.row.cardName)"
+                  @click="editCard(scope.row.cardName, scope.row.rare)"
                   >编辑</el-button
                 >
               </template>
@@ -1146,6 +1146,24 @@
             clearable
           ></el-input>
         </el-form-item>
+
+        <el-form-item label="新稀有度" size="small">
+            <el-select
+              size="mini"
+              v-model="editingCardData.rare"
+              placeholder="请选择稀有度"
+              clearable
+            >
+              <el-option label="N" value="N"></el-option>
+              <el-option label="R" value="R"></el-option>
+              <el-option label="SR" value="SR"></el-option>
+              <el-option label="UR" value="UR"></el-option>
+              <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
+            </el-select>
+        </el-form-item>
+
         <el-form-item label="是否记录" size="small">
           <el-checkbox v-model="editingCardData.show"></el-checkbox>
         </el-form-item>
@@ -1623,6 +1641,7 @@ export default {
       editingCardData: {
         oldname: "",
         newname: "",
+        rare: "",
         show: false,
       },
 
@@ -1970,8 +1989,10 @@ export default {
         }
       });
     },
-    editCard(cardName) {
+    editCard(cardName, cardRare) {
       this.editingCardData.oldname = cardName;
+      this.editingCardData.newname = cardName;
+      this.editingCardData.rare = cardRare;
       this.isEditingCard = true;
     },
 
@@ -1989,6 +2010,7 @@ export default {
           data: {
             oldname: this.editingCardData.oldname,
             newname: this.editingCardData.newname,
+            newRare: this.editingCardData.rare,
             show: Number(this.editingCardData.show) || undefined,
           },
         }).then((res) => {
