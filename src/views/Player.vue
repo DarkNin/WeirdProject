@@ -401,6 +401,8 @@
               size="mini"
               v-model="drawRecordQueryAddition.package"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -416,6 +418,8 @@
               size="mini"
               v-model="drawRecordQueryAddition.user"
               placeholder="请选择玩家"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -443,7 +447,7 @@
               >清除条件</el-button
             >
             <el-button type="primary" size="mini" @click="setToMineInRecord"
-              >查询自己</el-button
+              >只查自己</el-button
             >
             <el-button type="primary" size="mini" @click="drawRecordQuery"
               >查询</el-button
@@ -1086,7 +1090,8 @@ export default {
       });
     },
     setToMineInRecord() {
-      this.drawRecordQueryAddition.user = this.username;
+      this.drawRecordQueryAddition.user = []
+      this.drawRecordQueryAddition.user.push(this.username);
       this.drawRecordQuery();
     },
 

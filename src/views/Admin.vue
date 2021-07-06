@@ -562,6 +562,8 @@
               size="mini"
               v-model="userQueryAddition.package"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -696,6 +698,8 @@
               size="mini"
               v-model="drawRecordQueryAddition.package"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -711,6 +715,8 @@
               size="mini"
               v-model="drawRecordQueryAddition.user"
               placeholder="请选择玩家"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option

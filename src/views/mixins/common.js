@@ -184,11 +184,11 @@ export default {
         //查询记录列表
         _queryDrawRecordList(page, pageSize, _package, user, startTime, endTime) {
             return new Promise((resolve) => {
-                axiosFetch({
+                axiosPostAsJSON({
                     url: queryDrawResultUrl,
                     data: {
-                        package: _package,
-                        user: user,
+                        packageList: _package,
+                        userList: user,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                         start: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
