@@ -23,7 +23,7 @@ const formatRareListSeq = (arr) => {
         return undefined;
     }
     let tempArr = [];
-    ["N", "R", "SR", "UR", "HR"].forEach(item => {
+    ["N", "R", "SR", "UR", "HR", "GR", "SER"].forEach(item => {
         if (arr.indexOf(item) >= 0) {
             tempArr.push(item)
         }
@@ -136,7 +136,7 @@ export default {
                 axiosPostAsJSON({
                     url: url,
                     data: {
-                        packageName: _package,
+                        packageNameList: _package,
                         cardName: card,
                         rareList: formatRareListSeq(rare),
                         targetUser: target,
@@ -216,6 +216,8 @@ export default {
                     return "color-rare";
                 case "SR":
                 case "UR":
+                case "SER":
+                case "GR":
                 case "HR":
                     return "color-ultra-rare";
             }

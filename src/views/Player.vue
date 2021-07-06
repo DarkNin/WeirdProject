@@ -151,6 +151,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
@@ -262,6 +264,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
@@ -549,6 +553,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
