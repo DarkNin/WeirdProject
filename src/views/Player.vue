@@ -240,6 +240,8 @@
               size="mini"
               v-model="libQueryAddition.packageName"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -273,6 +275,8 @@
               size="mini"
               v-model="libQueryAddition.userName"
               placeholder="请选择玩家"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -297,7 +301,7 @@
               >清除条件</el-button
             >
             <el-button type="primary" size="mini" @click="setToMineInLib"
-              >查询自己</el-button
+              >只查自己</el-button
             >
             <el-button type="primary" size="mini" @click="libQueryCard"
               >查询</el-button
@@ -989,7 +993,8 @@ export default {
     },
 
     setToMineInLib() {
-      this.libQueryAddition.userName = this.username;
+      this.libQueryAddition.userName = []
+      this.libQueryAddition.userName.push(this.username);
       this.libQueryCard();
     },
     libExport() {

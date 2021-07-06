@@ -357,6 +357,8 @@
               size="mini"
               v-model="playerLibQueryAddition.packageName"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -390,6 +392,8 @@
               size="mini"
               v-model="playerLibQueryAddition.userName"
               placeholder="请选择玩家"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
