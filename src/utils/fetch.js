@@ -18,7 +18,10 @@ export const axiosGet = opt => {
     method: 'get',
     url: opt.url,
     timeout: 90000,
-    params: opt.data
+    params: opt.data,
+    paramsSerializer: function(p) {
+      return Qs.stringify(p, {arrayFormat: 'repeat'})
+    }
   })
 };
 
