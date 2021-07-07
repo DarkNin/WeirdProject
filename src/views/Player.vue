@@ -537,6 +537,8 @@
               size="mini"
               v-model="recordQueryAddition.packageName"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option

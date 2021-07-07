@@ -162,7 +162,7 @@ export default {
                 axiosPostAsJSON({
                     url: searchEditedRecordUrl,
                     data: {
-                        packageName: _package,
+                        packageNameList: _package,
                         cardName: card,
                         rareList: formatRareListSeq(rare),
                         page: page || this.defaultPage,
