@@ -254,6 +254,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
@@ -327,7 +329,7 @@
                 <el-button
                   size="mini"
                   type="text"
-                  @click="editCard(scope.row.cardName)"
+                  @click="editCard(scope.row.cardName, scope.row.rare)"
                   >编辑</el-button
                 >
               </template>
@@ -355,6 +357,8 @@
               size="mini"
               v-model="playerLibQueryAddition.packageName"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -379,6 +383,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
@@ -386,6 +392,8 @@
               size="mini"
               v-model="playerLibQueryAddition.userName"
               placeholder="请选择玩家"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -554,6 +562,8 @@
               size="mini"
               v-model="userQueryAddition.package"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -578,6 +588,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
@@ -686,6 +698,8 @@
               size="mini"
               v-model="drawRecordQueryAddition.package"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -701,6 +715,8 @@
               size="mini"
               v-model="drawRecordQueryAddition.user"
               placeholder="请选择玩家"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -830,6 +846,8 @@
               size="mini"
               v-model="recordQueryAddition.packageName"
               placeholder="请选择卡包"
+              multiple
+              collapse-tags
               clearable
             >
               <el-option
@@ -854,6 +872,8 @@
               <el-option label="SR" value="SR"></el-option>
               <el-option label="UR" value="UR"></el-option>
               <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
             </el-select>
           </div>
           <div class="admin-main-content-addition-item">
@@ -1032,6 +1052,8 @@
             <el-option label="SR" value="SR"></el-option>
             <el-option label="UR" value="UR"></el-option>
             <el-option label="HR" value="HR"></el-option>
+            <el-option label="GR" value="GR"></el-option>
+            <el-option label="SER" value="SER"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -1126,6 +1148,24 @@
             clearable
           ></el-input>
         </el-form-item>
+
+        <el-form-item label="新稀有度" size="small">
+            <el-select
+              size="mini"
+              v-model="editingCardData.rare"
+              placeholder="请选择稀有度"
+              clearable
+            >
+              <el-option label="N" value="N"></el-option>
+              <el-option label="R" value="R"></el-option>
+              <el-option label="SR" value="SR"></el-option>
+              <el-option label="UR" value="UR"></el-option>
+              <el-option label="HR" value="HR"></el-option>
+              <el-option label="GR" value="GR"></el-option>
+              <el-option label="SER" value="SER"></el-option>
+            </el-select>
+        </el-form-item>
+
         <el-form-item label="是否记录" size="small">
           <el-checkbox v-model="editingCardData.show"></el-checkbox>
         </el-form-item>
@@ -1568,6 +1608,16 @@ export default {
           keyWord: "stash-hr-",
           dataKey: "hrList",
         },
+        {
+          label: "GR",
+          keyWord: "stash-gr-",
+          dataKey: "grList",
+        },
+        {
+          label: "SER",
+          keyWord: "stash-ser-",
+          dataKey: "serList",
+        },
       ],
       tempBatchAddingCardData: {
         nList: "",
@@ -1575,6 +1625,8 @@ export default {
         srList: "",
         hrList: "",
         urList: "",
+        grList: "",
+        serList: "",
       },
       batchAddingCardData: {
         packageName: "",
@@ -1583,12 +1635,15 @@ export default {
         srList: [],
         hrList: [],
         urList: [],
+        grList: [],
+        serList: [],
       },
       //编辑卡片
       isEditingCard: false,
       editingCardData: {
         oldname: "",
         newname: "",
+        rare: "",
         show: false,
       },
 
@@ -1907,7 +1962,7 @@ export default {
       );
     },
     analyseBatchAddingCardList() {
-      ["nList", "rList", "srList", "hrList", "urList"].forEach((item) => {
+      ["nList", "rList", "srList", "hrList", "urList", "grList", "serList"].forEach((item) => {
         this.batchAddingCardData[item] = this.tempBatchAddingCardData[item]
           ? this.tempBatchAddingCardData[item].split("|").map((t) => t.trim())
           : [];
@@ -1925,6 +1980,8 @@ export default {
           srList: this.batchAddingCardData.srList,
           hrList: this.batchAddingCardData.hrList,
           urList: this.batchAddingCardData.urList,
+          grList: this.batchAddingCardData.grList,
+          serList: this.batchAddingCardData.serList,
         },
       }).then((res) => {
         if (res.data.code === 200) {
@@ -1934,8 +1991,10 @@ export default {
         }
       });
     },
-    editCard(cardName) {
+    editCard(cardName, cardRare) {
       this.editingCardData.oldname = cardName;
+      this.editingCardData.newname = cardName;
+      this.editingCardData.rare = cardRare;
       this.isEditingCard = true;
     },
 
@@ -1953,6 +2012,7 @@ export default {
           data: {
             oldname: this.editingCardData.oldname,
             newname: this.editingCardData.newname,
+            newRare: this.editingCardData.rare,
             show: Number(this.editingCardData.show) || undefined,
           },
         }).then((res) => {

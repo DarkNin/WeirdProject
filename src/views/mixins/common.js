@@ -23,7 +23,7 @@ const formatRareListSeq = (arr) => {
         return undefined;
     }
     let tempArr = [];
-    ["N", "R", "SR", "UR", "HR"].forEach(item => {
+    ["N", "R", "SR", "UR", "HR", "GR", "SER"].forEach(item => {
         if (arr.indexOf(item) >= 0) {
             tempArr.push(item)
         }
@@ -136,10 +136,10 @@ export default {
                 axiosPostAsJSON({
                     url: url,
                     data: {
-                        packageName: _package,
+                        packageNameList: _package,
                         cardName: card,
                         rareList: formatRareListSeq(rare),
-                        targetUser: target,
+                        targetUserList: target,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                     },
@@ -162,7 +162,7 @@ export default {
                 axiosPostAsJSON({
                     url: searchEditedRecordUrl,
                     data: {
-                        packageName: _package,
+                        packageNameList: _package,
                         cardName: card,
                         rareList: formatRareListSeq(rare),
                         page: page || this.defaultPage,
@@ -184,11 +184,11 @@ export default {
         //查询记录列表
         _queryDrawRecordList(page, pageSize, _package, user, startTime, endTime) {
             return new Promise((resolve) => {
-                axiosFetch({
+                axiosPostAsJSON({
                     url: queryDrawResultUrl,
                     data: {
-                        package: _package,
-                        user: user,
+                        packageList: _package,
+                        userList: user,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                         start: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
@@ -216,6 +216,8 @@ export default {
                     return "color-rare";
                 case "SR":
                 case "UR":
+                case "SER":
+                case "GR":
                 case "HR":
                     return "color-ultra-rare";
             }
