@@ -187,12 +187,12 @@ export default {
                 axiosPostAsJSON({
                     url: queryDrawResultUrl,
                     data: {
-                        packageList: _package,
-                        userList: user,
+                        packageNameList: _package,
+                        userNameList: user,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
-                        start: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
-                        end: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined
+                        startTime: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
+                        endTime: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined
                     },
                 }).then((res) => {
                     resolve({
