@@ -176,7 +176,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="libTableData" size="mini" height="48vh">
+          <el-table :data="libTableData" size="mini" height="auto">
             <el-table-column
               :key="'lib-column-' + 1"
               prop="cardName"
@@ -315,7 +315,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="playerLibTableData" size="mini" height="48vh">
+          <el-table :data="playerLibTableData" size="mini" height="auto">
             <el-table-column
               :key="'player-lib-column-' + 1"
               prop="cardName"
@@ -458,7 +458,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="drawRecordTableData" size="mini" height="48vh">
+          <el-table :data="drawRecordTableData" size="mini" height="auto">
             <el-table-column :key="'draw-record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div
@@ -589,7 +589,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="recordTableData" size="mini" height="48vh">
+          <el-table :data="recordTableData" size="mini" height="auto">
             <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div class="table-expand-desc-box">
@@ -1304,6 +1304,8 @@ export default {
   padding: 1rem;
   flex: auto;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .player-main-content /deep/ .el-collapse-item__header {
@@ -1342,7 +1344,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-content: center;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .player-main-content-addition {
@@ -1361,6 +1363,11 @@ export default {
 }
 .player-main-content-addition-item.special {
   width: auto;
+}
+.player-main-content-table-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .table-tag-draw {
   display: inline-block;
