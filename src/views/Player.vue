@@ -8,6 +8,7 @@
         <p>剩余尘数: {{ leftDust }}</p>
       </span>
 
+      <el-button type="text" @click="reloadPage">刷新</el-button>
       <el-button type="text" @click="fuseCard">合成</el-button>
     </div>
     <div class="player-main">
@@ -156,13 +157,14 @@
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
-            <el-input
+            <el-autocomplete
               size="mini"
               v-model.trim="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
+              :fetch-suggestions="querySearchCandicateCardList"
               @keyup.enter.native="libAllQueryCard"
-            ></el-input>
+            ></el-autocomplete>
           </div>
           <div class="player-main-content-addition-item">
             <el-button type="info" size="mini" @click="libClearAddition"
@@ -288,13 +290,14 @@
             </el-select>
           </div>
           <div class="player-main-content-addition-item">
-            <el-input
+            <el-autocomplete
               size="mini"
               v-model.trim="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
+              :fetch-suggestions="querySearchCandicateCardList"
               @keyup.enter.native="libQueryCard"
-            ></el-input>
+            ></el-autocomplete>
           </div>
           <div class="player-main-content-addition-item special">
             <el-button type="info" size="mini" @click="libClearAddition"
@@ -682,11 +685,12 @@
             required
             v-if="fusingCardType === 'standard'"
           >
-            <el-input
+            <el-autocomplete
               v-model.trim="fusingCardData.card"
               type="text"
               clearable
-            ></el-input>
+              :fetch-suggestions="querySearchCandicateCardList"
+            ></el-autocomplete>
           </el-form-item>
           <el-form-item
             label="卡包"
@@ -796,6 +800,8 @@ export default {
       packageListContent: {},
       activeItemIndex: "",
 
+      cardCandicateList: [],
+
       libPagination: {
         page: 1,
         pageSize: 20,
@@ -866,6 +872,7 @@ export default {
     };
   },
   async mounted() {
+    this.generateCandicateCardList();
     this.$on("preloaded", () => {
       let userInfo = this.userList.find(
         (element) => element.userName === this.username
@@ -898,7 +905,9 @@ export default {
     },
     async reloadPage() {
       this.$openLoading();
+      var tempIndex = this.showTab;
       Object.assign(this.$data, this.$options.data());
+      this.showTab = tempIndex;
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
       let userInfo = this.userList.find(
@@ -910,6 +919,38 @@ export default {
         this.leftAward = userInfo.nonawardCount;
       }
       this.$closeLoading();
+      this.generateCandicateCardList();
+    },
+
+    //生成输入卡片名字时的输入建议列表
+    async generateCandicateCardList() {
+      let cardList = await this._queryCardList(
+        1,
+        65535,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "admin_search"
+      );
+      this.cardCandicateList = cardList.data.map((item) => {
+        return {
+          value: item.cardName,
+        };
+      });
+    },
+
+    querySearchCandicateCardList(queryString, callback) {
+      let result = queryString
+        ? this.cardCandicateList.filter(this.listFilter(queryString))
+        : [];
+      callback(result);
+    },
+
+    listFilter(queryString) {
+      return (item) => {
+        return item.value.indexOf(queryString) >= 0;
+      };
     },
 
     //情报页面点击手风琴面板时触发

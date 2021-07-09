@@ -1790,7 +1790,9 @@ export default {
 
     async reloadPage() {
       this.$openLoading();
+      var tempIndex = this.showTab;
       Object.assign(this.$data, this.$options.data());
+      this.showTab = tempIndex;
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
       this.$closeLoading();
@@ -1824,7 +1826,7 @@ export default {
 
     listFilter(queryString) {
       return (item) => {
-        return item.value.indexOf(queryString) === 0;
+        return item.value.indexOf(queryString) >= 0;
       };
     },
 
