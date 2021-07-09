@@ -899,7 +899,9 @@ export default {
     },
     async reloadPage() {
       this.$openLoading();
+      var tempIndex = this.showTab;
       Object.assign(this.$data, this.$options.data());
+      this.showTab = tempIndex;
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
       let userInfo = this.userList.find(
