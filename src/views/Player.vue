@@ -8,6 +8,7 @@
         <p>剩余尘数: {{ leftDust }}</p>
       </span>
 
+      <el-button type="text" @click="reloadPage">刷新</el-button>
       <el-button type="text" @click="fuseCard">合成</el-button>
     </div>
     <div class="player-main">

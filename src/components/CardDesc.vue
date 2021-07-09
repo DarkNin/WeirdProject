@@ -19,7 +19,7 @@
         @mouseleave="$emit('update:visible', false)"
       >
         <div class="card-pic-box">
-          <el-image v-if="picId !== 0" :src="'https://cdn01.moecube.com/images/ygopro-images-en-US/' + picId + '.jpg'">
+          <el-image v-if="picId !== 0" :src="'https://cdn01.moecube.com/ygomobile-images/' + picId + '.png'">
             <div slot="placeholder">
               <el-image :src="require('../assets/unknown.jpg')" fit="contain">
               </el-image>
