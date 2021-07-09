@@ -1826,7 +1826,7 @@ export default {
 
     listFilter(queryString) {
       return (item) => {
-        return item.value.indexOf(queryString) === 0;
+        return item.value.indexOf(queryString) >= 0;
       };
     },
 
