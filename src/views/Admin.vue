@@ -2284,11 +2284,19 @@ export default {
       this.addingUserCardTips = "";
     },
     submitEditCardCount_() {
-      if (this.showTab === "3") {
-        this.submitEditCardCount(this.playerLibQueryCard, 1);
-      } else if (this.showTab === "4") {
-        this.submitEditCardCount(this.userQuery, 1);
-      }
+      MessageBox.confirm("请确认是否修改", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          if (this.showTab === "3") {
+            this.submitEditCardCount(this.playerLibQueryCard, 1);
+          } else if (this.showTab === "4") {
+            this.submitEditCardCount(this.userQuery, 1);
+          }
+        })
+        .catch(() => {});
     },
     submitEditCardCount(callback, arg) {
       if (
@@ -2519,23 +2527,31 @@ export default {
     },
 
     submitSwapUserCards() {
-      let temp = this.swappingCardsDetails;
-      if (temp.cardA && temp.cardB && temp.userA && temp.userB) {
-        this.$openLoading();
-        axiosPostAsJSON({
-          url: swapUserOwnCardUrl,
-          data: {
-            userA: temp.userA,
-            cardA: temp.cardA,
-            userB: temp.userB,
-            cardB: temp.cardB,
-          },
-        }).then((res) => {
-          if (res.data.code === 200) {
-            this.reloadPage();
+      MessageBox.confirm("请确认是否交换", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let temp = this.swappingCardsDetails;
+          if (temp.cardA && temp.cardB && temp.userA && temp.userB) {
+            this.$openLoading();
+            axiosPostAsJSON({
+              url: swapUserOwnCardUrl,
+              data: {
+                userA: temp.userA,
+                cardA: temp.cardA,
+                userB: temp.userB,
+                cardB: temp.cardB,
+              },
+            }).then((res) => {
+              if (res.data.code === 200) {
+                this.reloadPage();
+              }
+            });
           }
-        });
-      }
+        })
+        .catch(() => {});
     },
   },
 };
