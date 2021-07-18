@@ -13,6 +13,7 @@
           <el-menu-item index="4">玩家</el-menu-item>
           <el-menu-item index="5">抽卡记录</el-menu-item>
           <el-menu-item index="6">修改记录</el-menu-item>
+          <el-menu-item index="7">日志</el-menu-item>
         </el-menu>
         <div class="admin-main-menu-control">
           <el-button
@@ -953,6 +954,82 @@
           </div>
         </div>
       </div>
+
+      <!-- 日志 -->
+      <div class="admin-main-content" v-else-if="showTab === '7'">
+        <div class="admin-main-content-addition">
+          <div class="admin-main-content-addition-item">
+            <el-input
+              size="mini"
+              v-model.trim="logQueryAddition.operator"
+              placeholder="操作人"
+              clearable
+              :trigger-on-focus="false"
+              @keyup.enter.native="logQuery"
+            ></el-input>
+          </div>
+          <div class="admin-main-content-addition-item">
+            <el-input
+              size="mini"
+              v-model.trim="logQueryAddition.detail"
+              placeholder="操作内容"
+              clearable
+              :trigger-on-focus="false"
+              @keyup.enter.native="logQuery"
+            ></el-input>
+          </div>
+          <div class="admin-main-content-addition-item special">
+            <el-date-picker
+              size="mini"
+              v-model="logQueryAddition.dateRange"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :picker-options="pickerOptions"
+              clearable
+            ></el-date-picker>
+          </div>
+          <div class="admin-main-content-addition-item special">
+            <el-button type="info" size="mini" @click="logClearAddition"
+              >清除条件</el-button
+            >
+            <el-button type="primary" size="mini" @click="logQuery"
+              >查询</el-button
+            >
+          </div>
+        </div>
+        <div class="admin-main-content-table-wrap">
+          <el-table :data="logTableData" size="mini" height="auto">
+            <el-table-column
+              :key="'log-column-' + 1"
+              prop="operator"
+              label="操作人"
+            ></el-table-column>
+            <el-table-column
+              :key="'log-column-' + 2"
+              prop="time"
+              label="操作时间"
+            ></el-table-column>
+            <el-table-column
+              :key="'log-column-' + 3"
+              prop="detail"
+              label="操作内容"
+            ></el-table-column>
+          </el-table>
+          <div class="admin-main-content-table-pagination">
+            <el-pagination
+              small
+              background
+              layout="prev, pager, next"
+              :total="logPagination.total"
+              :page-size="logPagination.pageSize"
+              :current-page="logPagination.page"
+              @current-change="logQuery"
+            ></el-pagination>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 新增卡包dialog -->
@@ -1750,6 +1827,19 @@ export default {
         dateRange: null,
       },
       drawRecordTableData: [],
+
+      //日志查询
+      logPagination: {
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
+      logQueryAddition: {
+        operator: "",
+        detail: "",
+        dateRange: null
+      },
+      logTableData: [],
 
       //设置抽卡记录状态
       isSettingDrawRecord: false,
@@ -2553,6 +2643,38 @@ export default {
         })
         .catch(() => {});
     },
+
+    // 日志
+    logClearAddition() {
+      Object.assign(
+        this.$data.logQueryAddition,
+        this.$options.data().logQueryAddition
+      );
+    },
+
+    logQuery(page) {
+      this.$openLoading();
+      //排除默认鼠标事件参数
+      let currPage = typeof page === "number" ? page : undefined;
+      this._queryLogList(
+        currPage || this.defaultPage,
+        this.defaultPageSize,
+        this.logQueryAddition.operator || undefined,
+        this.logQueryAddition.detail || undefined,
+        this.logQueryAddition.dateRange
+          ? this.logQueryAddition.dateRange[0]
+          : undefined,
+        this.logQueryAddition.dateRange
+          ? this.logQueryAddition.dateRange[1]
+          : undefined
+      ).then((data) => {
+        this.logPagination.page = data.pagination.page;
+        this.logPagination.total = data.pagination.total;
+        this.logTableData = data.data;
+        this.$closeLoading();
+      });
+    },
+
   },
 };
 </script>

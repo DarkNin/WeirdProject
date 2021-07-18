@@ -9,7 +9,8 @@ import {
     queryCardPackageListUrl,
     searchEditedRecordUrl,
     searchUserUrl,
-    queryDrawResultUrl
+    queryDrawResultUrl,
+    queryLogUrl
 } from "@/config/url.js";
 import {
     openLoading,
@@ -191,6 +192,32 @@ export default {
                         userNameList: user,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
+                        startTime: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
+                        endTime: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined
+                    },
+                }).then((res) => {
+                    resolve({
+                        pagination: {
+                            page: res.data.data.currPage,
+                            total: res.data.data.totalCount,
+                            pageSize: res.data.data.pageSize
+                        },
+                        data: res.data.data.dataList,
+                    });
+                });
+            });
+        },
+
+        //查询日志
+        _queryLogList(page, pageSize, user, detail, startTime, endTime) {
+            return new Promise((resolve) => {
+                axiosPostAsJSON({
+                    url: queryLogUrl,
+                    data: {
+                        page: page || this.defaultPage,
+                        pagesize: pageSize || this.defaultPageSize,
+                        operator: user,
+                        detail: detail,
                         startTime: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
                         endTime: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined
                     },
