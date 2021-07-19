@@ -1015,6 +1015,7 @@
               :key="'log-column-' + 3"
               prop="detail"
               label="操作内容"
+              min-width="400"
             ></el-table-column>
           </el-table>
           <div class="admin-main-content-table-pagination">
