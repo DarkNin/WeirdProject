@@ -62,6 +62,11 @@
                 </el-table-column>
                 <el-table-column
                   :key="'package-' + item.packageName + '-3'"
+                  prop="count"
+                  label="持有数量"
+                ></el-table-column>
+                <el-table-column
+                  :key="'package-' + item.packageName + '-4'"
                   prop="desc"
                   label="预览"
                   width="54"
@@ -200,6 +205,11 @@
             </el-table-column>
             <el-table-column
               :key="'lib-column-' + 4"
+              prop="count"
+              label="持有数量"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 5"
               prop="desc"
               label="预览"
               width="54"
@@ -375,10 +385,7 @@
                   type="text"
                   size="mini"
                   @click="turnToDust(scope.row)"
-                  v-if="
-                    libQueryAddition.userName === username &&
-                    checkIfTurnColumnShow(scope.row)
-                  "
+                  v-if="checkIfTurnColumnShow(scope.row)"
                   >转化</el-button
                 >
               </template>
@@ -729,7 +736,7 @@
 
     <!-- 转尘dialog -->
     <el-dialog
-      title="转尘"
+      title="转尘（50尘/张）"
       :visible.sync="isTurningToDust"
       width="20rem"
       :close-on-click-modal="false"
@@ -1190,7 +1197,7 @@ export default {
 
     //转化多余闪为尘
     checkIfTurnColumnShow(row) {
-      return row.count > 3 && ["UR", "SR", "HR"].includes(row.rare);
+      return row.count > 3 && ["UR", "SR", "HR"].includes(row.rare) && row.userName === this.username;
     },
     turnToDust(row) {
       this.turnToDustInfo.card = row.cardName;
@@ -1205,7 +1212,7 @@ export default {
     },
     submitTurnToDust() {
       let temp = this.turnToDustInfo;
-      let regx = /^[1-9]+$/;
+      let regx = /^[1-9][0-9]*$/;
       if (!regx.test(temp.count) || temp.count > temp.basicCount - 3) {
         this.$alertInfo("请输入合适的数量");
         return;
