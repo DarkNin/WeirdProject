@@ -62,6 +62,11 @@
                 </el-table-column>
                 <el-table-column
                   :key="'package-' + item.packageName + '-3'"
+                  prop="count"
+                  label="持有数量"
+                ></el-table-column>
+                <el-table-column
+                  :key="'package-' + item.packageName + '-4'"
                   prop="desc"
                   label="预览"
                   width="54"
@@ -200,6 +205,11 @@
             </el-table-column>
             <el-table-column
               :key="'lib-column-' + 4"
+              prop="count"
+              label="持有数量"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 5"
               prop="desc"
               label="预览"
               width="54"
