@@ -596,7 +596,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="recordTableData" size="mini" height="auto">
+          <el-table :data="recordTableData" size="mini" height="auto" @cell-mouse-enter="recordHighlightRow" @cell-mouse-leave="recordCancelHighlightRow" :row-class-name="recordHightlightClass">
             <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div class="table-expand-desc-box">
@@ -846,6 +846,7 @@ export default {
         rare: "",
       },
       recordTableData: [],
+      highlightKey: null,
 
       drawRecordPagination: {
         page: 1,
@@ -1107,6 +1108,18 @@ export default {
         this.recordTableData = data.data;
         this.$closeLoading();
       });
+    },
+    //记录 高亮同carkPk行
+    recordHighlightRow(row, column, cell, event) {
+      this.highlightKey = row["cardPk"];
+    },
+    recordCancelHighlightRow(row, column, cell, event) {
+      this.highlightKey = null;
+    },
+    recordHightlightClass({row, rowIndex}) {
+      if (row["cardPk"] === this.highlightKey) {
+        return "record-hightlight-row"
+      }
     },
 
     //抽卡记录 清除条件
@@ -1432,5 +1445,9 @@ export default {
 .table-expand-desc-box {
   white-space: pre-wrap;
   margin-bottom: 10px;
+}
+
+.el-table /deep/ .record-hightlight-row {
+  box-shadow: 0 0 20px inset #409EFF55;
 }
 </style>

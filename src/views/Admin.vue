@@ -898,7 +898,7 @@
           </div>
         </div>
         <div class="admin-main-content-table-wrap">
-          <el-table :data="recordTableData" size="mini" height="auto">
+          <el-table :data="recordTableData" size="mini" height="auto" @cell-mouse-enter="recordHighlightRow" @cell-mouse-leave="recordCancelHighlightRow" :row-class-name="recordHightlightClass">
             <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div class="table-expand-desc-box">
@@ -1617,7 +1617,7 @@ import {
   importDrewResultUrl,
   exchangeCardsRareUrl,
   editPackageOrderUrl,
-  swapUserOwnCardUrl,
+  swapUserOwnCardUrl
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
@@ -1629,7 +1629,7 @@ export default {
   mixins: [common],
   components: {
     CardDesc,
-    draggable,
+    draggable
   },
   data() {
     return {
@@ -1643,20 +1643,20 @@ export default {
       //新增卡包
       isAddingPackage: false,
       addingPackageData: {
-        package: "",
+        package: ""
       },
       //编辑卡包
       isEditingPackage: false,
       editingPackageData: {
         oldname: "",
-        newname: "",
+        newname: ""
       },
       //新增卡片
       isAddingCard: false,
       addingCardData: {
         package: "",
         card: "",
-        rare: "N",
+        rare: "N"
       },
       //批量新增卡片
       isBatchAddingCard: false,
@@ -1664,38 +1664,38 @@ export default {
         {
           label: "N",
           keyWord: "stash-n-",
-          dataKey: "nList",
+          dataKey: "nList"
         },
         {
           label: "R",
           keyWord: "stash-r-",
-          dataKey: "rList",
+          dataKey: "rList"
         },
         {
           label: "SR",
           keyWord: "stash-sr-",
-          dataKey: "srList",
+          dataKey: "srList"
         },
         {
           label: "UR",
           keyWord: "stash-ur-",
-          dataKey: "urList",
+          dataKey: "urList"
         },
         {
           label: "HR",
           keyWord: "stash-hr-",
-          dataKey: "hrList",
+          dataKey: "hrList"
         },
         {
           label: "GR",
           keyWord: "stash-gr-",
-          dataKey: "grList",
+          dataKey: "grList"
         },
         {
           label: "SER",
           keyWord: "stash-ser-",
-          dataKey: "serList",
-        },
+          dataKey: "serList"
+        }
       ],
       tempBatchAddingCardData: {
         nList: "",
@@ -1704,7 +1704,7 @@ export default {
         hrList: "",
         urList: "",
         grList: "",
-        serList: "",
+        serList: ""
       },
       batchAddingCardData: {
         packageName: "",
@@ -1714,7 +1714,7 @@ export default {
         hrList: [],
         urList: [],
         grList: [],
-        serList: [],
+        serList: []
       },
       //编辑卡片
       isEditingCard: false,
@@ -1722,7 +1722,7 @@ export default {
         oldname: "",
         newname: "",
         rare: "",
-        show: false,
+        show: false
       },
 
       //交换两卡片稀有度
@@ -1730,33 +1730,33 @@ export default {
       exchangingCardData: {
         card1: "",
         card2: "",
-        show: false,
+        show: false
       },
 
       //卡库查询
       libPagination: {
         page: 1,
         pageSize: 20,
-        total: 0,
+        total: 0
       },
       libQueryAddition: {
         packageName: "",
         cardName: "",
         userName: "",
-        rare: "",
+        rare: ""
       },
       libTableData: [],
       //玩家卡库查询
       playerLibPagination: {
         page: 1,
         pageSize: 20,
-        total: 0,
+        total: 0
       },
       playerLibQueryAddition: {
         packageName: "",
         cardName: "",
         userName: "",
-        rare: "",
+        rare: ""
       },
       playerLibTableData: [],
 
@@ -1764,20 +1764,20 @@ export default {
       //新增玩家
       isAddingUser: false,
       addingUserData: {
-        target: "",
+        target: ""
       },
       //玩家查询
       userQueryAddition: {
         target: "",
         package: "",
         card: "",
-        rare: "",
+        rare: ""
       },
 
       userSelectedInfo: {
         dust: 0,
         award: 0,
-        duelPoint: 0,
+        duelPoint: 0
       },
       //编辑玩家数据
       isEditingUserInfoItem: false,
@@ -1788,7 +1788,7 @@ export default {
       userPagination: {
         page: 1,
         pageSize: 20,
-        total: 0,
+        total: 0
       },
       userTableData: [],
 
@@ -1798,7 +1798,7 @@ export default {
       editingCardCountData: {
         card: "",
         target: "",
-        count: null,
+        count: null
       },
       addingUserCardTips: "",
       editingCardCountTips: "",
@@ -1807,25 +1807,26 @@ export default {
       recordPagination: {
         page: 1,
         pageSize: 20,
-        total: 0,
+        total: 0
       },
       recordQueryAddition: {
         packageName: "",
         cardName: "",
-        rare: "",
+        rare: ""
       },
       recordTableData: [],
+      highlightKey: null,
 
       //抽卡记录查询
       drawRecordPagination: {
         page: 1,
         pageSize: 20,
-        total: 0,
+        total: 0
       },
       drawRecordQueryAddition: {
         package: "",
         user: "",
-        dateRange: null,
+        dateRange: null
       },
       drawRecordTableData: [],
 
@@ -1833,7 +1834,7 @@ export default {
       logPagination: {
         page: 1,
         pageSize: 20,
-        total: 0,
+        total: 0
       },
       logQueryAddition: {
         operator: "",
@@ -1846,13 +1847,13 @@ export default {
       isSettingDrawRecord: false,
       drawRecordStatusData: {
         status: 0,
-        id: null,
+        id: null
       },
       //导入抽卡记录
       isImportingDrewCards: false,
       importingDrewCardsInfo: {
         target: "",
-        cards: [],
+        cards: []
       },
       tempDrewCardsInfo: "",
       //编辑卡包排序
@@ -1866,8 +1867,8 @@ export default {
         userA: "",
         cardA: "",
         userB: "",
-        cardB: "",
-      },
+        cardB: ""
+      }
     };
   },
 
@@ -1901,9 +1902,9 @@ export default {
         undefined,
         "admin_search"
       );
-      this.cardCandicateList = cardList.data.map((item) => {
+      this.cardCandicateList = cardList.data.map(item => {
         return {
-          value: item.cardName,
+          value: item.cardName
         };
       });
     },
@@ -1916,7 +1917,7 @@ export default {
     },
 
     listFilter(queryString) {
-      return (item) => {
+      return item => {
         return item.value.indexOf(queryString) >= 0;
       };
     },
@@ -1951,7 +1952,7 @@ export default {
         undefined,
         undefined,
         "admin_package"
-      ).then((data) => {
+      ).then(data => {
         this.$set(this.packageListContent, this.activeItemIndex, data);
         this.$closeLoading();
       });
@@ -1971,9 +1972,9 @@ export default {
         axiosFetch({
           url: addPackageUrl,
           data: {
-            package: this.addingPackageData.package,
-          },
-        }).then((res) => {
+            package: this.addingPackageData.package
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isAddingPackage = false;
             this.reloadPage();
@@ -1999,9 +2000,9 @@ export default {
           url: editPackageNameUrl,
           data: {
             oldname: this.editingPackageData.oldname,
-            newname: this.editingPackageData.newname,
-          },
-        }).then((res) => {
+            newname: this.editingPackageData.newname
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isEditingPackage = false;
             this.reloadPage();
@@ -2029,9 +2030,9 @@ export default {
           data: {
             package: this.addingCardData.package,
             card: this.addingCardData.card,
-            rare: this.addingCardData.rare,
-          },
-        }).then((res) => {
+            rare: this.addingCardData.rare
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isAddingCard = false;
             this.reloadPage();
@@ -2055,9 +2056,17 @@ export default {
       );
     },
     analyseBatchAddingCardList() {
-      ["nList", "rList", "srList", "hrList", "urList", "grList", "serList"].forEach((item) => {
+      [
+        "nList",
+        "rList",
+        "srList",
+        "hrList",
+        "urList",
+        "grList",
+        "serList"
+      ].forEach(item => {
         this.batchAddingCardData[item] = this.tempBatchAddingCardData[item]
-          ? this.tempBatchAddingCardData[item].split("|").map((t) => t.trim())
+          ? this.tempBatchAddingCardData[item].split("|").map(t => t.trim())
           : [];
       });
     },
@@ -2074,9 +2083,9 @@ export default {
           hrList: this.batchAddingCardData.hrList,
           urList: this.batchAddingCardData.urList,
           grList: this.batchAddingCardData.grList,
-          serList: this.batchAddingCardData.serList,
-        },
-      }).then((res) => {
+          serList: this.batchAddingCardData.serList
+        }
+      }).then(res => {
         if (res.data.code === 200) {
           this.isBatchAddingCard = false;
           this.$alertSuccess(res.data.data);
@@ -2106,9 +2115,9 @@ export default {
             oldname: this.editingCardData.oldname,
             newname: this.editingCardData.newname,
             newRare: this.editingCardData.rare,
-            show: Number(this.editingCardData.show) || undefined,
-          },
-        }).then((res) => {
+            show: Number(this.editingCardData.show) || undefined
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isEditingCard = false;
             this.reloadPage();
@@ -2135,9 +2144,9 @@ export default {
           data: {
             card1: this.exchangingCardData.card1,
             card2: this.exchangingCardData.card2,
-            show: Number(this.exchangingCardData.show) || undefined,
-          },
-        }).then((res) => {
+            show: Number(this.exchangingCardData.show) || undefined
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isExchangingCard = false;
             this.reloadPage();
@@ -2164,10 +2173,12 @@ export default {
         this.defaultPageSize,
         this.libQueryAddition.packageName || undefined,
         this.libQueryAddition.cardName || undefined,
-        this.libQueryAddition.rare.length > 0 ? this.libQueryAddition.rare : undefined,
+        this.libQueryAddition.rare.length > 0
+          ? this.libQueryAddition.rare
+          : undefined,
         this.libQueryAddition.userName || undefined,
         "admin_search"
-      ).then((data) => {
+      ).then(data => {
         this.libPagination.page = data.pagination.page;
         this.libPagination.total = data.pagination.total;
         this.libTableData = data.data;
@@ -2192,10 +2203,12 @@ export default {
         this.defaultPageSize,
         this.playerLibQueryAddition.packageName || undefined,
         this.playerLibQueryAddition.cardName || undefined,
-        this.playerLibQueryAddition.rare.length > 0 ? this.playerLibQueryAddition.rare : undefined,
+        this.playerLibQueryAddition.rare.length > 0
+          ? this.playerLibQueryAddition.rare
+          : undefined,
         this.playerLibQueryAddition.userName || undefined,
         "player_lib"
-      ).then((data) => {
+      ).then(data => {
         this.playerLibPagination.page = data.pagination.page;
         this.playerLibPagination.total = data.pagination.total;
         this.playerLibTableData = data.data;
@@ -2206,7 +2219,7 @@ export default {
       MessageBox.confirm("请确认是否以当前条件导出Excel文档", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(() => {
           this.$openLoading();
@@ -2215,16 +2228,18 @@ export default {
             2147483647,
             this.playerLibQueryAddition.packageName || undefined,
             this.playerLibQueryAddition.cardName || undefined,
-            this.playerLibQueryAddition.rare.length > 0 ? this.playerLibQueryAddition.rare : undefined,
+            this.playerLibQueryAddition.rare.length > 0
+              ? this.playerLibQueryAddition.rare
+              : undefined,
             this.playerLibQueryAddition.userName || undefined,
             "player_lib"
-          ).then((data) => {
+          ).then(data => {
             let fileData = this._generateLibDataForExport(data.data);
             exportToExcelByJson(fileData.data, fileData.fileName)
-              .then((_res) => {
+              .then(_res => {
                 this.$alertSuccess(_res);
               })
-              .catch((_err) => {
+              .catch(_err => {
                 this.$alertWarning(_err);
               });
 
@@ -2253,7 +2268,7 @@ export default {
         this.recordQueryAddition.packageName || undefined,
         this.recordQueryAddition.cardName || undefined,
         this.recordQueryAddition.rare || undefined
-      ).then((data) => {
+      ).then(data => {
         this.recordPagination.page = data.pagination.page;
         this.recordPagination.total = data.pagination.total;
         this.recordTableData = data.data;
@@ -2261,6 +2276,18 @@ export default {
       });
     },
 
+    //记录 高亮同carkPk行
+    recordHighlightRow(row, column, cell, event) {
+      this.highlightKey = row["cardPk"];
+    },
+    recordCancelHighlightRow(row, column, cell, event) {
+      this.highlightKey = null;
+    },
+    recordHightlightClass({row, rowIndex}) {
+      if (row["cardPk"] === this.highlightKey) {
+        return "record-hightlight-row"
+      }
+    },
     //新增玩家
     addUser() {
       this.isAddingUser = true;
@@ -2276,9 +2303,9 @@ export default {
         axiosFetch({
           url: addUserUrl,
           data: {
-            target: this.addingUserData.target,
-          },
-        }).then((res) => {
+            target: this.addingUserData.target
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isAddingUser = false;
             this.reloadPage();
@@ -2296,7 +2323,7 @@ export default {
 
     setUserInfo(userName) {
       let userInfo = this.userList.find(
-        (element) => element.userName === userName
+        element => element.userName === userName
       );
       this.userSelectedInfo.dust = userInfo.dustCount;
       this.userSelectedInfo.award = userInfo.nonawardCount;
@@ -2312,10 +2339,12 @@ export default {
         this.defaultPageSize,
         this.userQueryAddition.package || undefined,
         this.userQueryAddition.card || undefined,
-        this.userQueryAddition.rare.length > 0 ? this.userQueryAddition.rare : undefined,
+        this.userQueryAddition.rare.length > 0
+          ? this.userQueryAddition.rare
+          : undefined,
         this.userQueryAddition.target || undefined,
         "player_lib"
-      ).then((data) => {
+      ).then(data => {
         this.userPagination.page = data.pagination.page;
         this.userPagination.total = data.pagination.total;
         this.userTableData = data.data;
@@ -2327,7 +2356,7 @@ export default {
       MessageBox.confirm("请确认是否以当前条件导出Excel文档", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(() => {
           this.$openLoading();
@@ -2336,16 +2365,18 @@ export default {
             2147483647,
             this.userQueryAddition.package || undefined,
             this.userQueryAddition.card || undefined,
-            this.userQueryAddition.rare.length > 0 ? this.userQueryAddition.rare : undefined,
+            this.userQueryAddition.rare.length > 0
+              ? this.userQueryAddition.rare
+              : undefined,
             this.userQueryAddition.target || undefined,
             "player_lib"
-          ).then((data) => {
+          ).then(data => {
             let fileData = this._generateLibDataForExport(data.data);
             exportToExcelByJson(fileData.data, fileData.fileName)
-              .then((_res) => {
+              .then(_res => {
                 this.$alertSuccess(_res);
               })
-              .catch((_err) => {
+              .catch(_err => {
                 this.$alertWarning(_err);
               });
 
@@ -2364,7 +2395,9 @@ export default {
     //利用相同接口新增卡牌
     addUserCard() {
       this.editingCardCountData.target = this.userQueryAddition.target;
-      this.addingUserCardTips = `正在为玩家【${this.userQueryAddition.target}】新增卡牌`;
+      this.addingUserCardTips = `正在为玩家【${
+        this.userQueryAddition.target
+      }】新增卡牌`;
       this.isAddingUserCard = true;
     },
     cancelEditCardCount() {
@@ -2378,7 +2411,7 @@ export default {
       MessageBox.confirm("请确认是否修改", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(() => {
           if (this.showTab === "3") {
@@ -2401,9 +2434,9 @@ export default {
           data: {
             card: this.editingCardCountData.card,
             target: this.editingCardCountData.target,
-            count: this.editingCardCountData.count,
-          },
-        }).then((res) => {
+            count: this.editingCardCountData.count
+          }
+        }).then(res => {
           if (res.data.code === 200) {
             this.isEditingCardCount = false;
             this.isAddingUserCard = false;
@@ -2426,7 +2459,9 @@ export default {
           this.editingUserInfoItemCount = this.userSelectedInfo.dust;
           break;
       }
-      this.editingUserInfoItemTips = `正在编辑玩家【${this.userQueryAddition.target}】`;
+      this.editingUserInfoItemTips = `正在编辑玩家【${
+        this.userQueryAddition.target
+      }】`;
       this.isEditingUserInfoItem = true;
     },
 
@@ -2445,8 +2480,8 @@ export default {
         let options = {
           url: "",
           data: {
-            target: this.userQueryAddition.target,
-          },
+            target: this.userQueryAddition.target
+          }
         };
         switch (this.editingUserInfoItemType) {
           case "月见黑":
@@ -2458,7 +2493,7 @@ export default {
             options.data.count = this.editingUserInfoItemCount;
             break;
         }
-        axiosFetch(options).then(async (res) => {
+        axiosFetch(options).then(async res => {
           if (res.data.code === 200) {
             this.isEditingUserInfoItem = false;
             this.userList = await this._queryUserList();
@@ -2493,7 +2528,7 @@ export default {
         this.drawRecordQueryAddition.dateRange
           ? this.drawRecordQueryAddition.dateRange[1]
           : undefined
-      ).then((data) => {
+      ).then(data => {
         this.drawRecordPagination.page = data.pagination.page;
         this.drawRecordPagination.total = data.pagination.total;
         this.drawRecordTableData = data.data;
@@ -2519,9 +2554,9 @@ export default {
         url: setDrawResultUrl,
         data: {
           status: this.drawRecordStatusData.status,
-          id: this.drawRecordStatusData.id,
-        },
-      }).then(async (res) => {
+          id: this.drawRecordStatusData.id
+        }
+      }).then(async res => {
         if (res.data.code === 200) {
           this.isSettingDrawRecord = false;
           this.drawRecordQuery(1);
@@ -2546,12 +2581,12 @@ export default {
       let regx = /\n\r|\r|\n/g;
       let tempArray = this.tempDrewCardsInfo
         .split(regx)
-        .filter((t) => !!t)
-        .map((t) => t.trim());
+        .filter(t => !!t)
+        .map(t => t.trim());
       let result = [];
       tempArray.forEach(item => {
-        result.push(item.split('|').map((t) => t.trim()))
-      })
+        result.push(item.split("|").map(t => t.trim()));
+      });
       this.importingDrewCardsInfo.cards = result;
     },
     submitImportDrewCards() {
@@ -2564,9 +2599,9 @@ export default {
           url: importDrewResultUrl,
           data: {
             target: this.importingDrewCardsInfo.target,
-            cards: this.importingDrewCardsInfo.cards,
-          },
-        }).then(async (res) => {
+            cards: this.importingDrewCardsInfo.cards
+          }
+        }).then(async res => {
           if (res.data.code === 200) {
             this.isImportingDrewCards = false;
             this.drawRecordQuery(1);
@@ -2580,10 +2615,10 @@ export default {
     //编辑卡包排序
     editPackageOrder() {
       this.isEditingPackageOrder = true;
-      this.editingPackageOrderList = this.cardPackageList.map((item) => {
+      this.editingPackageOrderList = this.cardPackageList.map(item => {
         return {
           name: item["packageName"],
-          order: item["packageId"],
+          order: item["packageId"]
         };
       });
     },
@@ -2596,9 +2631,9 @@ export default {
       axiosPostAsJSON({
         url: editPackageOrderUrl,
         data: {
-          packageIndexList: this.editingPackageOrderList.map((i) => i.order),
-        },
-      }).then((res) => {
+          packageIndexList: this.editingPackageOrderList.map(i => i.order)
+        }
+      }).then(res => {
         if (res.data.code === 200) {
           this.reloadPage();
         }
@@ -2621,7 +2656,7 @@ export default {
       MessageBox.confirm("请确认是否交换", "提示", {
         confirmButtonText: "确认",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       })
         .then(() => {
           let temp = this.swappingCardsDetails;
@@ -2633,9 +2668,9 @@ export default {
                 userA: temp.userA,
                 cardA: temp.cardA,
                 userB: temp.userB,
-                cardB: temp.cardB,
-              },
-            }).then((res) => {
+                cardB: temp.cardB
+              }
+            }).then(res => {
               if (res.data.code === 200) {
                 this.reloadPage();
               }
@@ -2668,15 +2703,14 @@ export default {
         this.logQueryAddition.dateRange
           ? this.logQueryAddition.dateRange[1]
           : undefined
-      ).then((data) => {
+      ).then(data => {
         this.logPagination.page = data.pagination.page;
         this.logPagination.total = data.pagination.total;
         this.logTableData = data.data;
         this.$closeLoading();
       });
-    },
-
-  },
+    }
+  }
 };
 </script>
 
@@ -2966,5 +3000,7 @@ export default {
   background: #c8ebfb;
 }
 
-
+.el-table /deep/ .record-hightlight-row {
+  box-shadow: 0 0 20px inset #409EFF55;
+}
 </style>
