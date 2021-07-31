@@ -64,6 +64,10 @@ const transDustToCardRandomUrl = BASE_URL + '/user/card/random';
 //闪卡转尘
 const transCardToDustUrl = BASE_URL + '/user/card/todust';
 
+//收藏
+//收藏操作
+const collectionOpeationUrl = BASE_URL + '/collection/op';
+
 
 
 //需要验证账号密码的地址列表
@@ -89,7 +93,9 @@ const urlNeededValidate = [
     transDustToCardUrl,
     transDustToCardRandomUrl,
     transCardToDustUrl,
-    queryLogUrl
+    queryLogUrl,
+
+    collectionOpeationUrl
 ]
 
 
@@ -121,6 +127,7 @@ export {
     transDustToCardRandomUrl,
     transCardToDustUrl,
     queryLogUrl,
+    collectionOpeationUrl,
 
     urlNeededValidate
 }

@@ -10,7 +10,8 @@ import {
     searchEditedRecordUrl,
     searchUserUrl,
     queryDrawResultUrl,
-    queryLogUrl
+    queryLogUrl,
+    collectionOpeationUrl
 } from "@/config/url.js";
 import {
     openLoading,
@@ -114,8 +115,9 @@ export default {
         },
 
         //查询卡片列表
-        _queryCardList(page, pageSize, _package, card, rare, target, type) {
+        _queryCardList(page, pageSize, _package, card, rare, target, type, collection=undefined) {
             let url;
+            console.info(collection);
             switch (type) {
                 case 'admin_package':
                     url = searchCardUrl;
@@ -130,9 +132,9 @@ export default {
                     url = searchOwningCardUrl;
                     break;
             }
-            return this._queryList(page, pageSize, _package, card, rare, target, url)
+            return this._queryList(page, pageSize, _package, card, rare, target, url, collection)
         },
-        _queryList(page, pageSize, _package, card, rare, target, url) {
+        _queryList(page, pageSize, _package, card, rare, target, url, collection) {
             return new Promise((resolve) => {
                 axiosPostAsJSON({
                     url: url,
@@ -143,6 +145,7 @@ export default {
                         targetUserList: target,
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
+                        searchInCollection: collection || undefined
                     },
                 }).then((res) => {
                     resolve({
@@ -231,6 +234,17 @@ export default {
                         data: res.data.data.dataList,
                     });
                 });
+            });
+        },
+
+        //收藏卡片操作
+        _collectionOperation(cardName, operation) {
+            return axiosPostAsJSON({
+                url: collectionOpeationUrl,
+                data: {
+                    cardName: cardName,
+                    op: operation
+                },
             });
         },
 

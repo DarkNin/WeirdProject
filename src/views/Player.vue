@@ -172,6 +172,12 @@
             ></el-autocomplete>
           </div>
           <div class="player-main-content-addition-item">
+            <el-checkbox size="mini" v-model="libQueryAddition.searchInCollection"
+              >收藏中</el-checkbox
+            >
+          </div>
+                      
+          <div class="player-main-content-addition-item">
             <el-button type="info" size="mini" @click="libClearAddition"
               >清除条件</el-button
             >
@@ -230,6 +236,25 @@
                 ></el-button>
               </template>
             </el-table-column>
+            <el-table-column :key="'player-lib-column-' + 6" width="64">
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="toCollection(scope.row)"
+                  v-if="checkIfCanCollect(scope.row)"
+                  >收藏</el-button
+                >
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="disCollection(scope.row)"
+                  v-if="checkIfCanDisCollect(scope.row)"
+                  >取消收藏</el-button
+                >
+              </template>
+            </el-table-column>
+
             <!-- <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column> -->
           </el-table>
           <div class="player-main-content-table-pagination">
@@ -819,6 +844,7 @@ export default {
         cardName: "",
         userName: "",
         rare: "",
+        searchInCollection: ""
       },
       libTableData: [],
       //玩家卡库查询
@@ -1038,7 +1064,8 @@ export default {
         this.libQueryAddition.cardName || undefined,
         this.libQueryAddition.rare || undefined,
         this.libQueryAddition.userName || undefined,
-        "admin_search"
+        "admin_search",
+        this.libQueryAddition.searchInCollection
       ).then((data) => {
         this.libPagination.page = data.pagination.page;
         this.libPagination.total = data.pagination.total;
@@ -1256,6 +1283,32 @@ export default {
         })
         .catch(() => {});
     },
+
+    checkIfCanCollect(row) {
+      return row.inCollection === 0;
+    },
+
+    checkIfCanDisCollect(row) {
+      return row.inCollection === 1;
+    },
+
+    toCollection(row) {
+      this._collectionOperation(row.cardName, 1)
+      .then((res) => {
+          if (res.data.code === 200) {
+            this.libAllQueryCard(this.libPagination.page);
+          }
+      });
+    },
+
+    disCollection(row) {
+      this._collectionOperation(row.cardName, 2)
+      .then((res) => {
+          if (res.data.code === 200) {
+            this.libAllQueryCard(this.libPagination.page);
+          }
+      });
+    }
   },
 };
 </script>
