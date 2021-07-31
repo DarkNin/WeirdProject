@@ -171,7 +171,7 @@
               @keyup.enter.native="libAllQueryCard"
             ></el-autocomplete>
           </div>
-          <div class="player-main-content-addition-item">
+          <div class="player-main-content-addition-item special">
             <el-checkbox size="mini" v-model="libQueryAddition.searchInCollection"
               >收藏中</el-checkbox
             >
@@ -236,7 +236,7 @@
                 ></el-button>
               </template>
             </el-table-column>
-            <el-table-column :key="'player-lib-column-' + 6" width="64">
+            <el-table-column :key="'lib-column-' + 6" width="64">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -1502,5 +1502,12 @@ export default {
 
 .el-table /deep/ .record-hightlight-row {
   box-shadow: 0 0 20px inset #409EFF55;
+}
+
+.player-main-content-addition-item.special .el-checkbox{
+  margin-top: 4px;
+}
+.player-main-content-addition-item.special .el-checkbox /deep/ *{
+  font-size: 12px;
 }
 </style>
