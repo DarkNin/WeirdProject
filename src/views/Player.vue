@@ -3,7 +3,7 @@
     <div class="player-info">
       <p class="player-info-tips">欢迎来到诡异云，{{ username }}。</p>
       <span class="player-info-item">
-        <p>DP: {{ duelPoint }}</p>
+        <p>硬币: {{ coin }}</p>
         <p>月见黑: {{ leftAward }}</p>
         <p>剩余尘数: {{ leftDust }}</p>
       </span>
@@ -211,11 +211,16 @@
             </el-table-column>
             <el-table-column
               :key="'lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 5"
               prop="count"
               label="持有数量"
             ></el-table-column>
             <el-table-column
-              :key="'lib-column-' + 5"
+              :key="'lib-column-' + 6"
               prop="desc"
               label="预览"
               width="54"
@@ -236,7 +241,7 @@
                 ></el-button>
               </template>
             </el-table-column>
-            <el-table-column :key="'lib-column-' + 6" width="64">
+            <el-table-column :key="'lib-column-' + 7" width="64">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -251,6 +256,17 @@
                   @click="disCollection(scope.row)"
                   v-if="checkIfCanDisCollect(scope.row)"
                   >取消收藏</el-button
+                >
+              </template>
+            </el-table-column>
+            <el-table-column :key="'lib-column-' + 8" width="64">
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="confirmUseCoin(scope.row)"
+                  v-if="checkIfCanUseCoin(scope.row)"
+                  >兑换</el-button
                 >
               </template>
             </el-table-column>
@@ -374,16 +390,21 @@
             </el-table-column>
             <el-table-column
               :key="'player-lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 5"
               prop="userName"
               label="拥有者"
             ></el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 5"
+              :key="'player-lib-column-' + 6"
               prop="count"
               label="拥有数量"
             ></el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 6"
+              :key="'player-lib-column-' + 7"
               prop="desc"
               label="预览"
               width="54"
@@ -404,7 +425,7 @@
                 ></el-button>
               </template>
             </el-table-column>
-            <el-table-column :key="'player-lib-column-' + 7" width="64">
+            <el-table-column :key="'player-lib-column-' + 8" width="64">
               <template slot-scope="scope">
                 <el-button
                   type="text"
@@ -812,6 +833,7 @@ import {
   transDustToCardUrl,
   transDustToCardRandomUrl,
   transCardToDustUrl,
+  transCoinToCardUrl
 } from "@/config/url.js";
 import CardDesc from "@/components/CardDesc";
 import { exportToExcelByJson } from "@/utils/xlsx";
@@ -824,6 +846,7 @@ export default {
   data() {
     return {
       leftDust: 0,
+      coin: 0,
       leftAward: 0,
       duelPoint: 0,
 
@@ -915,6 +938,7 @@ export default {
         this.duelPoint = userInfo.duelPoint;
         this.leftDust = userInfo.dustCount;
         this.leftAward = userInfo.nonawardCount;
+        this.coin = userInfo.coin;
       }
       if (
         JSON.parse(window.localStorage.getItem("info")).p ===
@@ -951,6 +975,7 @@ export default {
         this.duelPoint = userInfo.duelPoint;
         this.leftDust = userInfo.dustCount;
         this.leftAward = userInfo.nonawardCount;
+        this.coin = userInfo.coin;
       }
       this.$closeLoading();
       this.generateCandicateCardList();
@@ -1308,6 +1333,36 @@ export default {
             this.libAllQueryCard(this.libPagination.page);
           }
       });
+    },
+
+    checkIfCanUseCoin(row) {
+      return row.needCoin > 0 && row.needCoin <= this.coin && row.count === 0;
+    },
+
+    confirmUseCoin(row) {
+      MessageBox.confirm(
+        `是否使用${row.needCoin}枚硬币兑换【${row.cardName}】？`,
+        "提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$openLoading();
+          axiosGet({
+            url: transCoinToCardUrl,
+            data: {
+              cardName: row.cardName,
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              this.reloadPage();
+            }
+          });
+        })
+        .catch(() => {});
     }
   },
 };

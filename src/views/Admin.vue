@@ -127,6 +127,11 @@
                 </el-table-column>
                 <el-table-column
                   :key="'package-' + item.packageName + '-3'"
+                  prop="needCoin"
+                  label="需要硬币"
+                ></el-table-column>
+                <el-table-column
+                  :key="'package-' + item.packageName + '-4'"
                   prop="desc"
                   label="预览"
                   width="54"
@@ -156,7 +161,7 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  :key="'package-' + item.packageName + '-4'"
+                  :key="'package-' + item.packageName + '-5'"
                   fixed="right"
                   width="80"
                 >
@@ -164,7 +169,7 @@
                     <el-button
                       size="mini"
                       type="text"
-                      @click="editCard(scope.row.cardName)"
+                      @click="editCard(scope.row)"
                       >编辑</el-button
                     >
                   </template>
@@ -304,6 +309,11 @@
             </el-table-column>
             <el-table-column
               :key="'lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+            ></el-table-column>
+            <el-table-column
+              :key="'lib-column-' + 5"
               prop="desc"
               label="预览"
               width="54"
@@ -325,12 +335,12 @@
               </template>
             </el-table-column>
 
-            <el-table-column :key="'lib-column-' + 5" fixed="right" width="80">
+            <el-table-column :key="'lib-column-' + 6" fixed="right" width="80">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
                   type="text"
-                  @click="editCard(scope.row.cardName, scope.row.rare)"
+                  @click="editCard(scope.row)"
                   >编辑</el-button
                 >
               </template>
@@ -536,9 +546,10 @@
           </div>
           <div class="special-user-info" v-if="userQueryAddition.target">
             <span>
-              DP:
-              <!-- <el-button type="text" @click="editUserInfo('DP')">{{userSelectedInfo.duelPoint}}</el-button> -->
-              {{ userSelectedInfo.duelPoint }}
+              硬币:
+              <el-button type="text" @click="editUserInfo('硬币')">{{
+                userSelectedInfo.coin
+              }}</el-button>
             </span>
             <span>
               月见黑:
@@ -1227,7 +1238,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="新稀有度" size="small">
+        <el-form-item label="新稀有度" size="small" required>
             <el-select
               size="mini"
               v-model="editingCardData.rare"
@@ -1242,6 +1253,15 @@
               <el-option label="GR" value="GR"></el-option>
               <el-option label="SER" value="SER"></el-option>
             </el-select>
+        </el-form-item>
+
+        <el-form-item label="需要硬币" size="small" required>
+          <el-input
+            v-model.number="editingCardData.needCoin"
+            type="number"
+            @keyup.enter.native="submitEditingCard"
+            clearable
+          ></el-input>
         </el-form-item>
 
         <el-form-item label="是否记录" size="small">
@@ -1613,6 +1633,7 @@ import {
   editCardCountUrl,
   editDustUrl,
   editAwardUrl,
+  editCoinUrl,
   setDrawResultUrl,
   importDrewResultUrl,
   exchangeCardsRareUrl,
@@ -1722,6 +1743,7 @@ export default {
         oldname: "",
         newname: "",
         rare: "",
+        needCoin: 0,
         show: false
       },
 
@@ -1777,7 +1799,8 @@ export default {
       userSelectedInfo: {
         dust: 0,
         award: 0,
-        duelPoint: 0
+        duelPoint: 0,
+        coin: 0
       },
       //编辑玩家数据
       isEditingUserInfoItem: false,
@@ -2093,16 +2116,19 @@ export default {
         }
       });
     },
-    editCard(cardName, cardRare) {
-      this.editingCardData.oldname = cardName;
-      this.editingCardData.newname = cardName;
-      this.editingCardData.rare = cardRare;
+    editCard(row) {
+      this.editingCardData.oldname = row.cardName;
+      this.editingCardData.newname = row.cardName;
+      this.editingCardData.rare = row.rare;
+      this.editingCardData.needCoin = row.needCoin;
       this.isEditingCard = true;
     },
 
     cancelEditingCard() {
       this.editingCardData.oldname = "";
       this.editingCardData.newname = "";
+      this.editingCardData.rare = "";
+      this.editingCardData.needCoin = 0;
       this.editingCardData.show = false;
     },
 
@@ -2115,6 +2141,7 @@ export default {
             oldname: this.editingCardData.oldname,
             newname: this.editingCardData.newname,
             newRare: this.editingCardData.rare,
+            needCoin: this.editingCardData.needCoin,
             show: Number(this.editingCardData.show) || undefined
           }
         }).then(res => {
@@ -2328,6 +2355,7 @@ export default {
       this.userSelectedInfo.dust = userInfo.dustCount;
       this.userSelectedInfo.award = userInfo.nonawardCount;
       this.userSelectedInfo.duelPoint = userInfo.duelPoint;
+      this.userSelectedInfo.coin = userInfo.coin;
     },
 
     userQuery(page) {
@@ -2458,6 +2486,9 @@ export default {
         case "剩余尘数":
           this.editingUserInfoItemCount = this.userSelectedInfo.dust;
           break;
+        case "硬币":
+          this.editingUserInfoItemCount = this.userSelectedInfo.coin;
+          break;
       }
       this.editingUserInfoItemTips = `正在编辑玩家【${
         this.userQueryAddition.target
@@ -2491,6 +2522,10 @@ export default {
           case "剩余尘数":
             options.url = editDustUrl;
             options.data.count = this.editingUserInfoItemCount;
+            break;
+          case "硬币":
+            options.url = editCoinUrl;
+            options.data.coin = this.editingUserInfoItemCount;
             break;
         }
         axiosFetch(options).then(async res => {

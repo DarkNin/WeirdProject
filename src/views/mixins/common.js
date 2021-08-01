@@ -117,7 +117,6 @@ export default {
         //查询卡片列表
         _queryCardList(page, pageSize, _package, card, rare, target, type, collection=undefined) {
             let url;
-            console.info(collection);
             switch (type) {
                 case 'admin_package':
                     url = searchCardUrl;

@@ -37,6 +37,8 @@ const editCardCountUrl = BASE_URL + '/user/card/update';
 const editDustUrl = BASE_URL + '/user/dust';
 //修改月见黑计数
 const editAwardUrl = BASE_URL + '/user/award';
+//修改硬币
+const editCoinUrl = BASE_URL + '/user/coin';
 //查询用户信息
 const searchUserUrl = BASE_URL + '/user/list';
 //编辑用户密码
@@ -63,6 +65,8 @@ const transDustToCardUrl = BASE_URL + '/user/card/change';
 const transDustToCardRandomUrl = BASE_URL + '/user/card/random';
 //闪卡转尘
 const transCardToDustUrl = BASE_URL + '/user/card/todust';
+//硬币换卡
+const transCoinToCardUrl = BASE_URL + '/user/card/coin';
 
 //收藏
 //收藏操作
@@ -86,6 +90,7 @@ const urlNeededValidate = [
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,
+    editCoinUrl,
     setDrawResultUrl,
     importDrewResultUrl,
     swapUserOwnCardUrl,
@@ -93,6 +98,7 @@ const urlNeededValidate = [
     transDustToCardUrl,
     transDustToCardRandomUrl,
     transCardToDustUrl,
+    transCoinToCardUrl,
     queryLogUrl,
 
     collectionOpeationUrl
@@ -116,6 +122,7 @@ export {
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,
+    editCoinUrl,
     editUserPasswordUrl,
     validateUserUrl,
     searchUserUrl,
@@ -126,6 +133,7 @@ export {
     transDustToCardUrl,
     transDustToCardRandomUrl,
     transCardToDustUrl,
+    transCoinToCardUrl,
     queryLogUrl,
     collectionOpeationUrl,
 
