@@ -31,6 +31,8 @@ const editPackageOrderUrl = BASE_URL + '/package/sort';
 //用户
 //新增用户
 const addUserUrl = BASE_URL + '/user/add';
+//重置密码
+const resetPasswordUrl = BASE_URL + '/user/reset';
 //修改用户持有卡片数量
 const editCardCountUrl = BASE_URL + '/user/card/update';
 //修改尘数
@@ -89,6 +91,7 @@ const urlNeededValidate = [
 
 
     addUserUrl,
+    resetPasswordUrl,
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,
@@ -122,6 +125,7 @@ export {
     queryCardPackageListUrl,
     editPackageOrderUrl,
     addUserUrl,
+    resetPasswordUrl,
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,

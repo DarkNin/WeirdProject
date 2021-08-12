@@ -540,6 +540,9 @@
             </el-select>
           </div>
           <div class="special-user-add" v-if="userQueryAddition.target">
+            <el-button type="primary" size="mini" @click="submitResetPassword"
+              >重置密码</el-button
+            >
             <el-button type="primary" size="mini" @click="exchangeUserCard"
               >替换卡片</el-button
             >
@@ -1680,6 +1683,7 @@ import {
   editPackageNameUrl,
   addPackageUrl,
   addUserUrl,
+  resetPasswordUrl,
   editCardCountUrl,
   editDustUrl,
   editAwardUrl,
@@ -2776,6 +2780,35 @@ export default {
         .catch(() => {});
     },
 
+    submitResetPassword() {
+      let confirmStr = `是否重置玩家【${
+        this.userQueryAddition.target
+      }】的密码？`;
+      MessageBox.confirm(confirmStr, "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$openLoading();
+          let param = {
+            url: resetPasswordUrl,
+            data: {
+              target: this.userQueryAddition.target
+            }
+          }
+          axiosGet(param).then(async res => {
+            if (res.data.code === 200) {
+              this.userList = await this._queryUserList();
+              this.setUserInfo(this.userQueryAddition.target);
+              this.$closeLoading();
+              //this.reloadPage();
+            }
+          });
+        })
+        .catch(() => {});
+    },
+
     //交换玩家持有的卡片
     exchangeUserCard() {
       this.exchangeUserCardDetails.targetUser = this.userQueryAddition.target;
@@ -2803,7 +2836,7 @@ export default {
           let temp = this.exchangeUserCardDetails;
           if (temp.targetUser && temp.oldCardName && temp.newCardName) {
             this.$openLoading();
-            axiosPostAsJSON({
+            let param = {
               url: changeUserOwnCardUrl,
               data: {
                 targetUser: temp.targetUser,
@@ -2811,9 +2844,14 @@ export default {
                 newCardName: temp.newCardName,
                 count: temp.count
               }
-            }).then(res => {
+            }
+            axiosPostAsJSON(param).then(async res => {
               if (res.data.code === 200) {
-                this.reloadPage();
+                this.isExchangingUserCard = false;
+                this.userList = await this._queryUserList();
+                this.setUserInfo(this.userQueryAddition.target);
+                this.$closeLoading();
+                //this.reloadPage();
               }
             });
           }
