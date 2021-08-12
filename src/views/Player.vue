@@ -164,7 +164,7 @@
           <div class="player-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="libQueryAddition.cardName"
+              v-model="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :fetch-suggestions="querySearchCandicateCardList"
@@ -212,6 +212,7 @@
             <el-table-column
               :key="'lib-column-' + 4"
               prop="needCoin"
+              v-if="_checkAnyUsingCoin(this.libTableData)"
               label="需要硬币"
             ></el-table-column>
             <el-table-column
@@ -343,7 +344,7 @@
           <div class="player-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="libQueryAddition.cardName"
+              v-model="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :fetch-suggestions="querySearchCandicateCardList"
@@ -391,6 +392,7 @@
             <el-table-column
               :key="'player-lib-column-' + 4"
               prop="needCoin"
+              v-if="_checkAnyUsingCoin(this.playerLibTableData)"
               label="需要硬币"
             ></el-table-column>
             <el-table-column
@@ -626,7 +628,7 @@
           <div class="player-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="recordQueryAddition.cardName"
+              v-model="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               @keyup.enter.native="recordQuery"
@@ -739,7 +741,7 @@
             v-if="fusingCardType === 'standard'"
           >
             <el-autocomplete
-              v-model.trim="fusingCardData.card"
+              v-model="fusingCardData.card"
               type="text"
               clearable
               :fetch-suggestions="querySearchCandicateCardList"

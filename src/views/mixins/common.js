@@ -263,6 +263,18 @@ export default {
             }
         },
 
+        _checkAnyUsingCoin(data) {
+            let result = false;
+            for (let i = 0; i < data.length; i++) {
+              let row = data[i]
+              if (row.needCoin > 0) {
+                result = true;
+                return true;
+              }
+            }
+            return result;
+          },
+
         //检测是否移动端应用
         _checkIfMobile() {
             return 'ontouchend' in document.body;

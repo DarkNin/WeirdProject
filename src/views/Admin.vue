@@ -129,6 +129,9 @@
                   :key="'package-' + item.packageName + '-3'"
                   prop="needCoin"
                   label="需要硬币"
+                  v-if="_checkAnyUsingCoin(packageListContent[index]
+                    ? packageListContent[index]['data']
+                    : [])"
                 ></el-table-column>
                 <el-table-column
                   :key="'package-' + item.packageName + '-4'"
@@ -267,7 +270,7 @@
           <div class="admin-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="libQueryAddition.cardName"
+              v-model="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -311,6 +314,7 @@
               :key="'lib-column-' + 4"
               prop="needCoin"
               label="需要硬币"
+              v-if="_checkAnyUsingCoin(this.libTableData)"
             ></el-table-column>
             <el-table-column
               :key="'lib-column-' + 5"
@@ -418,7 +422,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="playerLibQueryAddition.cardName"
+              v-model="playerLibQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               @keyup.enter.native="playerLibQueryCard"
@@ -460,17 +464,23 @@
               </template>
             </el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 4"
+              :key="'lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+              v-if="_checkAnyUsingCoin(this.playerLibTableData)"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 5"
               prop="userName"
               label="拥有者"
             ></el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 5"
+              :key="'player-lib-column-' + 6"
               prop="count"
               label="拥有数量"
             ></el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 6"
+              :key="'player-lib-column-' + 7"
               prop="desc"
               label="预览"
               width="54"
@@ -493,7 +503,7 @@
             </el-table-column>
 
             <el-table-column
-              :key="'player-lib-column-' + 7"
+              :key="'player-lib-column-' + 8"
               fixed="right"
               width="80"
             >
@@ -613,7 +623,7 @@
           <div class="admin-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="userQueryAddition.card"
+              v-model="userQueryAddition.card"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -657,13 +667,19 @@
               </template>
             </el-table-column>
             <el-table-column
-              :key="'user-column-' + 4"
+              :key="'lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+              v-if="_checkAnyUsingCoin(this.userTableData)"
+            ></el-table-column>
+            <el-table-column
+              :key="'user-column-' + 5"
               prop="count"
               label="持有数量"
             ></el-table-column>
 
             <el-table-column
-              :key="'user-column-' + 5"
+              :key="'user-column-' + 6"
               prop="desc"
               label="预览"
               width="54"
@@ -684,7 +700,7 @@
                 ></el-button>
               </template>
             </el-table-column>
-            <el-table-column :key="'user-column-' + 6" fixed="right" width="80">
+            <el-table-column :key="'user-column-' + 7" fixed="right" width="80">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
@@ -897,7 +913,7 @@
           <div class="admin-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="recordQueryAddition.cardName"
+              v-model="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -978,7 +994,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="logQueryAddition.operator"
+              v-model="logQueryAddition.operator"
               placeholder="操作人"
               clearable
               :trigger-on-focus="false"
@@ -988,7 +1004,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="logQueryAddition.detail"
+              v-model="logQueryAddition.detail"
               placeholder="操作内容"
               clearable
               :trigger-on-focus="false"
