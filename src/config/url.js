@@ -54,6 +54,8 @@ const queryDrawResultUrl = BASE_URL + '/roll/list';
 const importDrewResultUrl = BASE_URL + '/roll/add';
 //交换玩家持卡
 const swapUserOwnCardUrl = BASE_URL + '/user/card/swap';
+//交换玩家的卡片
+const changeUserOwnCardUrl = BASE_URL + '/card/exchangeOwn';
 //查询日志
 const queryLogUrl = BASE_URL + '/record/list';
 
@@ -94,6 +96,7 @@ const urlNeededValidate = [
     setDrawResultUrl,
     importDrewResultUrl,
     swapUserOwnCardUrl,
+    changeUserOwnCardUrl,
 
     transDustToCardUrl,
     transDustToCardRandomUrl,
@@ -130,6 +133,7 @@ export {
     queryDrawResultUrl,
     importDrewResultUrl,
     swapUserOwnCardUrl,
+    changeUserOwnCardUrl,
     transDustToCardUrl,
     transDustToCardRandomUrl,
     transCardToDustUrl,

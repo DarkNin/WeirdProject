@@ -540,8 +540,11 @@
             </el-select>
           </div>
           <div class="special-user-add" v-if="userQueryAddition.target">
+            <el-button type="primary" size="mini" @click="exchangeUserCard"
+              >替换卡片</el-button
+            >
             <el-button type="primary" size="mini" @click="addUserCard"
-              >添加卡牌</el-button
+              >添加卡片</el-button
             >
           </div>
           <div class="special-user-info" v-if="userQueryAddition.target">
@@ -1414,6 +1417,53 @@
       </span>
     </el-dialog>
 
+    <!-- 替换用户卡牌dialog -->
+    <el-dialog
+      :title="exchangeUserCardTips"
+      :visible.sync="isExchangingUserCard"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelEditCardCount"
+    >
+      <el-form label-position="top">
+        <el-form-item label="原卡名" size="small" required>
+          <el-autocomplete
+            size="mini"
+            v-model.trim="exchangeUserCardDetails.oldCardName"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="新卡名" size="small" required>
+          <el-autocomplete
+            size="mini"
+            v-model.trim="exchangeUserCardDetails.newCardName"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="数量" size="small">
+          <el-input
+            v-model.number="exchangeUserCardDetails.count"
+            type="number"
+            @keyup.enter.native="submitExchangeUserCard"
+            clearable
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isExchangingUserCard = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitExchangeUserCard" size="small"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+
     <!-- 修改用户信息dialog -->
     <el-dialog
       :title="editingUserInfoItemTips"
@@ -1638,7 +1688,8 @@ import {
   importDrewResultUrl,
   exchangeCardsRareUrl,
   editPackageOrderUrl,
-  swapUserOwnCardUrl
+  swapUserOwnCardUrl,
+  changeUserOwnCardUrl
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
@@ -1891,6 +1942,16 @@ export default {
         cardA: "",
         userB: "",
         cardB: ""
+      },
+
+      //交换玩家自己的卡片
+      isExchangingUserCard: false,
+      exchangeUserCardTips: "",
+      exchangeUserCardDetails: {
+        targetUser: "",
+        oldCardName: "",
+        newCardName: "",
+        count: 0
       }
     };
   },
@@ -2704,6 +2765,51 @@ export default {
                 cardA: temp.cardA,
                 userB: temp.userB,
                 cardB: temp.cardB
+              }
+            }).then(res => {
+              if (res.data.code === 200) {
+                this.reloadPage();
+              }
+            });
+          }
+        })
+        .catch(() => {});
+    },
+
+    //交换玩家持有的卡片
+    exchangeUserCard() {
+      this.exchangeUserCardDetails.targetUser = this.userQueryAddition.target;
+      this.exchangeUserCardTips = `正在替换玩家【${
+        this.userQueryAddition.target
+      }】的卡片`;
+      this.isExchangingUserCard = true;
+    },
+
+    cancelExchangeUserCard() {
+      this.exchangeUserCardTips = "";
+      Object.assign(
+        this.$data.exchangeUserCardDetails,
+        this.$options.data().exchangeUserCardDetails
+      );
+    },
+
+    submitExchangeUserCard() {
+      MessageBox.confirm("请确认是否替换", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let temp = this.exchangeUserCardDetails;
+          if (temp.targetUser && temp.oldCardName && temp.newCardName) {
+            this.$openLoading();
+            axiosPostAsJSON({
+              url: changeUserOwnCardUrl,
+              data: {
+                targetUser: temp.targetUser,
+                oldCardName: temp.oldCardName,
+                newCardName: temp.newCardName,
+                count: temp.count
               }
             }).then(res => {
               if (res.data.code === 200) {
