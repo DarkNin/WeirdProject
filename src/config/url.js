@@ -31,6 +31,8 @@ const editPackageOrderUrl = BASE_URL + '/package/sort';
 //用户
 //新增用户
 const addUserUrl = BASE_URL + '/user/add';
+//重置密码
+const resetPasswordUrl = BASE_URL + '/user/reset';
 //修改用户持有卡片数量
 const editCardCountUrl = BASE_URL + '/user/card/update';
 //修改尘数
@@ -54,6 +56,8 @@ const queryDrawResultUrl = BASE_URL + '/roll/list';
 const importDrewResultUrl = BASE_URL + '/roll/add';
 //交换玩家持卡
 const swapUserOwnCardUrl = BASE_URL + '/user/card/swap';
+//交换玩家的卡片
+const changeUserOwnCardUrl = BASE_URL + '/card/exchangeOwn';
 //查询日志
 const queryLogUrl = BASE_URL + '/record/list';
 
@@ -87,6 +91,7 @@ const urlNeededValidate = [
 
 
     addUserUrl,
+    resetPasswordUrl,
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,
@@ -94,6 +99,7 @@ const urlNeededValidate = [
     setDrawResultUrl,
     importDrewResultUrl,
     swapUserOwnCardUrl,
+    changeUserOwnCardUrl,
 
     transDustToCardUrl,
     transDustToCardRandomUrl,
@@ -119,6 +125,7 @@ export {
     queryCardPackageListUrl,
     editPackageOrderUrl,
     addUserUrl,
+    resetPasswordUrl,
     editCardCountUrl,
     editDustUrl,
     editAwardUrl,
@@ -130,6 +137,7 @@ export {
     queryDrawResultUrl,
     importDrewResultUrl,
     swapUserOwnCardUrl,
+    changeUserOwnCardUrl,
     transDustToCardUrl,
     transDustToCardRandomUrl,
     transCardToDustUrl,

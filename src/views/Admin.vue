@@ -129,6 +129,9 @@
                   :key="'package-' + item.packageName + '-3'"
                   prop="needCoin"
                   label="需要硬币"
+                  v-if="_checkAnyUsingCoin(packageListContent[index]
+                    ? packageListContent[index]['data']
+                    : [])"
                 ></el-table-column>
                 <el-table-column
                   :key="'package-' + item.packageName + '-4'"
@@ -267,7 +270,7 @@
           <div class="admin-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="libQueryAddition.cardName"
+              v-model="libQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -311,6 +314,7 @@
               :key="'lib-column-' + 4"
               prop="needCoin"
               label="需要硬币"
+              v-if="_checkAnyUsingCoin(this.libTableData)"
             ></el-table-column>
             <el-table-column
               :key="'lib-column-' + 5"
@@ -418,7 +422,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="playerLibQueryAddition.cardName"
+              v-model="playerLibQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               @keyup.enter.native="playerLibQueryCard"
@@ -460,17 +464,23 @@
               </template>
             </el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 4"
+              :key="'lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+              v-if="_checkAnyUsingCoin(this.playerLibTableData)"
+            ></el-table-column>
+            <el-table-column
+              :key="'player-lib-column-' + 5"
               prop="userName"
               label="拥有者"
             ></el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 5"
+              :key="'player-lib-column-' + 6"
               prop="count"
               label="拥有数量"
             ></el-table-column>
             <el-table-column
-              :key="'player-lib-column-' + 6"
+              :key="'player-lib-column-' + 7"
               prop="desc"
               label="预览"
               width="54"
@@ -493,7 +503,7 @@
             </el-table-column>
 
             <el-table-column
-              :key="'player-lib-column-' + 7"
+              :key="'player-lib-column-' + 8"
               fixed="right"
               width="80"
             >
@@ -540,8 +550,14 @@
             </el-select>
           </div>
           <div class="special-user-add" v-if="userQueryAddition.target">
+            <el-button type="primary" size="mini" @click="submitResetPassword"
+              >重置密码</el-button
+            >
+            <el-button type="primary" size="mini" @click="exchangeUserCard"
+              >替换卡片</el-button
+            >
             <el-button type="primary" size="mini" @click="addUserCard"
-              >添加卡牌</el-button
+              >添加卡片</el-button
             >
           </div>
           <div class="special-user-info" v-if="userQueryAddition.target">
@@ -607,7 +623,7 @@
           <div class="admin-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="userQueryAddition.card"
+              v-model="userQueryAddition.card"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -651,13 +667,19 @@
               </template>
             </el-table-column>
             <el-table-column
-              :key="'user-column-' + 4"
+              :key="'lib-column-' + 4"
+              prop="needCoin"
+              label="需要硬币"
+              v-if="_checkAnyUsingCoin(this.userTableData)"
+            ></el-table-column>
+            <el-table-column
+              :key="'user-column-' + 5"
               prop="count"
               label="持有数量"
             ></el-table-column>
 
             <el-table-column
-              :key="'user-column-' + 5"
+              :key="'user-column-' + 6"
               prop="desc"
               label="预览"
               width="54"
@@ -678,7 +700,7 @@
                 ></el-button>
               </template>
             </el-table-column>
-            <el-table-column :key="'user-column-' + 6" fixed="right" width="80">
+            <el-table-column :key="'user-column-' + 7" fixed="right" width="80">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
@@ -891,7 +913,7 @@
           <div class="admin-main-content-addition-item">
             <el-autocomplete
               size="mini"
-              v-model.trim="recordQueryAddition.cardName"
+              v-model="recordQueryAddition.cardName"
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
@@ -972,7 +994,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="logQueryAddition.operator"
+              v-model="logQueryAddition.operator"
               placeholder="操作人"
               clearable
               :trigger-on-focus="false"
@@ -982,7 +1004,7 @@
           <div class="admin-main-content-addition-item">
             <el-input
               size="mini"
-              v-model.trim="logQueryAddition.detail"
+              v-model="logQueryAddition.detail"
               placeholder="操作内容"
               clearable
               :trigger-on-focus="false"
@@ -1414,6 +1436,53 @@
       </span>
     </el-dialog>
 
+    <!-- 替换用户卡牌dialog -->
+    <el-dialog
+      :title="exchangeUserCardTips"
+      :visible.sync="isExchangingUserCard"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelEditCardCount"
+    >
+      <el-form label-position="top">
+        <el-form-item label="原卡名" size="small" required>
+          <el-autocomplete
+            size="mini"
+            v-model.trim="exchangeUserCardDetails.oldCardName"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="新卡名" size="small" required>
+          <el-autocomplete
+            size="mini"
+            v-model.trim="exchangeUserCardDetails.newCardName"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+          ></el-autocomplete>
+        </el-form-item>
+        <el-form-item label="数量" size="small">
+          <el-input
+            v-model.number="exchangeUserCardDetails.count"
+            type="number"
+            @keyup.enter.native="submitExchangeUserCard"
+            clearable
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isExchangingUserCard = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitExchangeUserCard" size="small"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+
     <!-- 修改用户信息dialog -->
     <el-dialog
       :title="editingUserInfoItemTips"
@@ -1630,6 +1699,7 @@ import {
   editPackageNameUrl,
   addPackageUrl,
   addUserUrl,
+  resetPasswordUrl,
   editCardCountUrl,
   editDustUrl,
   editAwardUrl,
@@ -1638,7 +1708,8 @@ import {
   importDrewResultUrl,
   exchangeCardsRareUrl,
   editPackageOrderUrl,
-  swapUserOwnCardUrl
+  swapUserOwnCardUrl,
+  changeUserOwnCardUrl
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
@@ -1891,6 +1962,16 @@ export default {
         cardA: "",
         userB: "",
         cardB: ""
+      },
+
+      //交换玩家自己的卡片
+      isExchangingUserCard: false,
+      exchangeUserCardTips: "",
+      exchangeUserCardDetails: {
+        targetUser: "",
+        oldCardName: "",
+        newCardName: "",
+        count: 0
       }
     };
   },
@@ -2708,6 +2789,85 @@ export default {
             }).then(res => {
               if (res.data.code === 200) {
                 this.reloadPage();
+              }
+            });
+          }
+        })
+        .catch(() => {});
+    },
+
+    submitResetPassword() {
+      let confirmStr = `是否重置玩家【${
+        this.userQueryAddition.target
+      }】的密码？`;
+      MessageBox.confirm(confirmStr, "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$openLoading();
+          let param = {
+            url: resetPasswordUrl,
+            data: {
+              target: this.userQueryAddition.target
+            }
+          }
+          axiosGet(param).then(async res => {
+            if (res.data.code === 200) {
+              this.userList = await this._queryUserList();
+              this.setUserInfo(this.userQueryAddition.target);
+              this.$closeLoading();
+              //this.reloadPage();
+            }
+          });
+        })
+        .catch(() => {});
+    },
+
+    //交换玩家持有的卡片
+    exchangeUserCard() {
+      this.exchangeUserCardDetails.targetUser = this.userQueryAddition.target;
+      this.exchangeUserCardTips = `正在替换玩家【${
+        this.userQueryAddition.target
+      }】的卡片`;
+      this.isExchangingUserCard = true;
+    },
+
+    cancelExchangeUserCard() {
+      this.exchangeUserCardTips = "";
+      Object.assign(
+        this.$data.exchangeUserCardDetails,
+        this.$options.data().exchangeUserCardDetails
+      );
+    },
+
+    submitExchangeUserCard() {
+      MessageBox.confirm("请确认是否替换", "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let temp = this.exchangeUserCardDetails;
+          if (temp.targetUser && temp.oldCardName && temp.newCardName) {
+            this.$openLoading();
+            let param = {
+              url: changeUserOwnCardUrl,
+              data: {
+                targetUser: temp.targetUser,
+                oldCardName: temp.oldCardName,
+                newCardName: temp.newCardName,
+                count: temp.count
+              }
+            }
+            axiosPostAsJSON(param).then(async res => {
+              if (res.data.code === 200) {
+                this.isExchangingUserCard = false;
+                this.userList = await this._queryUserList();
+                this.setUserInfo(this.userQueryAddition.target);
+                this.$closeLoading();
+                //this.reloadPage();
               }
             });
           }
