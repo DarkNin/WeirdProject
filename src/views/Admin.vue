@@ -14,6 +14,7 @@
           <el-menu-item index="5">抽卡记录</el-menu-item>
           <el-menu-item index="6">修改记录</el-menu-item>
           <el-menu-item index="7">日志</el-menu-item>
+          <el-menu-item index="8">卡组</el-menu-item>
         </el-menu>
         <div class="admin-main-menu-control">
           <el-button
@@ -1064,6 +1065,15 @@
           </div>
         </div>
       </div>
+      <!-- 卡组 -->
+      <div class="admin-main-content" v-else-if="showTab === '8'">
+        <deck-generator
+          :showCardDescHover="_showCardDescHover"
+          :showCardDescClick="_showCardDescClick"
+          :closeCardDesc="_closeCardDesc"
+          :userList="userList"
+        />
+      </div>
     </div>
 
     <!-- 新增卡包dialog -->
@@ -1713,6 +1723,7 @@ import {
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
+import DeckGenerator from "./common/DeckGenerator";
 import draggable from "vuedraggable";
 import { MessageBox } from "element-ui";
 import { exportToExcelByJson } from "@/utils/xlsx";
@@ -1721,7 +1732,8 @@ export default {
   mixins: [common],
   components: {
     CardDesc,
-    draggable
+    draggable,
+    DeckGenerator,
   },
   data() {
     return {
@@ -2585,8 +2597,7 @@ export default {
 
     submitEditUserInfo() {
       if (
-        typeof this.editingUserInfoItemCount === "number" &&
-        this.editingUserInfoItemCount >= 0
+        typeof this.editingUserInfoItemCount === "number"
       ) {
         this.$openLoading();
         let options = {

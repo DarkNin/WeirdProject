@@ -18,6 +18,7 @@
         <el-menu-item index="3">卡库</el-menu-item>
         <el-menu-item index="4">抽卡记录</el-menu-item>
         <el-menu-item index="5">修改记录</el-menu-item>
+        <el-menu-item index="6">卡组</el-menu-item>
       </el-menu>
       <div class="player-main-content" v-if="showTab === '1'">
         <el-collapse
@@ -123,7 +124,7 @@
           </el-collapse-item>
         </el-collapse>
       </div>
-            <!-- 全卡检索 -->
+      <!-- 全卡检索 -->
       <div class="player-main-content" v-else-if="showTab === '2'">
         <div class="player-main-content-addition">
           <div class="player-main-content-addition-item">
@@ -172,11 +173,13 @@
             ></el-autocomplete>
           </div>
           <div class="player-main-content-addition-item special">
-            <el-checkbox size="mini" v-model="libQueryAddition.searchInCollection"
+            <el-checkbox
+              size="mini"
+              v-model="libQueryAddition.searchInCollection"
               >收藏中</el-checkbox
             >
           </div>
-                      
+
           <div class="player-main-content-addition-item">
             <el-button type="info" size="mini" @click="libClearAddition"
               >清除条件</el-button
@@ -644,7 +647,14 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="recordTableData" size="mini" height="auto" @cell-mouse-enter="recordHighlightRow" @cell-mouse-leave="recordCancelHighlightRow" :row-class-name="recordHightlightClass">
+          <el-table
+            :data="recordTableData"
+            size="mini"
+            height="auto"
+            @cell-mouse-enter="recordHighlightRow"
+            @cell-mouse-leave="recordCancelHighlightRow"
+            :row-class-name="recordHightlightClass"
+          >
             <el-table-column :key="'record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div class="table-expand-desc-box">
@@ -699,6 +709,15 @@
             ></el-pagination>
           </div>
         </div>
+      </div>
+
+      <!-- 卡组 -->
+      <div class="player-main-content" v-else-if="showTab === '6'">
+        <deck-generator
+          :showCardDescHover="_showCardDescHover"
+          :showCardDescClick="_showCardDescClick"
+          :closeCardDesc="_closeCardDesc"
+        />
       </div>
     </div>
 
@@ -835,15 +854,17 @@ import {
   transDustToCardUrl,
   transDustToCardRandomUrl,
   transCardToDustUrl,
-  transCoinToCardUrl
+  transCoinToCardUrl,
 } from "@/config/url.js";
 import CardDesc from "@/components/CardDesc";
+import DeckGenerator from "./common/DeckGenerator";
 import { exportToExcelByJson } from "@/utils/xlsx";
 export default {
   name: "Player",
   mixins: [common],
   components: {
     CardDesc,
+    DeckGenerator,
   },
   data() {
     return {
@@ -869,7 +890,7 @@ export default {
         cardName: "",
         userName: "",
         rare: "",
-        searchInCollection: ""
+        searchInCollection: "",
       },
       libTableData: [],
       //玩家卡库查询
@@ -1102,7 +1123,7 @@ export default {
     },
 
     setToMineInLib() {
-      this.libQueryAddition.userName = []
+      this.libQueryAddition.userName = [];
       this.libQueryAddition.userName.push(this.username);
       this.libQueryCard();
     },
@@ -1170,9 +1191,9 @@ export default {
     recordCancelHighlightRow(row, column, cell, event) {
       this.highlightKey = null;
     },
-    recordHightlightClass({row, rowIndex}) {
+    recordHightlightClass({ row, rowIndex }) {
       if (row["cardPk"] === this.highlightKey) {
-        return "record-hightlight-row"
+        return "record-hightlight-row";
       }
     },
 
@@ -1207,7 +1228,7 @@ export default {
       });
     },
     setToMineInRecord() {
-      this.drawRecordQueryAddition.user = []
+      this.drawRecordQueryAddition.user = [];
       this.drawRecordQueryAddition.user.push(this.username);
       this.drawRecordQuery();
     },
@@ -1264,7 +1285,11 @@ export default {
 
     //转化多余闪为尘
     checkIfTurnColumnShow(row) {
-      return row.count > 3 && ["UR", "SR", "HR"].includes(row.rare) && row.userName === this.username;
+      return (
+        row.count > 3 &&
+        ["UR", "SR", "HR"].includes(row.rare) &&
+        row.userName === this.username
+      );
     },
     turnToDust(row) {
       this.turnToDustInfo.card = row.cardName;
@@ -1320,20 +1345,18 @@ export default {
     },
 
     toCollection(row) {
-      this._collectionOperation(row.cardName, 1)
-      .then((res) => {
-          if (res.data.code === 200) {
-            this.libAllQueryCard(this.libPagination.page);
-          }
+      this._collectionOperation(row.cardName, 1).then((res) => {
+        if (res.data.code === 200) {
+          this.libAllQueryCard(this.libPagination.page);
+        }
       });
     },
 
     disCollection(row) {
-      this._collectionOperation(row.cardName, 2)
-      .then((res) => {
-          if (res.data.code === 200) {
-            this.libAllQueryCard(this.libPagination.page);
-          }
+      this._collectionOperation(row.cardName, 2).then((res) => {
+        if (res.data.code === 200) {
+          this.libAllQueryCard(this.libPagination.page);
+        }
       });
     },
 
@@ -1365,7 +1388,7 @@ export default {
           });
         })
         .catch(() => {});
-    }
+    },
   },
 };
 </script>
@@ -1558,13 +1581,13 @@ export default {
 }
 
 .el-table /deep/ .record-hightlight-row {
-  box-shadow: 0 0 20px inset #409EFF55;
+  box-shadow: 0 0 20px inset #409eff55;
 }
 
-.player-main-content-addition-item.special .el-checkbox{
+.player-main-content-addition-item.special .el-checkbox {
   margin-top: 4px;
 }
-.player-main-content-addition-item.special .el-checkbox /deep/ *{
+.player-main-content-addition-item.special .el-checkbox /deep/ * {
   font-size: 12px;
 }
 </style>

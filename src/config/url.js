@@ -76,7 +76,20 @@ const transCoinToCardUrl = BASE_URL + '/user/card/coin';
 //收藏操作
 const collectionOpeationUrl = BASE_URL + '/collection/op';
 
-
+//卡组处理
+//搜索
+const queryDeckUrl = BASE_URL + '/deck/list';
+//添加卡组
+const addDeckUrl = BASE_URL + '/deck/add';
+const batchAddDeckUrl = BASE_URL + '/deck/add/batch';
+//修改卡组
+//const editDeckUrl = BASE_URL + '/deck/update';
+//卡组信息
+const queryDeckDetailUrl = BASE_URL + '/deck/info';
+//重命名卡组
+const renameDeckUrl = BASE_URL + '/deck/rename';
+//删除卡组
+const removeDeckUrl = BASE_URL + '/deck/remove';
 
 //需要验证账号密码的地址列表
 const urlNeededValidate = [
@@ -107,7 +120,14 @@ const urlNeededValidate = [
     transCoinToCardUrl,
     queryLogUrl,
 
-    collectionOpeationUrl
+    collectionOpeationUrl,
+
+    queryDeckUrl,
+    addDeckUrl,
+    batchAddDeckUrl,
+    queryDeckDetailUrl,
+    renameDeckUrl,
+    removeDeckUrl
 ]
 
 
@@ -145,5 +165,12 @@ export {
     queryLogUrl,
     collectionOpeationUrl,
 
-    urlNeededValidate
+    urlNeededValidate,
+    
+    queryDeckUrl,
+    addDeckUrl,
+    batchAddDeckUrl,
+    queryDeckDetailUrl,
+    renameDeckUrl,
+    removeDeckUrl
 }
