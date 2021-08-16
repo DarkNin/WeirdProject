@@ -118,8 +118,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-own">{{mainItem.own}}</span>
-                      <span class="deck-count">{{mainItem.count}}</span>
+                      <span class="deck-count">{{mainItem.own + ' / ' + mainItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -514,7 +513,7 @@ export default {
     },
 
     formatDate(srcDate) {
-      return Moment(srcDate).format("yyyy-MM-DD hh:mm:ss");
+      return Moment(srcDate).format("yyyy-MM-DD HH:mm:ss");
     },
   },
 };
@@ -568,33 +567,30 @@ export default {
 .deck-image {
   display: inline-block;
   position: relative;
-
   cursor: pointer;
   margin-left: 5px;
 }
+
 .deck-image img {
   height: 64px;
   width: 44px;
 }
 
-.deck-image .deck-count, .deck-image .deck-own {
+.deck-image .deck-count {
   position: absolute;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  left: 26px;
+  left: 10px;
   top: 48px;
   height: 16px;
-  width: 16px;
-  border-radius: 50%;
-  font-size: 14px;
+  width: 36px;
+  border-radius: 3px;
+  font-size: 13px;
   font-weight: bold;
-  color: #ffffff;
-  background-color: rgb(136, 136, 136);
-}
-.deck-image .deck-own {
-  background-color: #dfb466;
-  left: 0;
+  color: #f5f25a;
+  background-color: rgb(61, 61, 61);
+  transform: scale(0.8)
 }
 
 .img-grayscale {
