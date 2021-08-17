@@ -125,47 +125,75 @@
                 <div class="deck-box-item">
                   <div class="deck-box-item-title">副卡组</div>
                   <div class="deck-box-item-content">
-                    <el-image
+                    <div
+                      class="deck-image"
                       v-for="(exItem, exIndex) in deckDetailObject[
                         scope.row.deckId
                       ].exList"
                       :key="scope.row.deckId + '-ex-' + exIndex"
-                      :src="
-                        'http://cdn.233.momobako.com/ygopro/pics/' +
-                          exItem.code +
-                          '.jpg!thumb'
-                      "
-                      @mouseenter.native="
-                        showCardDescHover($event, exItem.desc, exItem.code)
-                      "
-                      @click="
-                        showCardDescClick($event, exItem.desc, exItem.code)
-                      "
-                      @mouseleave.native="closeCardDesc"
-                    ></el-image>
+                    >
+                      <img
+                        :class="exItem.count > exItem.own ? 'img-grayscale' : ''"
+                        :src="
+                          'http://cdn.233.momobako.com/ygopro/pics/' +
+                            exItem.code +
+                            '.jpg!thumb'
+                        "
+                        @mouseenter="
+                          showCardDescHover(
+                            $event,
+                            exItem.desc,
+                            exItem.code
+                          )
+                        "
+                        @click="
+                          showCardDescClick(
+                            $event,
+                            exItem.desc,
+                            exItem.code
+                          )
+                        "
+                        @mouseleave="closeCardDesc"
+                      />
+                      <span class="deck-count">{{exItem.own + ' / ' + exItem.count}}</span>
+                    </div>
                   </div>
                 </div>
                 <div class="deck-box-item">
                   <div class="deck-box-item-title">额外卡组</div>
                   <div class="deck-box-item-content">
-                    <el-image
+                    <div
+                      class="deck-image"
                       v-for="(sideItem, sideIndex) in deckDetailObject[
                         scope.row.deckId
                       ].sideList"
                       :key="scope.row.deckId + '-side-' + sideIndex"
-                      :src="
-                        'http://cdn.233.momobako.com/ygopro/pics/' +
-                          sideItem.code +
-                          '.jpg!thumb'
-                      "
-                      @mouseenter.native="
-                        showCardDescHover($event, sideItem.desc, sideItem.code)
-                      "
-                      @click="
-                        showCardDescClick($event, sideItem.desc, sideItem.code)
-                      "
-                      @mouseleave.native="closeCardDesc"
-                    ></el-image>
+                    >
+                      <img
+                        :class="sideItem.count > sideItem.own ? 'img-grayscale' : ''"
+                        :src="
+                          'http://cdn.233.momobako.com/ygopro/pics/' +
+                            sideItem.code +
+                            '.jpg!thumb'
+                        "
+                        @mouseenter="
+                          showCardDescHover(
+                            $event,
+                            sideItem.desc,
+                            sideItem.code
+                          )
+                        "
+                        @click="
+                          showCardDescClick(
+                            $event,
+                            sideItem.desc,
+                            sideItem.code
+                          )
+                        "
+                        @mouseleave="closeCardDesc"
+                      />
+                      <span class="deck-count">{{sideItem.own + ' / ' + sideItem.count}}</span>
+                    </div>
                   </div>
                 </div>
               </div>
