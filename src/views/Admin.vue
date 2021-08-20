@@ -51,7 +51,7 @@
             >新增玩家</el-button
           >
           <el-button type="text" @click="swapUserCards()" v-if="showTab === '4'"
-            >换卡</el-button
+            >交易</el-button
           >
           <el-button
             type="text"
@@ -1522,9 +1522,9 @@
       </span>
     </el-dialog>
 
-    <!-- 交换两用户卡片 -->
+    <!-- 交易两用户卡片 -->
     <el-dialog
-      title="换卡"
+      title="交易"
       :visible.sync="isSwappingUserCards"
       width="20rem"
       :close-on-click-modal="false"
