@@ -284,8 +284,13 @@ export default {
         _showCardDescHover(event, desc, pid) {
             if (this._checkIfMobile()) return;
             let tarRect = event.target.getBoundingClientRect();
-            this.cardDesc.x = Math.ceil(tarRect.x);
-            this.cardDesc.y = Math.floor(tarRect.y + tarRect.height);
+            let currentX = tarRect.x + tarRect.width / 2;
+            if (currentX < 600) {
+                this.cardDesc.x = Math.ceil(currentX + 600);
+            } else {
+                this.cardDesc.x = Math.ceil(currentX);
+            }
+            this.cardDesc.y = Math.floor(tarRect.y + tarRect.height / 2);
             this.cardDesc.desc = desc;
             this.cardDesc.picId = pid;
             this.isShowingCardDesc = true;

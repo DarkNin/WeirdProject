@@ -610,7 +610,7 @@ export default {
     },
 
     getDeckCardDesc(item) {
-      return "【" + item.packageName + "】(" + item.rare + ")\n" + item.desc;
+      return item.desc + "\n\n" + item.packageName + " - " + item.rare;
     },
   },
 };
