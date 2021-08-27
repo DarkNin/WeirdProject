@@ -90,6 +90,8 @@ const queryDeckDetailUrl = BASE_URL + '/deck/info';
 const renameDeckUrl = BASE_URL + '/deck/rename';
 //删除卡组
 const removeDeckUrl = BASE_URL + '/deck/remove';
+//分享卡组
+const shareDeckUrl = BASE_URL + '/deck/share';
 
 //需要验证账号密码的地址列表
 const urlNeededValidate = [
@@ -127,7 +129,8 @@ const urlNeededValidate = [
     batchAddDeckUrl,
     queryDeckDetailUrl,
     renameDeckUrl,
-    removeDeckUrl
+    removeDeckUrl,
+    shareDeckUrl
 ]
 
 
@@ -172,5 +175,6 @@ export {
     batchAddDeckUrl,
     queryDeckDetailUrl,
     renameDeckUrl,
-    removeDeckUrl
+    removeDeckUrl,
+    shareDeckUrl
 }

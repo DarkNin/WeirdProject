@@ -49,6 +49,13 @@
         </el-select>
       </div>
       <div class="deck-content-addition-item special">
+        <el-checkbox
+          size="mini"
+          v-model="deckQueryAddition.share"
+          >分享中</el-checkbox
+        >
+      </div>
+      <div class="deck-content-addition-item special">
         <el-button type="info" size="mini" @click="deckClearAddition"
           >清除条件
         </el-button>
@@ -58,7 +65,6 @@
         <el-button
           type="primary"
           size="mini"
-          v-if="isAdmin === 'false'"
           @click="isUploadDialogShowing = true"
           >上传卡组
         </el-button>
@@ -105,14 +111,14 @@
                         @mouseenter="
                           showCardDescHover(
                             $event,
-                            mainItem.desc,
+                            getDeckCardDesc(mainItem),
                             mainItem.code
                           )
                         "
                         @click="
                           showCardDescClick(
                             $event,
-                            mainItem.desc,
+                            getDeckCardDesc(mainItem),
                             mainItem.code
                           )
                         "
@@ -142,14 +148,14 @@
                         @mouseenter="
                           showCardDescHover(
                             $event,
-                            exItem.desc,
+                            getDeckCardDesc(exItem),
                             exItem.code
                           )
                         "
                         @click="
                           showCardDescClick(
                             $event,
-                            exItem.desc,
+                            getDeckCardDesc(exItem),
                             exItem.code
                           )
                         "
@@ -179,14 +185,14 @@
                         @mouseenter="
                           showCardDescHover(
                             $event,
-                            sideItem.desc,
+                            getDeckCardDesc(sideItem),
                             sideItem.code
                           )
                         "
                         @click="
                           showCardDescClick(
                             $event,
-                            sideItem.desc,
+                            getDeckCardDesc(sideItem),
                             sideItem.code
                           )
                         "
@@ -209,7 +215,6 @@
           :key="'deck-column-' + 2"
           prop="userName"
           label="玩家名"
-          v-if="isAdmin === 'true'"
         ></el-table-column>
         <el-table-column
           :key="'deck-column-' + 3"
@@ -225,16 +230,32 @@
         <el-table-column fixed="right" :key="'deck-column-' + 4" label="操作">
           <template slot-scope="scope">
             <el-button
+              v-if="checkIfCanOperate(scope.row)"
               type="text"
               size="mini"
               @click="editDeckName(scope.row.deckId, scope.row.deckName)"
               >重命名
             </el-button>
             <el-button
+              v-if="checkIfCanOperate(scope.row)"
               type="text"
               size="mini"
               @click="removeDeck(scope.row.deckId, scope.row.deckName)"
               >删除卡组
+            </el-button>
+            <el-button
+              v-if="checkIfCanShare(scope.row)"
+              type="text"
+              size="mini"
+              @click="shareOperation(scope.row.deckId, 1)"
+              >分享
+            </el-button>
+            <el-button
+              v-if="checkIfCanDisShare(scope.row)"
+              type="text"
+              size="mini"
+              @click="shareOperation(scope.row.deckId, 0)"
+              >取消分享
             </el-button>
             <el-button
               v-if="deckDetailObject[scope.row.deckId]"
@@ -300,11 +321,11 @@ import {
   queryDeckDetailUrl,
   renameDeckUrl,
   removeDeckUrl,
+  shareDeckUrl,
 } from "../../../config/url";
 import { MessageBox } from "element-ui";
 import { axiosPostAsJSON } from "@/utils/fetch.js";
 import { saveAs } from "file-saver";
-import { Blob } from "buffer";
 export default {
   name: "DeckGenerator",
   props: {
@@ -328,12 +349,14 @@ export default {
   data() {
     return {
       isAdmin: window.localStorage.getItem("isAdmin"),
+      username: JSON.parse(window.localStorage.getItem("info")).u,
 
       deckQueryAddition: {
         sortType: 1,
         sortWay: 1,
         deckName: "",
         targetUser: undefined,
+        share: 0
       },
       deckTableData: null,
 
@@ -350,7 +373,8 @@ export default {
   },
   async mounted() {},
   methods: {
-    queryDeckList(page, pageSize, deckName, sortType, sortWay, targetUser) {
+    queryDeckList(page, pageSize, deckName, sortType, sortWay, targetUser, share) {
+      this.deckDetailObject = {};
       return new Promise((resolve) => {
         axiosPostAsJSON({
           url: queryDeckUrl,
@@ -361,6 +385,7 @@ export default {
             page: page || 1,
             pagesize: pageSize,
             targetUser: targetUser ? targetUser : undefined,
+            share: share,
           },
         }).then((res) => {
           resolve({
@@ -383,7 +408,8 @@ export default {
         this.deckQueryAddition.deckName,
         this.deckQueryAddition.sortType,
         this.deckQueryAddition.sortWay,
-        this.deckQueryAddition.targetUser
+        this.deckQueryAddition.targetUser,
+        this.deckQueryAddition.share
       ).then((data) => {
         this.deckPagination.page = data.pagination.page;
         this.deckPagination.total = data.pagination.total;
@@ -542,6 +568,36 @@ export default {
 
     formatDate(srcDate) {
       return Moment(srcDate).format("yyyy-MM-DD HH:mm:ss");
+    },
+
+    checkIfCanOperate(row) {
+      return row.userName === this.username || JSON.parse(this.isAdmin) === true;
+    },
+
+    checkIfCanShare(row) {
+      return this.checkIfCanOperate(row) && row.share === 0;
+    },
+
+    checkIfCanDisShare(row) {
+      return this.checkIfCanOperate(row) && row.share === 1;
+    },
+
+    shareOperation(deckId, operation) {
+      axiosPostAsJSON({
+          url: shareDeckUrl,
+          data: {
+              deckId: deckId,
+              share: operation
+          },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          this.deckQuery(this.deckPagination.page);
+        }
+      });
+    },
+
+    getDeckCardDesc(item) {
+      return "【" + item.packageName + "】(" + item.rare + ")\n" + item.desc;
     },
   },
 };
