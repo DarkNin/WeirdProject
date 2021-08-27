@@ -233,15 +233,15 @@
               v-if="checkIfCanOperate(scope.row)"
               type="text"
               size="mini"
-              @click="editDeckName(scope.row.deckId, scope.row.deckName)"
-              >重命名
+              @click="editDeck(scope.row)"
+              >修改
             </el-button>
             <el-button
               v-if="checkIfCanOperate(scope.row)"
               type="text"
               size="mini"
               @click="removeDeck(scope.row.deckId, scope.row.deckName)"
-              >删除卡组
+              >删除
             </el-button>
             <el-button
               v-if="checkIfCanShare(scope.row)"
@@ -316,6 +316,46 @@
         >
       </span>
     </el-dialog>
+
+
+    <!-- 修改 -->
+    <el-dialog
+      title="修改"
+      :visible.sync="isEditDialogShowing"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelUploadDeck"
+    >
+      <el-form label-position="top" :model="editDeckInfo">
+        <el-form-item label="卡组名" size="small">
+          <el-input
+            v-model="editDeckInfo.deckName"
+            type="text"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-upload
+          ref="deck_uploader"
+          class="deck-uploader"
+          size="mini"
+          action=""
+          accept=".ydk"
+          :auto-upload="false"
+          :limit=1
+        >
+          <el-button size="mini" type="primary">选择文件</el-button>
+        </el-upload>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isEditDialogShowing = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditDeck" size="small"
+          >修 改</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -325,6 +365,7 @@ import {
   queryDeckUrl,
   addDeckUrl,
   batchAddDeckUrl,
+  editDeckUrl,
   queryDeckDetailUrl,
   renameDeckUrl,
   removeDeckUrl,
@@ -374,6 +415,11 @@ export default {
       },
 
       isUploadDialogShowing: false,
+      isEditDialogShowing: false,
+      editDeckInfo: {
+        deckName: "",
+        deckId: 0
+      },
 
       deckDetailObject: {},
     };
@@ -612,6 +658,75 @@ export default {
     getDeckCardDesc(item) {
       return item.desc + "\n\n" + item.packageName + " - " + item.rare;
     },
+
+    editDeck(row) {
+      this.editDeckInfo.deckId = row.deckId;
+      this.editDeckInfo.deckName = row.deckName;
+      this.isEditDialogShowing = true;
+    },
+
+    submitEditDeck() {
+      let files = this.$refs["deck_uploader"].uploadFiles;
+      // 没有选择文件，只修改卡组名
+      if (files.length === 0) {
+        let deckName = this.editDeckInfo.deckName;
+        if (deckName) {
+          this.$openLoading();
+          axiosPostAsJSON({
+            url: renameDeckUrl,
+            data: {
+              deck: {
+                deckId: this.editDeckInfo.deckId,
+                deckName: deckName,
+              },
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              this.deckQuery();
+            }
+            this.isEditDialogShowing = false;
+          });
+        }
+        return;
+      };
+      if (files.length > 1) {
+        this.$alertInfo("修改卡组只需要上传一个文件，请移除后提交");
+      };
+      this.$openLoading();
+      for (let fileItem of files) {
+        if (
+          !(fileItem.name.includes(".ydk") || fileItem.name.includes(".YDK"))
+        ) {
+          this.$alertInfo("存在不支持的文件类型，请移除后提交");
+          return;
+        }
+      }
+      files.forEach((fileItem) => {
+        let fileReader = new FileReader();
+        //异步加载的监听
+        fileReader.addEventListener("loadend", () => {
+          let ydk = fileReader.result;
+          console.log(ydk);
+          axiosPostAsJSON({
+            url: editDeckUrl,
+            data: {
+              deck: {
+                deckId: this.editDeckInfo.deckId,
+                deckName: this.editDeckInfo.deckName,
+                ydk: ydk
+              }
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              this.isEditDialogShowing = false;
+              this.deckQuery();
+            }
+          });
+        });
+        fileReader.readAsText(fileItem.raw);
+        return;
+      });
+    }
   },
 };
 </script>

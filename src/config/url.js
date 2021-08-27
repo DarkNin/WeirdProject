@@ -83,7 +83,7 @@ const queryDeckUrl = BASE_URL + '/deck/list';
 const addDeckUrl = BASE_URL + '/deck/add';
 const batchAddDeckUrl = BASE_URL + '/deck/add/batch';
 //修改卡组
-//const editDeckUrl = BASE_URL + '/deck/update';
+const editDeckUrl = BASE_URL + '/deck/update';
 //卡组信息
 const queryDeckDetailUrl = BASE_URL + '/deck/info';
 //重命名卡组
@@ -127,6 +127,7 @@ const urlNeededValidate = [
     queryDeckUrl,
     addDeckUrl,
     batchAddDeckUrl,
+    editDeckUrl,
     queryDeckDetailUrl,
     renameDeckUrl,
     removeDeckUrl,
@@ -173,6 +174,7 @@ export {
     queryDeckUrl,
     addDeckUrl,
     batchAddDeckUrl,
+    editDeckUrl,
     queryDeckDetailUrl,
     renameDeckUrl,
     removeDeckUrl,
