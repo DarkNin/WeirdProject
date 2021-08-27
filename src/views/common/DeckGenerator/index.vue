@@ -92,7 +92,7 @@
               </div>
               <div class="deck-box-content" v-else>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">主卡组</div>
+                  <p class="deck-box-item-title">主卡组（{{ deckDetailObject[scope.row.deckId].mainCount }}）</p>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -129,7 +129,7 @@
                   </div>
                 </div>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">副卡组</div>
+                  <div class="deck-box-item-title">额外卡组（{{ deckDetailObject[scope.row.deckId].exCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -166,7 +166,7 @@
                   </div>
                 </div>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">额外卡组</div>
+                  <div class="deck-box-item-title">副卡组（{{ deckDetailObject[scope.row.deckId].exCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -263,6 +263,13 @@
               size="mini"
               @click="downloadYDK(scope.row.deckId)"
               >下载
+            </el-button>
+            <el-button
+              v-if="deckDetailObject[scope.row.deckId]"
+              type="text"
+              size="mini"
+              @click="copyDeck(scope.row.deckId)"
+              >复制分享码
             </el-button>
           </template>
         </el-table-column>
@@ -564,6 +571,12 @@ export default {
       console.log(str);
       const blob = new Blob([str]);
       saveAs(blob, this.deckDetailObject[id].deckName + ".ydk");
+    },
+
+    copyDeck(id) {
+      const str = this.deckDetailObject[id].mobileCode;
+      console.log(str);
+      navigator.clipboard.writeText(str);
     },
 
     formatDate(srcDate) {
