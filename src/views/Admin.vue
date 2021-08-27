@@ -272,7 +272,7 @@
             <el-autocomplete
               size="mini"
               v-model="libQueryAddition.cardName"
-              placeholder="请填写卡名"
+              placeholder="请填写搜索条件"
               clearable
               :trigger-on-focus="false"
               :fetch-suggestions="querySearchCandicateCardList"
@@ -424,7 +424,7 @@
             <el-input
               size="mini"
               v-model="playerLibQueryAddition.cardName"
-              placeholder="请填写卡名"
+              placeholder="请填写搜索条件"
               clearable
               @keyup.enter.native="playerLibQueryCard"
             ></el-input>
@@ -625,7 +625,7 @@
             <el-autocomplete
               size="mini"
               v-model="userQueryAddition.card"
-              placeholder="请填写卡名"
+              placeholder="请填写搜索条件"
               clearable
               :trigger-on-focus="false"
               :fetch-suggestions="querySearchCandicateCardList"

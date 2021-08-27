@@ -83,13 +83,15 @@ const queryDeckUrl = BASE_URL + '/deck/list';
 const addDeckUrl = BASE_URL + '/deck/add';
 const batchAddDeckUrl = BASE_URL + '/deck/add/batch';
 //修改卡组
-//const editDeckUrl = BASE_URL + '/deck/update';
+const editDeckUrl = BASE_URL + '/deck/update';
 //卡组信息
 const queryDeckDetailUrl = BASE_URL + '/deck/info';
 //重命名卡组
 const renameDeckUrl = BASE_URL + '/deck/rename';
 //删除卡组
 const removeDeckUrl = BASE_URL + '/deck/remove';
+//分享卡组
+const shareDeckUrl = BASE_URL + '/deck/share';
 
 //需要验证账号密码的地址列表
 const urlNeededValidate = [
@@ -125,9 +127,11 @@ const urlNeededValidate = [
     queryDeckUrl,
     addDeckUrl,
     batchAddDeckUrl,
+    editDeckUrl,
     queryDeckDetailUrl,
     renameDeckUrl,
-    removeDeckUrl
+    removeDeckUrl,
+    shareDeckUrl
 ]
 
 
@@ -170,7 +174,9 @@ export {
     queryDeckUrl,
     addDeckUrl,
     batchAddDeckUrl,
+    editDeckUrl,
     queryDeckDetailUrl,
     renameDeckUrl,
-    removeDeckUrl
+    removeDeckUrl,
+    shareDeckUrl
 }

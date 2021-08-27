@@ -49,6 +49,13 @@
         </el-select>
       </div>
       <div class="deck-content-addition-item special">
+        <el-checkbox
+          size="mini"
+          v-model="deckQueryAddition.share"
+          >分享中</el-checkbox
+        >
+      </div>
+      <div class="deck-content-addition-item special">
         <el-button type="info" size="mini" @click="deckClearAddition"
           >清除条件
         </el-button>
@@ -58,7 +65,6 @@
         <el-button
           type="primary"
           size="mini"
-          v-if="isAdmin === 'false'"
           @click="isUploadDialogShowing = true"
           >上传卡组
         </el-button>
@@ -86,7 +92,7 @@
               </div>
               <div class="deck-box-content" v-else>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">主卡组</div>
+                  <div class="deck-box-item-title">主卡组（{{ deckDetailObject[scope.row.deckId].mainCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -105,25 +111,25 @@
                         @mouseenter="
                           showCardDescHover(
                             $event,
-                            mainItem.desc,
+                            getDeckCardDesc(mainItem),
                             mainItem.code
                           )
                         "
                         @click="
                           showCardDescClick(
                             $event,
-                            mainItem.desc,
+                            getDeckCardDesc(mainItem),
                             mainItem.code
                           )
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-count">{{mainItem.own + ' / ' + mainItem.count}}</span>
+                      <span :class="mainItem.count > mainItem.own ? 'deck-count-illegal' : 'deck-count'">{{mainItem.own + ' / ' + mainItem.count}}</span>
                     </div>
                   </div>
                 </div>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">副卡组</div>
+                  <div class="deck-box-item-title">额外卡组（{{ deckDetailObject[scope.row.deckId].exCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -142,25 +148,25 @@
                         @mouseenter="
                           showCardDescHover(
                             $event,
-                            exItem.desc,
+                            getDeckCardDesc(exItem),
                             exItem.code
                           )
                         "
                         @click="
                           showCardDescClick(
                             $event,
-                            exItem.desc,
+                            getDeckCardDesc(exItem),
                             exItem.code
                           )
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-count">{{exItem.own + ' / ' + exItem.count}}</span>
+                      <span :class="exItem.count > exItem.own ? 'deck-count-illegal' : 'deck-count'">{{exItem.own + ' / ' + exItem.count}}</span>
                     </div>
                   </div>
                 </div>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">额外卡组</div>
+                  <div class="deck-box-item-title">副卡组（{{ deckDetailObject[scope.row.deckId].exCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -179,20 +185,20 @@
                         @mouseenter="
                           showCardDescHover(
                             $event,
-                            sideItem.desc,
+                            getDeckCardDesc(sideItem),
                             sideItem.code
                           )
                         "
                         @click="
                           showCardDescClick(
                             $event,
-                            sideItem.desc,
+                            getDeckCardDesc(sideItem),
                             sideItem.code
                           )
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-count">{{sideItem.own + ' / ' + sideItem.count}}</span>
+                      <span :class="sideItem.count > sideItem.own ? 'deck-count-illegal' : 'deck-count'">{{sideItem.own + ' / ' + sideItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -209,7 +215,6 @@
           :key="'deck-column-' + 2"
           prop="userName"
           label="玩家名"
-          v-if="isAdmin === 'true'"
         ></el-table-column>
         <el-table-column
           :key="'deck-column-' + 3"
@@ -225,16 +230,32 @@
         <el-table-column fixed="right" :key="'deck-column-' + 4" label="操作">
           <template slot-scope="scope">
             <el-button
+              v-if="checkIfCanOperate(scope.row)"
               type="text"
               size="mini"
-              @click="editDeckName(scope.row.deckId, scope.row.deckName)"
-              >重命名
+              @click="editDeck(scope.row)"
+              >修改
             </el-button>
             <el-button
+              v-if="checkIfCanOperate(scope.row)"
               type="text"
               size="mini"
               @click="removeDeck(scope.row.deckId, scope.row.deckName)"
-              >删除卡组
+              >删除
+            </el-button>
+            <el-button
+              v-if="checkIfCanShare(scope.row)"
+              type="text"
+              size="mini"
+              @click="shareOperation(scope.row.deckId, 1)"
+              >分享
+            </el-button>
+            <el-button
+              v-if="checkIfCanDisShare(scope.row)"
+              type="text"
+              size="mini"
+              @click="shareOperation(scope.row.deckId, 0)"
+              >取消分享
             </el-button>
             <el-button
               v-if="deckDetailObject[scope.row.deckId]"
@@ -242,6 +263,13 @@
               size="mini"
               @click="downloadYDK(scope.row.deckId)"
               >下载
+            </el-button>
+            <el-button
+              v-if="deckDetailObject[scope.row.deckId]"
+              type="text"
+              size="mini"
+              @click="copyDeck(scope.row.deckId)"
+              >复制分享码
             </el-button>
           </template>
         </el-table-column>
@@ -288,6 +316,46 @@
         >
       </span>
     </el-dialog>
+
+
+    <!-- 修改 -->
+    <el-dialog
+      title="修改"
+      :visible.sync="isEditDialogShowing"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelUploadDeck"
+    >
+      <el-form label-position="top" :model="editDeckInfo">
+        <el-form-item label="卡组名" size="small">
+          <el-input
+            v-model="editDeckInfo.deckName"
+            type="text"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-upload
+          ref="deck_uploader"
+          class="deck-uploader"
+          size="mini"
+          action=""
+          accept=".ydk"
+          :auto-upload="false"
+          :limit=1
+        >
+          <el-button size="mini" type="primary">选择文件</el-button>
+        </el-upload>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isEditDialogShowing = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditDeck" size="small"
+          >修 改</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -297,14 +365,15 @@ import {
   queryDeckUrl,
   addDeckUrl,
   batchAddDeckUrl,
+  editDeckUrl,
   queryDeckDetailUrl,
   renameDeckUrl,
   removeDeckUrl,
+  shareDeckUrl,
 } from "../../../config/url";
 import { MessageBox } from "element-ui";
 import { axiosPostAsJSON } from "@/utils/fetch.js";
 import { saveAs } from "file-saver";
-import { Blob } from "buffer";
 export default {
   name: "DeckGenerator",
   props: {
@@ -328,12 +397,14 @@ export default {
   data() {
     return {
       isAdmin: window.localStorage.getItem("isAdmin"),
+      username: JSON.parse(window.localStorage.getItem("info")).u,
 
       deckQueryAddition: {
         sortType: 1,
         sortWay: 1,
         deckName: "",
         targetUser: undefined,
+        share: 0
       },
       deckTableData: null,
 
@@ -344,13 +415,19 @@ export default {
       },
 
       isUploadDialogShowing: false,
+      isEditDialogShowing: false,
+      editDeckInfo: {
+        deckName: "",
+        deckId: 0
+      },
 
       deckDetailObject: {},
     };
   },
   async mounted() {},
   methods: {
-    queryDeckList(page, pageSize, deckName, sortType, sortWay, targetUser) {
+    queryDeckList(page, pageSize, deckName, sortType, sortWay, targetUser, share) {
+      this.deckDetailObject = {};
       return new Promise((resolve) => {
         axiosPostAsJSON({
           url: queryDeckUrl,
@@ -361,6 +438,7 @@ export default {
             page: page || 1,
             pagesize: pageSize,
             targetUser: targetUser ? targetUser : undefined,
+            share: share,
           },
         }).then((res) => {
           resolve({
@@ -383,7 +461,8 @@ export default {
         this.deckQueryAddition.deckName,
         this.deckQueryAddition.sortType,
         this.deckQueryAddition.sortWay,
-        this.deckQueryAddition.targetUser
+        this.deckQueryAddition.targetUser,
+        this.deckQueryAddition.share
       ).then((data) => {
         this.deckPagination.page = data.pagination.page;
         this.deckPagination.total = data.pagination.total;
@@ -540,9 +619,114 @@ export default {
       saveAs(blob, this.deckDetailObject[id].deckName + ".ydk");
     },
 
+    copyDeck(id) {
+      const str = this.deckDetailObject[id].mobileCode;
+      console.log(str);
+      navigator.clipboard.writeText(str);
+    },
+
     formatDate(srcDate) {
       return Moment(srcDate).format("yyyy-MM-DD HH:mm:ss");
     },
+
+    checkIfCanOperate(row) {
+      return row.userName === this.username || JSON.parse(this.isAdmin) === true;
+    },
+
+    checkIfCanShare(row) {
+      return this.checkIfCanOperate(row) && row.share === 0;
+    },
+
+    checkIfCanDisShare(row) {
+      return this.checkIfCanOperate(row) && row.share === 1;
+    },
+
+    shareOperation(deckId, operation) {
+      axiosPostAsJSON({
+          url: shareDeckUrl,
+          data: {
+              deckId: deckId,
+              share: operation
+          },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          this.deckQuery(this.deckPagination.page);
+        }
+      });
+    },
+
+    getDeckCardDesc(item) {
+      return item.desc + "\n\n" + item.packageName + " - " + item.rare;
+    },
+
+    editDeck(row) {
+      this.editDeckInfo.deckId = row.deckId;
+      this.editDeckInfo.deckName = row.deckName;
+      this.isEditDialogShowing = true;
+    },
+
+    submitEditDeck() {
+      let files = this.$refs["deck_uploader"].uploadFiles;
+      // 没有选择文件，只修改卡组名
+      if (files.length === 0) {
+        let deckName = this.editDeckInfo.deckName;
+        if (deckName) {
+          this.$openLoading();
+          axiosPostAsJSON({
+            url: renameDeckUrl,
+            data: {
+              deck: {
+                deckId: this.editDeckInfo.deckId,
+                deckName: deckName,
+              },
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              this.deckQuery();
+            }
+            this.isEditDialogShowing = false;
+          });
+        }
+        return;
+      };
+      if (files.length > 1) {
+        this.$alertInfo("修改卡组只需要上传一个文件，请移除后提交");
+      };
+      this.$openLoading();
+      for (let fileItem of files) {
+        if (
+          !(fileItem.name.includes(".ydk") || fileItem.name.includes(".YDK"))
+        ) {
+          this.$alertInfo("存在不支持的文件类型，请移除后提交");
+          return;
+        }
+      }
+      files.forEach((fileItem) => {
+        let fileReader = new FileReader();
+        //异步加载的监听
+        fileReader.addEventListener("loadend", () => {
+          let ydk = fileReader.result;
+          console.log(ydk);
+          axiosPostAsJSON({
+            url: editDeckUrl,
+            data: {
+              deck: {
+                deckId: this.editDeckInfo.deckId,
+                deckName: this.editDeckInfo.deckName,
+                ydk: ydk
+              }
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              this.isEditDialogShowing = false;
+              this.deckQuery();
+            }
+          });
+        });
+        fileReader.readAsText(fileItem.raw);
+        return;
+      });
+    }
   },
 };
 </script>
@@ -605,6 +789,23 @@ export default {
 }
 
 .deck-image .deck-count {
+  position: absolute;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  left: 10px;
+  top: 48px;
+  height: 16px;
+  width: 36px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #2df77a;
+  background-color: rgb(61, 61, 61);
+  transform: scale(0.8)
+}
+
+.deck-image .deck-count-illegal {
   position: absolute;
   display: inline-flex;
   justify-content: center;

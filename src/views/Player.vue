@@ -166,7 +166,7 @@
             <el-autocomplete
               size="mini"
               v-model="libQueryAddition.cardName"
-              placeholder="请填写卡名"
+              placeholder="请填写搜索条件"
               clearable
               :fetch-suggestions="querySearchCandicateCardList"
               @keyup.enter.native="libAllQueryCard"
@@ -348,7 +348,7 @@
             <el-autocomplete
               size="mini"
               v-model="libQueryAddition.cardName"
-              placeholder="请填写卡名"
+              placeholder="请填写搜索条件"
               clearable
               :fetch-suggestions="querySearchCandicateCardList"
               @keyup.enter.native="libQueryCard"
