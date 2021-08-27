@@ -92,7 +92,7 @@
               </div>
               <div class="deck-box-content" v-else>
                 <div class="deck-box-item">
-                  <p class="deck-box-item-title">主卡组（{{ deckDetailObject[scope.row.deckId].mainCount }}）</p>
+                  <div class="deck-box-item-title">主卡组（{{ deckDetailObject[scope.row.deckId].mainCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -124,7 +124,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-count">{{mainItem.own + ' / ' + mainItem.count}}</span>
+                      <span :class="mainItem.count > mainItem.own ? 'deck-count-illegal' : 'deck-count'">{{mainItem.own + ' / ' + mainItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -161,7 +161,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-count">{{exItem.own + ' / ' + exItem.count}}</span>
+                      <span :class="exItem.count > exItem.own ? 'deck-count-illegal' : 'deck-count'">{{exItem.own + ' / ' + exItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -198,7 +198,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span class="deck-count">{{sideItem.own + ' / ' + sideItem.count}}</span>
+                      <span :class="sideItem.count > sideItem.own ? 'deck-count-illegal' : 'deck-count'">{{sideItem.own + ' / ' + sideItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -674,6 +674,23 @@ export default {
 }
 
 .deck-image .deck-count {
+  position: absolute;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  left: 10px;
+  top: 48px;
+  height: 16px;
+  width: 36px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #2df77a;
+  background-color: rgb(61, 61, 61);
+  transform: scale(0.8)
+}
+
+.deck-image .deck-count-illegal {
   position: absolute;
   display: inline-flex;
   justify-content: center;
