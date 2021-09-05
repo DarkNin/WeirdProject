@@ -3,6 +3,7 @@
     <el-dropdown placement="top-end" @command="excuteCommand" trigger="click">
       <el-button icon="el-icon-user-solid" circle></el-button>
       <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item command="toggle_view">切换夜间模式</el-dropdown-item>
         <el-dropdown-item command="logout">注销</el-dropdown-item>
         <el-dropdown-item command="edit_password">修改密码</el-dropdown-item>
       </el-dropdown-menu>
@@ -21,6 +22,9 @@ export default {
       if (cmd === "edit_password") {
         this.editPassword();
       }
+      if (cmd === "toggle_view") {
+        this.toggleDarkMode();
+      }
     },
     logout() {
       window.localStorage.removeItem("info");
@@ -30,6 +34,10 @@ export default {
     },
     editPassword() {
       this.$router.push("/edit_password");
+    },
+    toggleDarkMode() {
+      document.getElementsByClassName("darkmode-toggle")[0].click();
+      window.localStorage.setItem('isDarkMode', this.$darkmode.isActivated());
     },
   },
 };

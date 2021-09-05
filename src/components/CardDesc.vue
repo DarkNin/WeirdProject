@@ -1,5 +1,5 @@
 <template>
-  <div id="card-desc">
+  <div id="card-desc" class="darkmode-ignore">
     <transition name="el-fade-in">
       <div
         v-show="visible"

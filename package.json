@@ -10,6 +10,7 @@
     "axios": "^0.21.3",
     "clipboard": "^2.0.8",
     "core-js": "^3.6.5",
+    "darkmode-js": "^1.5.7",
     "element-ui": "^2.13.2",
     "file-saver": "^2.0.2",
     "moment": "^2.29.1",
