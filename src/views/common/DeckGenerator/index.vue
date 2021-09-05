@@ -350,6 +350,25 @@
         >
       </span>
     </el-dialog>
+
+    <el-dialog
+      title="复制"
+      :visible.sync="isCopyDialogShowing"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @closed="closeCopyCallback">
+      <el-input id="copying_text_box" type="textarea" :rows='6' v-model="copyingText">
+      </el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isCopyDialogShowing = false" size="small"
+          >取 消</el-button
+        >
+        <el-button id="copying_text_btn" type="primary" data-clipboard-target="#copying_text_box" size="small"
+          >复 制</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -368,6 +387,7 @@ import {
 import { MessageBox } from "element-ui";
 import { axiosPostAsJSON } from "@/utils/fetch.js";
 import { saveAs } from "file-saver";
+import ClipboardJS from 'clipboard'
 export default {
   name: "DeckGenerator",
   props: {
@@ -417,6 +437,10 @@ export default {
 
       deckDetailObject: {},
       userCandidateList: [],
+
+      isCopyDialogShowing: false,
+      copyingText: '',
+      clipboardObj: null
     };
   },
   async mounted() {
@@ -618,8 +642,20 @@ export default {
 
     copyDeck(id) {
       const str = this.deckDetailObject[id].mobileCode;
-      console.log(str);
-      navigator.clipboard.writeText(str);
+      this.copyingText = str;
+      this.isCopyDialogShowing = true;
+      this.$nextTick(() => {
+        this.clipboardObj = new ClipboardJS('#copying_text_btn');
+        this.clipboardObj.on('success', () => {
+          this.$alertSuccess('已复制到剪贴板');
+          this.isCopyDialogShowing = false;
+        })
+      })
+    },
+
+    closeCopyCallback() {
+      this.copyingText = '',
+      this.clipboardObj = null
     },
 
     formatDate(srcDate) {
