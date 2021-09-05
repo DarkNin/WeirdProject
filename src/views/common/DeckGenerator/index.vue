@@ -648,6 +648,7 @@ export default {
         this.clipboardObj = new ClipboardJS('#copying_text_btn');
         this.clipboardObj.on('success', () => {
           this.$alertSuccess('已复制到剪贴板');
+          this.clipboardObj.destroy();
           this.isCopyDialogShowing = false;
         })
       })
@@ -655,7 +656,6 @@ export default {
 
     closeCopyCallback() {
       this.copyingText = '',
-      this.clipboardObj.destory();
       this.clipboardObj = null
     },
 
