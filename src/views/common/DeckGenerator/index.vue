@@ -7,7 +7,6 @@
           size="mini"
           v-model="deckQueryAddition.sortType"
           placeholder="请选择排序方式"
-          clearable
         >
           <el-option label="名称" :value="1"></el-option>
           <el-option label="最后修改时间" :value="2"></el-option>
@@ -18,7 +17,6 @@
           size="mini"
           v-model="deckQueryAddition.sortWay"
           placeholder="正序/倒序"
-          clearable
         >
           <el-option label="倒序" :value="1"></el-option>
           <el-option label="正序" :value="2"></el-option>
@@ -33,20 +31,16 @@
           @keyup.enter.native="deckQuery"
         ></el-input>
       </div>
-      <div class="deck-content-addition-item" v-if="isAdmin === 'true'">
-        <el-select
+      <div class="deck-content-addition-item" v-if="checkIfShowUser()">
+        <el-autocomplete
           size="mini"
           v-model="deckQueryAddition.targetUser"
           placeholder="请选择玩家"
           clearable
-        >
-          <el-option
-            v-for="item in userList"
-            :key="'deck-' + item.userName + item.userId"
-            :label="item.userName"
-            :value="item.userName"
-          ></el-option>
-        </el-select>
+          :trigger-on-focus="false"
+          :fetch-suggestions="queryDeckUser"
+          @keyup.enter.native="deckQuery"
+        ></el-autocomplete>
       </div>
       <div class="deck-content-addition-item special">
         <el-checkbox
@@ -166,7 +160,7 @@
                   </div>
                 </div>
                 <div class="deck-box-item">
-                  <div class="deck-box-item-title">副卡组（{{ deckDetailObject[scope.row.deckId].exCount }}）</div>
+                  <div class="deck-box-item-title">副卡组（{{ deckDetailObject[scope.row.deckId].sideCount }}）</div>
                   <div class="deck-box-item-content">
                     <div
                       class="deck-image"
@@ -227,7 +221,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column fixed="right" :key="'deck-column-' + 4" label="操作">
+        <el-table-column :key="'deck-column-' + 4" label="操作">
           <template slot-scope="scope">
             <el-button
               v-if="checkIfCanOperate(scope.row)"
@@ -422,9 +416,12 @@ export default {
       },
 
       deckDetailObject: {},
+      userCandidateList: [],
     };
   },
-  async mounted() {},
+  async mounted() {
+    this.generateUserName();
+  },
   methods: {
     queryDeckList(page, pageSize, deckName, sortType, sortWay, targetUser, share) {
       this.deckDetailObject = {};
@@ -726,7 +723,32 @@ export default {
         fileReader.readAsText(fileItem.raw);
         return;
       });
-    }
+    },
+
+    checkIfShowUser() {
+      return this.deckQueryAddition.share == true || JSON.parse(this.isAdmin) === true;
+    },
+
+    async generateUserName() {
+      this.userCandidateList = this.userList.map((item) => {
+        return {
+          value: item.userName,
+        };
+      });
+    },
+
+    queryDeckUser(queryString, callback) {
+      let result = queryString
+        ? this.userCandidateList.filter(this.userNameFilter(queryString))
+        : this.userCandidateList;
+      callback(result);
+    },
+
+    userNameFilter(queryString) {
+      return item => {
+        return item.value.indexOf(queryString) >= 0;
+      };
+    },
   },
 };
 </script>

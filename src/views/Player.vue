@@ -717,6 +717,7 @@
           :showCardDescHover="_showCardDescHover"
           :showCardDescClick="_showCardDescClick"
           :closeCardDesc="_closeCardDesc"
+          :userList="userList"
         />
       </div>
     </div>
