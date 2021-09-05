@@ -655,6 +655,7 @@ export default {
 
     closeCopyCallback() {
       this.copyingText = '',
+      this.clipboardObj.destory();
       this.clipboardObj = null
     },
 
