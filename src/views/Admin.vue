@@ -4,62 +4,74 @@
       <p class="admin-info-tips">欢迎来到诡异云，{{ username }}。</p>
     </div>
 
-    <div class="admin-main">
-      <div class="admin-main-menu">
-        <el-menu mode="horizontal" default-active="1" @select="handleSelect">
-          <el-menu-item index="1">卡包</el-menu-item>
-          <el-menu-item index="2">检索</el-menu-item>
-          <el-menu-item index="3">卡池</el-menu-item>
-          <el-menu-item index="4">玩家</el-menu-item>
-          <el-menu-item index="5">抽卡记录</el-menu-item>
-          <el-menu-item index="6">修改记录</el-menu-item>
-          <el-menu-item index="7">日志</el-menu-item>
-          <el-menu-item index="8">卡组</el-menu-item>
-        </el-menu>
-        <div class="admin-main-menu-control">
-          <el-button
-            type="text"
-            @click="editPackageOrder()"
-            v-if="showTab === '1' && !isEditingPackageOrder"
-            >排序</el-button
-          >
-          <el-button
-            type="text"
-            @click="addPackage()"
-            v-if="showTab === '1' && !isEditingPackageOrder"
-            >新增卡包</el-button
-          >
-          <el-button
-            type="text"
-            @click="exchangeCard()"
-            v-if="showTab === '1' && !isEditingPackageOrder"
-            >交换稀有度</el-button
-          >
-          <el-button
-            type="text"
-            @click="cancelEditingPackageOrder()"
-            v-if="showTab === '1' && isEditingPackageOrder"
-            >取消</el-button
-          >
-          <el-button
-            type="text"
-            @click="submitEditingPackageOrder()"
-            v-if="showTab === '1' && isEditingPackageOrder"
-            >确认</el-button
-          >
-          <el-button type="text" @click="addUser()" v-if="showTab === '4'"
-            >新增玩家</el-button
-          >
-          <el-button type="text" @click="swapUserCards()" v-if="showTab === '4'"
-            >交易</el-button
-          >
-          <el-button
-            type="text"
-            @click="importDrewCards()"
-            v-if="showTab === '5'"
-            >导入记录</el-button
-          >
-        </div>
+    <div class="admin-main" :class="{ 'admin-main-mobile': _checkIfMobile() }">
+      <el-menu mode="horizontal" default-active="1" @select="handleSelect">
+        <el-menu-item index="1">卡包</el-menu-item>
+        <el-menu-item index="2">检索</el-menu-item>
+        <el-menu-item index="3">卡池</el-menu-item>
+        <el-menu-item index="4">玩家</el-menu-item>
+        <el-menu-item index="5">抽卡记录</el-menu-item>
+        <el-menu-item index="6">修改记录</el-menu-item>
+        <el-menu-item index="7">日志</el-menu-item>
+        <el-menu-item index="8">卡组</el-menu-item>
+      </el-menu>
+      <div class="admin-main-menu-control">
+        <el-button
+          type="text"
+          @click="editPackageOrder()"
+          v-if="showTab === '1' && !isEditingPackageOrder"
+          >排序</el-button
+        >
+        <el-button
+          type="text"
+          @click="addPackage()"
+          v-if="showTab === '1' && !isEditingPackageOrder"
+          >新增卡包</el-button
+        >
+        <el-button
+          type="text"
+          @click="exchangeCard()"
+          v-if="showTab === '1' && !isEditingPackageOrder"
+          >交换稀有度</el-button
+        >
+        <el-button
+          type="text"
+          @click="cancelEditingPackageOrder()"
+          v-if="showTab === '1' && isEditingPackageOrder"
+          >取消</el-button
+        >
+        <el-button
+          type="text"
+          @click="submitEditingPackageOrder()"
+          v-if="showTab === '1' && isEditingPackageOrder"
+          >确认</el-button
+        >
+        <el-select
+          size="mini"
+          v-model="userQueryAddition.target"
+          placeholder="请选择玩家"
+          @change="setUserInfo"
+          v-if="showTab === '4'"
+        >
+          <el-option
+            v-for="item in userList"
+            :key="'user' + item.userName + item.userId"
+            :label="item.userName"
+            :value="item.userName"
+          ></el-option>
+        </el-select>
+        <el-button type="text" @click="addUser()" v-if="showTab === '4'"
+          >新增玩家</el-button
+        >
+        <el-button type="text" @click="swapUserCards()" v-if="showTab === '4'"
+          >交易</el-button
+        >
+        <el-button
+          type="text"
+          @click="importDrewCards()"
+          v-if="showTab === '5'"
+          >导入记录</el-button
+        >
       </div>
 
       <!-- 卡包查询 -->
@@ -167,7 +179,7 @@
                 <el-table-column
                   :key="'package-' + item.packageName + '-5'"
                   fixed="right"
-                  width="80"
+                  width="50"
                 >
                   <template slot-scope="scope">
                     <el-button
@@ -230,850 +242,826 @@
           </transition-group>
         </draggable>
       </div>
-      <!-- 全卡检索 -->
-      <div class="admin-main-content" v-else-if="showTab === '2'">
-        <div class="admin-main-content-addition">
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="libQueryAddition.packageName"
-              placeholder="请选择卡包"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in cardPackageList"
-                :key="'lib' + item.packageName + item.packageId"
-                :label="item.packageName"
-                :value="item.packageName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="libQueryAddition.rare"
-              placeholder="请选择稀有度"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option label="N" value="N"></el-option>
-              <el-option label="R" value="R"></el-option>
-              <el-option label="SR" value="SR"></el-option>
-              <el-option label="UR" value="UR"></el-option>
-              <el-option label="HR" value="HR"></el-option>
-              <el-option label="GR" value="GR"></el-option>
-              <el-option label="SER" value="SER"></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-autocomplete
-              size="mini"
-              v-model="libQueryAddition.cardName"
-              placeholder="请填写搜索条件"
-              clearable
-              :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
-              @keyup.enter.native="libQueryCard"
-            ></el-autocomplete>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-button type="info" size="mini" @click="libClearAddition"
-              >清除条件</el-button
-            >
-            <el-button type="primary" size="mini" @click="libQueryCard"
-              >查询</el-button
-            >
-          </div>
-        </div>
-        <div class="admin-main-content-table-wrap">
-          <el-table :data="libTableData" size="mini" height="auto">
-            <el-table-column
-              :key="'lib-column-' + 1"
-              prop="cardName"
-              label="卡名"
-            ></el-table-column>
-            <el-table-column
-              :key="'lib-column-' + 2"
-              prop="packageName"
-              label="卡包名"
-            ></el-table-column>
-            <el-table-column
-              :key="'lib-column-' + 3"
-              prop="rare"
-              label="稀有度"
-            >
-              <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
-                  {{ scope.row.rare }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              :key="'lib-column-' + 4"
-              prop="needCoin"
-              label="需要硬币"
-              v-if="_checkAnyUsingCoin(this.libTableData)"
-            ></el-table-column>
-            <el-table-column
-              :key="'lib-column-' + 5"
-              prop="desc"
-              label="预览"
-              width="54"
-            >
-              <template slot-scope="scope">
-                <el-button
-                  class="table-preview-btn"
-                  icon="el-icon-caret-right"
-                  size="mini"
-                  @mouseenter.native="
-                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
-                  "
-                  @click="
-                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
-                  "
-                  @mouseleave.native="_closeCardDesc"
-                  circle
-                ></el-button>
-              </template>
-            </el-table-column>
 
-            <el-table-column :key="'lib-column-' + 6" fixed="right" width="80">
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="text"
-                  @click="editCard(scope.row)"
-                  >编辑</el-button
-                >
-              </template>
-            </el-table-column>
-            <!-- <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column> -->
-          </el-table>
-          <div class="admin-main-content-table-pagination">
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :total="libPagination.total"
-              :page-size="libPagination.pageSize"
-              :current-page="libPagination.page"
-              @current-change="libQueryCard"
-            ></el-pagination>
-          </div>
+      <!-- 全卡检索 -->
+      <div class="admin-main-content-addition" v-if="showTab === '2'">
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="libQueryAddition.packageName"
+            placeholder="请选择卡包"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in cardPackageList"
+              :key="'lib' + item.packageName + item.packageId"
+              :label="item.packageName"
+              :value="item.packageName"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="libQueryAddition.rare"
+            placeholder="请选择稀有度"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option label="N" value="N"></el-option>
+            <el-option label="R" value="R"></el-option>
+            <el-option label="SR" value="SR"></el-option>
+            <el-option label="UR" value="UR"></el-option>
+            <el-option label="HR" value="HR"></el-option>
+            <el-option label="GR" value="GR"></el-option>
+            <el-option label="SER" value="SER"></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-autocomplete
+            size="mini"
+            v-model="libQueryAddition.cardName"
+            placeholder="请填写搜索条件"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+            @keyup.enter.native="libQueryCard"
+          ></el-autocomplete>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-button type="info" size="mini" @click="libClearAddition"
+            >清除条件</el-button
+          >
+          <el-button type="primary" size="mini" @click="libQueryCard"
+            >查询</el-button
+          >
         </div>
       </div>
-      <!-- 玩家卡库 -->
-      <div class="admin-main-content" v-else-if="showTab === '3'">
-        <div class="admin-main-content-addition">
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="playerLibQueryAddition.packageName"
-              placeholder="请选择卡包"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in cardPackageList"
-                :key="'player-lib' + item.packageName + item.packageId"
-                :label="item.packageName"
-                :value="item.packageName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="playerLibQueryAddition.rare"
-              placeholder="请选择稀有度"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option label="N" value="N"></el-option>
-              <el-option label="R" value="R"></el-option>
-              <el-option label="SR" value="SR"></el-option>
-              <el-option label="UR" value="UR"></el-option>
-              <el-option label="HR" value="HR"></el-option>
-              <el-option label="GR" value="GR"></el-option>
-              <el-option label="SER" value="SER"></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="playerLibQueryAddition.userName"
-              placeholder="请选择玩家"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in userList"
-                :key="'player-lib' + item.userName + item.userId"
-                :label="item.userName"
-                :value="item.userName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-input
-              size="mini"
-              v-model="playerLibQueryAddition.cardName"
-              placeholder="请填写搜索条件"
-              clearable
-              @keyup.enter.native="playerLibQueryCard"
-            ></el-input>
-          </div>
-          <div class="admin-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="playerLibClearAddition"
-              >清除条件</el-button
-            >
-            <el-button type="primary" size="mini" @click="playerLibQueryCard"
-              >查询</el-button
-            >
-            <el-button type="primary" size="mini" @click="playerLibExport"
-              >导出</el-button
-            >
-          </div>
-        </div>
-        <div class="admin-main-content-table-wrap">
-          <el-table :data="playerLibTableData" size="mini" height="auto">
-            <el-table-column
-              :key="'player-lib-column-' + 1"
-              prop="cardName"
-              label="卡名"
-            ></el-table-column>
-            <el-table-column
-              :key="'player-lib-column-' + 2"
-              prop="packageName"
-              label="卡包名"
-            ></el-table-column>
-            <el-table-column
-              :key="'player-lib-column-' + 3"
-              prop="rare"
-              label="稀有度"
-            >
-              <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
-                  {{ scope.row.rare }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              :key="'lib-column-' + 4"
-              prop="needCoin"
-              label="需要硬币"
-              v-if="_checkAnyUsingCoin(this.playerLibTableData)"
-            ></el-table-column>
-            <el-table-column
-              :key="'player-lib-column-' + 5"
-              prop="userName"
-              label="拥有者"
-            ></el-table-column>
-            <el-table-column
-              :key="'player-lib-column-' + 6"
-              prop="count"
-              label="拥有数量"
-            ></el-table-column>
-            <el-table-column
-              :key="'player-lib-column-' + 7"
-              prop="desc"
-              label="预览"
-              width="54"
-            >
-              <template slot-scope="scope">
-                <el-button
-                  class="table-preview-btn"
-                  icon="el-icon-caret-right"
-                  size="mini"
-                  @mouseenter.native="
-                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
-                  "
-                  @click="
-                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
-                  "
-                  @mouseleave.native="_closeCardDesc"
-                  circle
-                ></el-button>
-              </template>
-            </el-table-column>
+      <div class="admin-main-content-table-wrap" v-if="showTab === '2'">
+        <el-table :data="libTableData" size="mini" height="auto">
+          <el-table-column
+            :key="'lib-column-' + 1"
+            prop="cardName"
+            label="卡名"
+          ></el-table-column>
+          <el-table-column
+            :key="'lib-column-' + 2"
+            prop="packageName"
+            label="卡包名"
+          ></el-table-column>
+          <el-table-column
+            :key="'lib-column-' + 3"
+            prop="rare"
+            label="稀有度"
+          >
+            <template slot-scope="scope">
+              <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                {{ scope.row.rare }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="'lib-column-' + 4"
+            prop="needCoin"
+            label="需要硬币"
+            v-if="_checkAnyUsingCoin(this.libTableData)"
+          ></el-table-column>
+          <el-table-column
+            :key="'lib-column-' + 5"
+            prop="desc"
+            label="预览"
+            width="54"
+          >
+            <template slot-scope="scope">
+              <el-button
+                class="table-preview-btn"
+                icon="el-icon-caret-right"
+                size="mini"
+                @mouseenter.native="
+                  _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                "
+                @click="
+                  _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                "
+                @mouseleave.native="_closeCardDesc"
+                circle
+              ></el-button>
+            </template>
+          </el-table-column>
 
-            <el-table-column
-              :key="'player-lib-column-' + 8"
-              fixed="right"
-              width="80"
-            >
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="text"
-                  @click="editCardCount(scope.row.cardName, scope.row.userName)"
-                  >编辑数量</el-button
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="admin-main-content-table-pagination">
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :total="playerLibPagination.total"
-              :page-size="playerLibPagination.pageSize"
-              :current-page="playerLibPagination.page"
-              @current-change="playerLibQueryCard"
-            ></el-pagination>
-          </div>
+          <el-table-column :key="'lib-column-' + 6" fixed="right" width="50">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="text"
+                @click="editCard(scope.row)"
+                >编辑</el-button
+              >
+            </template>
+          </el-table-column>
+          <!-- <el-table-column :key="'lib-column-' + 4" prop="userName" label="拥有者"></el-table-column> -->
+        </el-table>
+        <div class="admin-main-content-table-pagination">
+          <el-pagination
+            small
+            background
+            layout="prev, pager, next"
+            :total="libPagination.total"
+            :page-size="libPagination.pageSize"
+            :current-page="libPagination.page"
+            @current-change="libQueryCard"
+          ></el-pagination>
+        </div>
+      </div>
+
+      <!-- 玩家卡库 -->
+      <div class="admin-main-content-addition" v-if="showTab === '3'">
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="playerLibQueryAddition.packageName"
+            placeholder="请选择卡包"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in cardPackageList"
+              :key="'player-lib' + item.packageName + item.packageId"
+              :label="item.packageName"
+              :value="item.packageName"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="playerLibQueryAddition.rare"
+            placeholder="请选择稀有度"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option label="N" value="N"></el-option>
+            <el-option label="R" value="R"></el-option>
+            <el-option label="SR" value="SR"></el-option>
+            <el-option label="UR" value="UR"></el-option>
+            <el-option label="HR" value="HR"></el-option>
+            <el-option label="GR" value="GR"></el-option>
+            <el-option label="SER" value="SER"></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="playerLibQueryAddition.userName"
+            placeholder="请选择玩家"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in userList"
+              :key="'player-lib' + item.userName + item.userId"
+              :label="item.userName"
+              :value="item.userName"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-input
+            size="mini"
+            v-model="playerLibQueryAddition.cardName"
+            placeholder="请填写搜索条件"
+            clearable
+            @keyup.enter.native="playerLibQueryCard"
+          ></el-input>
+        </div>
+        <div class="admin-main-content-addition-item special">
+          <el-button type="info" size="mini" @click="playerLibClearAddition"
+            >清除条件</el-button
+          >
+          <el-button type="primary" size="mini" @click="playerLibQueryCard"
+            >查询</el-button
+          >
+          <el-button type="primary" size="mini" @click="playerLibExport"
+            >导出</el-button
+          >
+        </div>
+      </div>
+      <div class="admin-main-content-table-wrap" v-if="showTab === '3'">
+        <el-table :data="playerLibTableData" size="mini" height="auto">
+          <el-table-column
+            :key="'player-lib-column-' + 1"
+            prop="cardName"
+            label="卡名"
+          ></el-table-column>
+          <el-table-column
+            :key="'player-lib-column-' + 2"
+            prop="packageName"
+            label="卡包名"
+          ></el-table-column>
+          <el-table-column
+            :key="'player-lib-column-' + 3"
+            prop="rare"
+            label="稀有度"
+          >
+            <template slot-scope="scope">
+              <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                {{ scope.row.rare }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="'lib-column-' + 4"
+            prop="needCoin"
+            label="需要硬币"
+            v-if="_checkAnyUsingCoin(this.playerLibTableData)"
+          ></el-table-column>
+          <el-table-column
+            :key="'player-lib-column-' + 5"
+            prop="userName"
+            label="拥有者"
+          ></el-table-column>
+          <el-table-column
+            :key="'player-lib-column-' + 6"
+            prop="count"
+            label="拥有数量"
+          ></el-table-column>
+          <el-table-column
+            :key="'player-lib-column-' + 7"
+            prop="desc"
+            label="预览"
+            width="54"
+          >
+            <template slot-scope="scope">
+              <el-button
+                class="table-preview-btn"
+                icon="el-icon-caret-right"
+                size="mini"
+                @mouseenter.native="
+                  _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                "
+                @click="
+                  _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                "
+                @mouseleave.native="_closeCardDesc"
+                circle
+              ></el-button>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            :key="'player-lib-column-' + 8"
+            fixed="right"
+            width="50"
+          >
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="text"
+                @click="editCardCount(scope.row.cardName, scope.row.userName)"
+                >编辑</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="admin-main-content-table-pagination">
+          <el-pagination
+            small
+            background
+            layout="prev, pager, next"
+            :total="playerLibPagination.total"
+            :page-size="playerLibPagination.pageSize"
+            :current-page="playerLibPagination.page"
+            @current-change="playerLibQueryCard"
+          ></el-pagination>
         </div>
       </div>
 
       <!-- 玩家操作 -->
-      <div class="admin-main-content" v-else-if="showTab === '4'">
-        <div class="admin-main-content-addition seperate">
-          <div class="admin-main-content-addition-special">
-            <el-select
-              size="mini"
-              v-model="userQueryAddition.target"
-              placeholder="请选择玩家"
-              @change="setUserInfo"
-            >
-              <el-option
-                v-for="item in userList"
-                :key="'user' + item.userName + item.userId"
-                :label="item.userName"
-                :value="item.userName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="special-user-add" v-if="userQueryAddition.target">
-            <el-button type="primary" size="mini" @click="submitResetPassword"
-              >重置密码</el-button
-            >
-            <el-button type="primary" size="mini" @click="exchangeUserCard"
-              >替换卡片</el-button
-            >
-            <el-button type="primary" size="mini" @click="addUserCard"
-              >添加卡片</el-button
-            >
-          </div>
-          <div class="special-user-info" v-if="userQueryAddition.target">
-            <span>
-              硬币:
-              <el-button type="text" @click="editUserInfo('硬币')">{{
-                userSelectedInfo.coin
-              }}</el-button>
-            </span>
-            <span>
-              月见黑:
-              <el-button type="text" @click="editUserInfo('月见黑')">{{
-                userSelectedInfo.award
-              }}</el-button>
-            </span>
-            <span>
-              剩余尘数:
-              <el-button type="text" @click="editUserInfo('剩余尘数')">{{
-                userSelectedInfo.dust
-              }}</el-button>
-            </span>
-          </div>
+      <div class="admin-main-content-addition seperate" v-if="showTab === '4'">
+        <div class="special-user-add" v-if="userQueryAddition.target">
+          <el-button type="primary" size="mini" @click="submitResetPassword"
+            >重置密码</el-button
+          >
+          <el-button type="primary" size="mini" @click="exchangeUserCard"
+            >替换卡片</el-button
+          >
+          <el-button type="primary" size="mini" @click="addUserCard"
+            >添加卡片</el-button
+          >
         </div>
-        <div
-          class="admin-main-content-addition"
-          v-if="userQueryAddition.target"
-        >
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="userQueryAddition.package"
-              placeholder="请选择卡包"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in cardPackageList"
-                :key="'lib' + item.packageName + item.packageId"
-                :label="item.packageName"
-                :value="item.packageName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="userQueryAddition.rare"
-              placeholder="请选择稀有度"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option label="N" value="N"></el-option>
-              <el-option label="R" value="R"></el-option>
-              <el-option label="SR" value="SR"></el-option>
-              <el-option label="UR" value="UR"></el-option>
-              <el-option label="HR" value="HR"></el-option>
-              <el-option label="GR" value="GR"></el-option>
-              <el-option label="SER" value="SER"></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-autocomplete
-              size="mini"
-              v-model="userQueryAddition.card"
-              placeholder="请填写搜索条件"
-              clearable
-              :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
-              @keyup.enter.native="userQuery"
-            ></el-autocomplete>
-          </div>
-          <div class="admin-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="userClearAddition"
-              >清除条件</el-button
-            >
-            <el-button type="primary" size="mini" @click="userQuery"
-              >查询</el-button
-            >
-            <el-button type="primary" size="mini" @click="userOwnExport"
-              >导出</el-button
-            >
-          </div>
+        <div class="special-user-info" v-if="userQueryAddition.target">
+          <span>
+            硬币:
+            <el-button type="text" @click="editUserInfo('硬币')">{{
+              userSelectedInfo.coin
+            }}</el-button>
+          </span>
+          <span>
+            月见黑:
+            <el-button type="text" @click="editUserInfo('月见黑')">{{
+              userSelectedInfo.award
+            }}</el-button>
+          </span>
+          <span>
+            剩余尘数:
+            <el-button type="text" @click="editUserInfo('剩余尘数')">{{
+              userSelectedInfo.dust
+            }}</el-button>
+          </span>
         </div>
-        <div class="admin-main-content-table-wrap">
-          <el-table :data="userTableData" size="mini" height="auto">
-            <el-table-column
-              :key="'user-column-' + 1"
-              prop="packageName"
-              label="卡包名"
-            ></el-table-column>
-            <el-table-column
-              :key="'user-column-' + 2"
-              prop="cardName"
-              label="卡名"
-            ></el-table-column>
-            <el-table-column
-              :key="'user-column-' + 3"
-              prop="rare"
-              label="稀有度"
-            >
-              <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
-                  {{ scope.row.rare }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              :key="'lib-column-' + 4"
-              prop="needCoin"
-              label="需要硬币"
-              v-if="_checkAnyUsingCoin(this.userTableData)"
-            ></el-table-column>
-            <el-table-column
-              :key="'user-column-' + 5"
-              prop="count"
-              label="持有数量"
-            ></el-table-column>
+      </div>
+      <div class="admin-main-content-addition" v-if="userQueryAddition.target && showTab === '4'"
+      >
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="userQueryAddition.package"
+            placeholder="请选择卡包"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in cardPackageList"
+              :key="'lib' + item.packageName + item.packageId"
+              :label="item.packageName"
+              :value="item.packageName"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="userQueryAddition.rare"
+            placeholder="请选择稀有度"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option label="N" value="N"></el-option>
+            <el-option label="R" value="R"></el-option>
+            <el-option label="SR" value="SR"></el-option>
+            <el-option label="UR" value="UR"></el-option>
+            <el-option label="HR" value="HR"></el-option>
+            <el-option label="GR" value="GR"></el-option>
+            <el-option label="SER" value="SER"></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-autocomplete
+            size="mini"
+            v-model="userQueryAddition.card"
+            placeholder="请填写搜索条件"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+            @keyup.enter.native="userQuery"
+          ></el-autocomplete>
+        </div>
+        <div class="admin-main-content-addition-item special">
+          <el-button type="info" size="mini" @click="userClearAddition"
+            >清除条件</el-button
+          >
+          <el-button type="primary" size="mini" @click="userQuery"
+            >查询</el-button
+          >
+          <el-button type="primary" size="mini" @click="userOwnExport"
+            >导出</el-button
+          >
+        </div>
+      </div>
+      <div class="admin-main-content-table-wrap" v-if="showTab === '4'">
+        <el-table :data="userTableData" size="mini" height="auto">
+          <el-table-column
+            :key="'user-column-' + 1"
+            prop="packageName"
+            label="卡包名"
+          ></el-table-column>
+          <el-table-column
+            :key="'user-column-' + 2"
+            prop="cardName"
+            label="卡名"
+          ></el-table-column>
+          <el-table-column
+            :key="'user-column-' + 3"
+            prop="rare"
+            label="稀有度"
+          >
+            <template slot-scope="scope">
+              <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                {{ scope.row.rare }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="'lib-column-' + 4"
+            prop="needCoin"
+            label="需要硬币"
+            v-if="_checkAnyUsingCoin(this.userTableData)"
+          ></el-table-column>
+          <el-table-column
+            :key="'user-column-' + 5"
+            prop="count"
+            label="持有数量"
+          ></el-table-column>
 
-            <el-table-column
-              :key="'user-column-' + 6"
-              prop="desc"
-              label="预览"
-              width="54"
-            >
-              <template slot-scope="scope">
-                <el-button
-                  class="table-preview-btn"
-                  icon="el-icon-caret-right"
-                  size="mini"
-                  @mouseenter.native="
-                    _showCardDescHover($event, scope.row.desc, scope.row.picId)
-                  "
-                  @click="
-                    _showCardDescClick($event, scope.row.desc, scope.row.picId)
-                  "
-                  @mouseleave.native="_closeCardDesc"
-                  circle
-                ></el-button>
-              </template>
-            </el-table-column>
-            <el-table-column :key="'user-column-' + 7" fixed="right" width="80">
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="text"
-                  @click="editCardCount(scope.row.cardName, scope.row.userName)"
-                  >编辑数量</el-button
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="admin-main-content-table-pagination">
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :total="userPagination.total"
-              :page-size="userPagination.pageSize"
-              :current-page="userPagination.page"
-              @current-change="userQuery"
-            ></el-pagination>
-          </div>
+          <el-table-column
+            :key="'user-column-' + 6"
+            prop="desc"
+            label="预览"
+            width="54"
+          >
+            <template slot-scope="scope">
+              <el-button
+                class="table-preview-btn"
+                icon="el-icon-caret-right"
+                size="mini"
+                @mouseenter.native="
+                  _showCardDescHover($event, scope.row.desc, scope.row.picId)
+                "
+                @click="
+                  _showCardDescClick($event, scope.row.desc, scope.row.picId)
+                "
+                @mouseleave.native="_closeCardDesc"
+                circle
+              ></el-button>
+            </template>
+          </el-table-column>
+          <el-table-column :key="'user-column-' + 7" fixed="right" width="50">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="text"
+                @click="editCardCount(scope.row.cardName, scope.row.userName)"
+                >编辑</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="admin-main-content-table-pagination">
+          <el-pagination
+            small
+            background
+            layout="prev, pager, next"
+            :total="userPagination.total"
+            :page-size="userPagination.pageSize"
+            :current-page="userPagination.page"
+            @current-change="userQuery"
+          ></el-pagination>
         </div>
       </div>
+
       <!-- 抽卡记录 -->
-      <div class="admin-main-content" v-else-if="showTab === '5'">
-        <div class="admin-main-content-addition">
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="drawRecordQueryAddition.package"
-              placeholder="请选择卡包"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in cardPackageList"
-                :key="'draw-record' + item.packageName + item.packageId"
-                :label="item.packageName"
-                :value="item.packageName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="drawRecordQueryAddition.user"
-              placeholder="请选择玩家"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in userList"
-                :key="'draw-record' + item.userName + item.userId"
-                :label="item.userName"
-                :value="item.userName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item special">
-            <el-date-picker
-              size="mini"
-              v-model="drawRecordQueryAddition.dateRange"
-              type="datetimerange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="pickerOptions"
-              clearable
-            ></el-date-picker>
-          </div>
-          <div class="admin-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="drawRecordClearAddition"
-              >清除条件</el-button
-            >
-            <el-button type="primary" size="mini" @click="drawRecordQuery"
-              >查询</el-button
-            >
-          </div>
+      <div class="admin-main-content-addition" v-if="showTab === '5'">
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="drawRecordQueryAddition.package"
+            placeholder="请选择卡包"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in cardPackageList"
+              :key="'draw-record' + item.packageName + item.packageId"
+              :label="item.packageName"
+              :value="item.packageName"
+            ></el-option>
+          </el-select>
         </div>
-        <div class="admin-main-content-table-wrap">
-          <el-table :data="drawRecordTableData" size="mini" height="auto">
-            <el-table-column :key="'draw-record-column-' + 0" type="expand">
-              <template slot-scope="scope">
-                <div
-                  class="table-expand-desc-box"
-                  v-for="(item, index) in scope.row.rollResult"
-                  :key="'draw-result-desc-' + index"
-                >
-                  {{ item.desc }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              :key="'draw-record-column-' + 1"
-              prop="rollPackageName"
-              label="卡包名"
-            ></el-table-column>
-            <el-table-column
-              :key="'draw-record-column-' + 2"
-              prop="rollUserName"
-              label="抽卡人"
-            ></el-table-column>
-            <el-table-column
-              :key="'draw-record-column-' + 3"
-              prop="time"
-              label="抽卡时间"
-            ></el-table-column>
-            <el-table-column
-              :key="'draw-record-column-' + 4"
-              prop="isDisabled"
-              label="状态"
-            >
-              <template slot-scope="scope">{{
-                scope.row.isDisabled ? "无效" : "有效"
-              }}</template>
-            </el-table-column>
-            <el-table-column
-              :key="'draw-record-column-' + 5"
-              prop="rollResult"
-              label="抽卡结果"
-              min-width="200"
-            >
-              <template slot-scope="scope">
-                <div
-                  class="table-tag-draw"
-                  v-for="(item, index) in scope.row.rollResult"
-                  :key="'draw-result-' + index"
-                >
-                  <span
-                    class="draw-result-rare"
-                    :class="_getRareColor(item.rare)"
-                    >{{ item.rare }}</span
-                  >
-                  <span
-                    class="draw-result-name"
-                    :class="{ grey: item.isDust }"
-                    >{{ item.cardName }}</span
-                  >
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              fixed="right"
-              :key="'draw-record-column-' + 6"
-              label="操作"
-            >
-              <template slot-scope="scope">
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click="setDrawStatus(scope.row.rollId, scope.row.isDisabled)"
-                  >设置</el-button
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="admin-main-content-table-pagination">
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :total="drawRecordPagination.total"
-              :page-size="drawRecordPagination.pageSize"
-              :current-page="drawRecordPagination.page"
-              @current-change="drawRecordQuery"
-            ></el-pagination>
-          </div>
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="drawRecordQueryAddition.user"
+            placeholder="请选择玩家"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in userList"
+              :key="'draw-record' + item.userName + item.userId"
+              :label="item.userName"
+              :value="item.userName"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item special">
+          <el-date-picker
+            size="mini"
+            v-model="drawRecordQueryAddition.dateRange"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerOptions"
+            clearable
+          ></el-date-picker>
+        </div>
+        <div class="admin-main-content-addition-item special">
+          <el-button type="info" size="mini" @click="drawRecordClearAddition"
+            >清除条件</el-button
+          >
+          <el-button type="primary" size="mini" @click="drawRecordQuery"
+            >查询</el-button
+          >
         </div>
       </div>
-      <!-- 修改记录 -->
-      <div class="admin-main-content" v-else-if="showTab === '6'">
-        <div class="admin-main-content-addition">
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="recordQueryAddition.packageName"
-              placeholder="请选择卡包"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option
-                v-for="item in cardPackageList"
-                :key="'record' + item.packageName + item.packageId"
-                :label="item.packageName"
-                :value="item.packageName"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-select
-              size="mini"
-              v-model="recordQueryAddition.rare"
-              placeholder="请选择稀有度"
-              multiple
-              collapse-tags
-              clearable
-            >
-              <el-option label="N" value="N"></el-option>
-              <el-option label="R" value="R"></el-option>
-              <el-option label="SR" value="SR"></el-option>
-              <el-option label="UR" value="UR"></el-option>
-              <el-option label="HR" value="HR"></el-option>
-              <el-option label="GR" value="GR"></el-option>
-              <el-option label="SER" value="SER"></el-option>
-            </el-select>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-autocomplete
-              size="mini"
-              v-model="recordQueryAddition.cardName"
-              placeholder="请填写卡名"
-              clearable
-              :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
-              @keyup.enter.native="recordQuery"
-            ></el-autocomplete>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-button type="info" size="mini" @click="recordClearAddition"
-              >清除条件</el-button
-            >
-            <el-button type="primary" size="mini" @click="recordQuery"
-              >查询</el-button
-            >
-          </div>
+      <div class="admin-main-content-table-wrap" v-if="showTab === '5'">
+        <el-table :data="drawRecordTableData" size="mini" height="auto">
+          <el-table-column :key="'draw-record-column-' + 0" type="expand">
+            <template slot-scope="scope">
+              <div
+                class="table-expand-desc-box"
+                v-for="(item, index) in scope.row.rollResult"
+                :key="'draw-result-desc-' + index"
+              >
+                {{ item.desc }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="'draw-record-column-' + 1"
+            prop="rollPackageName"
+            label="卡包名"
+          ></el-table-column>
+          <el-table-column
+            :key="'draw-record-column-' + 2"
+            prop="rollUserName"
+            label="抽卡人"
+          ></el-table-column>
+          <el-table-column
+            :key="'draw-record-column-' + 3"
+            prop="time"
+            label="抽卡时间"
+          ></el-table-column>
+          <el-table-column
+            :key="'draw-record-column-' + 4"
+            prop="isDisabled"
+            label="状态"
+          >
+            <template slot-scope="scope">{{
+              scope.row.isDisabled ? "无效" : "有效"
+            }}</template>
+          </el-table-column>
+          <el-table-column
+            :key="'draw-record-column-' + 5"
+            prop="rollResult"
+            label="抽卡结果"
+            min-width="200"
+          >
+            <template slot-scope="scope">
+              <div
+                class="table-tag-draw"
+                v-for="(item, index) in scope.row.rollResult"
+                :key="'draw-result-' + index"
+              >
+                <span
+                  class="draw-result-rare"
+                  :class="_getRareColor(item.rare)"
+                  >{{ item.rare }}</span
+                >
+                <span
+                  class="draw-result-name"
+                  :class="{ grey: item.isDust }"
+                  >{{ item.cardName }}</span
+                >
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            :key="'draw-record-column-' + 6"
+            label="操作"
+            width="50"
+          >
+            <template slot-scope="scope">
+              <el-button
+                type="text"
+                size="mini"
+                @click="setDrawStatus(scope.row.rollId, scope.row.isDisabled)"
+                >设置</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="admin-main-content-table-pagination">
+          <el-pagination
+            small
+            background
+            layout="prev, pager, next"
+            :total="drawRecordPagination.total"
+            :page-size="drawRecordPagination.pageSize"
+            :current-page="drawRecordPagination.page"
+            @current-change="drawRecordQuery"
+          ></el-pagination>
         </div>
-        <div class="admin-main-content-table-wrap">
-          <el-table :data="recordTableData" size="mini" height="auto" @cell-mouse-enter="recordHighlightRow" @cell-mouse-leave="recordCancelHighlightRow" :row-class-name="recordHightlightClass">
-            <el-table-column :key="'record-column-' + 0" type="expand">
-              <template slot-scope="scope">
-                <div class="table-expand-desc-box">
-                  {{ scope.row.oldDesc }}
-                </div>
-                <div class="table-expand-desc-box">
-                  {{ scope.row.newDesc }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              :key="'record-column-' + 1"
-              prop="packageName"
-              label="卡包名"
-            ></el-table-column>
-            <el-table-column
-              :key="'record-column-' + 2"
-              prop="oldName"
-              label="旧卡名"
-            ></el-table-column>
-            <el-table-column
-              :key="'record-column-' + 3"
-              prop="newName"
-              label="新卡名"
-            ></el-table-column>
-            <el-table-column
-              :key="'record-column-' + 4"
-              prop="rare"
-              label="稀有度"
-            >
-              <template slot-scope="scope">
-                <div class="table-tag" :class="_getRareColor(scope.row.rare)">
-                  {{ scope.row.rare }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column
-              :key="'record-column-' + 5"
-              prop="createdTime"
-              label="添加时间"
-            ></el-table-column>
-          </el-table>
-          <div class="admin-main-content-table-pagination">
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :total="recordPagination.total"
-              :page-size="recordPagination.pageSize"
-              :current-page="recordPagination.page"
-              @current-change="recordQuery"
-            ></el-pagination>
-          </div>
+      </div>
+
+      <!-- 修改记录 -->
+      <div class="admin-main-content-addition" v-if="showTab === '6'">
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="recordQueryAddition.packageName"
+            placeholder="请选择卡包"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option
+              v-for="item in cardPackageList"
+              :key="'record' + item.packageName + item.packageId"
+              :label="item.packageName"
+              :value="item.packageName"
+            ></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-select
+            size="mini"
+            v-model="recordQueryAddition.rare"
+            placeholder="请选择稀有度"
+            multiple
+            collapse-tags
+            clearable
+          >
+            <el-option label="N" value="N"></el-option>
+            <el-option label="R" value="R"></el-option>
+            <el-option label="SR" value="SR"></el-option>
+            <el-option label="UR" value="UR"></el-option>
+            <el-option label="HR" value="HR"></el-option>
+            <el-option label="GR" value="GR"></el-option>
+            <el-option label="SER" value="SER"></el-option>
+          </el-select>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-autocomplete
+            size="mini"
+            v-model="recordQueryAddition.cardName"
+            placeholder="请填写卡名"
+            clearable
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearchCandicateCardList"
+            @keyup.enter.native="recordQuery"
+          ></el-autocomplete>
+        </div>
+        <div class="admin-main-content-addition-item">
+          <el-button type="info" size="mini" @click="recordClearAddition"
+            >清除条件</el-button
+          >
+          <el-button type="primary" size="mini" @click="recordQuery"
+            >查询</el-button
+          >
+        </div>
+      </div>
+      <div class="admin-main-content-table-wrap" v-if="showTab === '6'">
+        <el-table :data="recordTableData" size="mini" height="auto" @cell-mouse-enter="recordHighlightRow" @cell-mouse-leave="recordCancelHighlightRow" :row-class-name="recordHightlightClass">
+          <el-table-column :key="'record-column-' + 0" type="expand">
+            <template slot-scope="scope">
+              <div class="table-expand-desc-box">
+                {{ scope.row.oldDesc }}
+              </div>
+              <div class="table-expand-desc-box">
+                {{ scope.row.newDesc }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="'record-column-' + 1"
+            prop="packageName"
+            label="卡包名"
+          ></el-table-column>
+          <el-table-column
+            :key="'record-column-' + 2"
+            prop="oldName"
+            label="旧卡名"
+          ></el-table-column>
+          <el-table-column
+            :key="'record-column-' + 3"
+            prop="newName"
+            label="新卡名"
+          ></el-table-column>
+          <el-table-column
+            :key="'record-column-' + 4"
+            prop="rare"
+            label="稀有度"
+          >
+            <template slot-scope="scope">
+              <div class="table-tag" :class="_getRareColor(scope.row.rare)">
+                {{ scope.row.rare }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="'record-column-' + 5"
+            prop="createdTime"
+            label="添加时间"
+          ></el-table-column>
+        </el-table>
+        <div class="admin-main-content-table-pagination">
+          <el-pagination
+            small
+            background
+            layout="prev, pager, next"
+            :total="recordPagination.total"
+            :page-size="recordPagination.pageSize"
+            :current-page="recordPagination.page"
+            @current-change="recordQuery"
+          ></el-pagination>
         </div>
       </div>
 
       <!-- 日志 -->
-      <div class="admin-main-content" v-else-if="showTab === '7'">
-        <div class="admin-main-content-addition">
-          <div class="admin-main-content-addition-item">
-            <el-input
-              size="mini"
-              v-model="logQueryAddition.operator"
-              placeholder="操作人"
-              clearable
-              :trigger-on-focus="false"
-              @keyup.enter.native="logQuery"
-            ></el-input>
-          </div>
-          <div class="admin-main-content-addition-item">
-            <el-input
-              size="mini"
-              v-model="logQueryAddition.detail"
-              placeholder="操作内容"
-              clearable
-              :trigger-on-focus="false"
-              @keyup.enter.native="logQuery"
-            ></el-input>
-          </div>
-          <div class="admin-main-content-addition-item special">
-            <el-date-picker
-              size="mini"
-              v-model="logQueryAddition.dateRange"
-              type="datetimerange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="pickerOptions"
-              clearable
-            ></el-date-picker>
-          </div>
-          <div class="admin-main-content-addition-item special">
-            <el-button type="info" size="mini" @click="logClearAddition"
-              >清除条件</el-button
-            >
-            <el-button type="primary" size="mini" @click="logQuery"
-              >查询</el-button
-            >
-          </div>
+      <div class="admin-main-content-addition" v-if="showTab === '7'">
+        <div class="admin-main-content-addition-item">
+          <el-input
+            size="mini"
+            v-model="logQueryAddition.operator"
+            placeholder="操作人"
+            clearable
+            :trigger-on-focus="false"
+            @keyup.enter.native="logQuery"
+          ></el-input>
         </div>
-        <div class="admin-main-content-table-wrap">
-          <el-table :data="logTableData" size="mini" height="auto">
-            <el-table-column
-              :key="'log-column-' + 1"
-              prop="operator"
-              label="操作人"
-            ></el-table-column>
-            <el-table-column
-              :key="'log-column-' + 2"
-              prop="time"
-              label="操作时间"
-            ></el-table-column>
-            <el-table-column
-              :key="'log-column-' + 3"
-              prop="detail"
-              label="操作内容"
-              min-width="400"
-            ></el-table-column>
-          </el-table>
-          <div class="admin-main-content-table-pagination">
-            <el-pagination
-              small
-              background
-              layout="prev, pager, next"
-              :total="logPagination.total"
-              :page-size="logPagination.pageSize"
-              :current-page="logPagination.page"
-              @current-change="logQuery"
-            ></el-pagination>
-          </div>
+        <div class="admin-main-content-addition-item">
+          <el-input
+            size="mini"
+            v-model="logQueryAddition.detail"
+            placeholder="操作内容"
+            clearable
+            :trigger-on-focus="false"
+            @keyup.enter.native="logQuery"
+          ></el-input>
+        </div>
+        <div class="admin-main-content-addition-item special">
+          <el-date-picker
+            size="mini"
+            v-model="logQueryAddition.dateRange"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerOptions"
+            clearable
+          ></el-date-picker>
+        </div>
+        <div class="admin-main-content-addition-item special">
+          <el-button type="info" size="mini" @click="logClearAddition"
+            >清除条件</el-button
+          >
+          <el-button type="primary" size="mini" @click="logQuery"
+            >查询</el-button
+          >
         </div>
       </div>
+      <div class="admin-main-content-table-wrap" v-if="showTab === '7'">
+        <el-table :data="logTableData" size="mini" height="auto">
+          <el-table-column
+            :key="'log-column-' + 1"
+            prop="operator"
+            label="操作人"
+          ></el-table-column>
+          <el-table-column
+            :key="'log-column-' + 2"
+            prop="time"
+            label="操作时间"
+          ></el-table-column>
+          <el-table-column
+            :key="'log-column-' + 3"
+            prop="detail"
+            label="操作内容"
+            min-width="400"
+          ></el-table-column>
+        </el-table>
+        <div class="admin-main-content-table-pagination">
+          <el-pagination
+            small
+            background
+            layout="prev, pager, next"
+            :total="logPagination.total"
+            :page-size="logPagination.pageSize"
+            :current-page="logPagination.page"
+            @current-change="logQuery"
+          ></el-pagination>
+        </div>
+      </div>
+
       <!-- 卡组 -->
-      <div class="admin-main-content" v-else-if="showTab === '8'">
-        <deck-generator
-          :showCardDescHover="_showCardDescHover"
-          :showCardDescClick="_showCardDescClick"
-          :closeCardDesc="_closeCardDesc"
-          :userList="userList"
-        />
-      </div>
+      <deck-generator
+        v-if="showTab === '8'"
+        :showCardDescHover="_showCardDescHover"
+        :showCardDescClick="_showCardDescClick"
+        :closeCardDesc="_closeCardDesc"
+        :userList="userList"
+      />
     </div>
 
     <!-- 新增卡包dialog -->
@@ -2971,14 +2959,31 @@ export default {
   display: flex;
   flex-direction: column;
 }
+.admin-main-mobile {
+  background: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: #bbbbbb 0 0 5px 0;
+  width: 100%;
+  flex: none;
+  height: 100%;
+  min-height: 500px;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
 .admin-main-menu {
   width: 100%;
   flex: initial;
   display: flex;
   flex-wrap: wrap;
 }
-.admin-main .el-menu {
-  flex: auto;
+.el-menu {
+  flex: none;
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 .admin-main-menu-control {
   flex: initial;
@@ -3060,6 +3065,10 @@ export default {
 .special-user-add {
   margin-left: auto;
   margin-right: 10px;
+  flex: none;
+  flex-direction: row;
+  overflow-x: scroll;
+  overflow-y: auto;
 }
 .special-user-info {
   color: #606266;
@@ -3084,22 +3093,36 @@ export default {
 .admin-main-content-addition {
   /* border: 1px solid #eeeeee;
   border-radius: 0.3rem; */
+
+  flex: none;
+  flex-direction: row;
+  overflow-x: scroll;
+  overflow-y: auto;
+
   min-height: 30px;
   padding: 0.5rem 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .admin-main-content-addition.seperate {
+  flex: none;
+  flex-direction: row;
+  overflow-x: scroll;
+  overflow-y: auto;
+  flex-wrap: wrap;
   border-bottom: 1px solid #eeeeee;
 }
 
 .admin-main-content-addition-item {
+  min-width: 100px;
   width: 12rem;
   height: 3rem;
   margin-right: 0.6rem;
 }
 .admin-main-content-addition-item.special {
   width: auto;
+  height: 3rem;
+  margin-right: 0.6rem;
 }
 .admin-main-content-addition-special /deep/ .el-tag,
 .admin-main-content-addition-item /deep/ .el-tag {

@@ -8,8 +8,8 @@
           v-model="deckQueryAddition.sortType"
           placeholder="请选择排序方式"
         >
-          <el-option label="名称" :value="1"></el-option>
           <el-option label="最后修改时间" :value="2"></el-option>
+          <el-option label="名称" :value="1"></el-option>
         </el-select>
       </div>
       <div class="deck-content-addition-item">
@@ -800,13 +800,20 @@ export default {
 .deck-content-addition {
   /* border: 1px solid #eeeeee;
   border-radius: 0.3rem; */
+
+  flex: none;
+  flex-direction: row;
+  overflow-x: scroll;
+  overflow-y: auto;
+
   min-height: 30px;
   padding: 0.5rem 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .deck-content-addition-item {
+  min-width: 100px;
   width: 10rem;
   height: 3rem;
   margin-right: 0.6rem;
