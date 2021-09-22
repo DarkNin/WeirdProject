@@ -19,6 +19,7 @@
         <el-menu-item index="4">抽卡记录</el-menu-item>
         <el-menu-item index="5">修改记录</el-menu-item>
         <el-menu-item index="6">卡组</el-menu-item>
+        <el-menu-item index="7">转盘</el-menu-item>
       </el-menu>
       <div class="player-main-content" v-if="showTab === '1'">
         <el-collapse
@@ -720,6 +721,31 @@
           :userList="userList"
         />
       </div>
+
+      <!-- 转盘 -->
+      <div class="player-main-content" v-else-if="showTab === '7'">
+        <LuckyWheel
+          ref="LuckyWheel"
+          width="300px"
+          height="300px"
+          :blocks="[
+            { padding: '10px', background: '#ffc27a' },
+            { padding: '10px', background: '#ff4a4c' },
+            { padding: '0px', background: '#fff' }
+          ]"
+          :prizes="roulettePrizes"
+          :buttons="[
+            { radius: '40px', background: '#d64737' },
+            { radius: '35px', background: '#f6c66f', pointer: true },
+            {
+              radius: '30px',
+              background: '#fff',
+              fonts: [{ text: `${this.roulette}\n${this.rollCount}/50`, top: '-50%' }]}
+          ]"
+          @start="startRoulette"
+          @end="endRoulette"
+        />
+      </div>
     </div>
 
     <!-- 尘转dialog -->
@@ -856,16 +882,21 @@ import {
   transDustToCardRandomUrl,
   transCardToDustUrl,
   transCoinToCardUrl,
+  runRouletteUrl,
+  searchRouletteHistoryUrl
 } from "@/config/url.js";
 import CardDesc from "@/components/CardDesc";
 import DeckGenerator from "./common/DeckGenerator";
 import { exportToExcelByJson } from "@/utils/xlsx";
+import { LuckyWheel } from "vue-luck-draw";
+import { axiosPostAsJSON } from '../utils/fetch';
 export default {
   name: "Player",
   mixins: [common],
   components: {
     CardDesc,
     DeckGenerator,
+    LuckyWheel,
   },
   data() {
     return {
@@ -873,6 +904,8 @@ export default {
       coin: 0,
       leftAward: 0,
       duelPoint: 0,
+      roulette: 0,
+      rollCount: 0,
 
       showTab: "1",
 
@@ -950,6 +983,10 @@ export default {
         count: null,
         basicCount: null,
       },
+
+      //转盘
+      roulettePrizes: [],
+      rouletteResult: ""
     };
   },
   async mounted() {
@@ -963,6 +1000,8 @@ export default {
         this.leftDust = userInfo.dustCount;
         this.leftAward = userInfo.nonawardCount;
         this.coin = userInfo.coin;
+        this.roulette = userInfo.roulette;
+        this.rollCount = userInfo.rollCount;
       }
       if (
         JSON.parse(window.localStorage.getItem("info")).p ===
@@ -978,6 +1017,7 @@ export default {
           })
           .catch(() => {});
       }
+      this.refreshRoulette();
     });
   },
 
@@ -1000,7 +1040,10 @@ export default {
         this.leftDust = userInfo.dustCount;
         this.leftAward = userInfo.nonawardCount;
         this.coin = userInfo.coin;
+        this.roulette = userInfo.roulette;
+        this.rollCount = userInfo.rollCount;
       }
+      this.refreshRoulette();
       this.$closeLoading();
       this.generateCandicateCardList();
     },
@@ -1390,6 +1433,42 @@ export default {
         })
         .catch(() => {});
     },
+
+    // 初始化转盘数据
+    refreshRoulette() {
+      var prizes = []
+      this.rouletteConfigData.forEach((item, index) => {
+        prizes.push({
+          background: item.color,
+          fonts: [{
+            text: item.detail
+          }]
+        })
+      });
+      this.roulettePrizes = prizes;
+    },
+
+    startRoulette() {
+      this.roulette -= 1;
+      this.$refs.LuckyWheel.play();
+      axiosPostAsJSON({
+        url: runRouletteUrl,
+        data: {}
+      }).then((res) => {
+          if (res.data.code === 200) {
+            var data = res.data.data;
+            this.rouletteResult = data.result;
+            this.$refs.LuckyWheel.stop(data.index);
+          } else {
+            this.rouletteResult = res.data.data;
+            this.$refs.LuckyWheel.stop(-1);
+          }
+      });
+    },
+
+    endRoulette(prize) {
+      this.$alertSuccess(this.rouletteResult);
+    }
   },
 };
 </script>

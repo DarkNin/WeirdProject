@@ -15,6 +15,7 @@
     "file-saver": "^2.0.2",
     "moment": "^2.29.1",
     "vue": "^2.6.11",
+    "vue-luck-draw": "^3.4.7",
     "vue-router": "^3.2.0",
     "vuedraggable": "^2.24.1",
     "xlsx": "^0.17.1"

@@ -11,7 +11,8 @@ import {
     searchUserUrl,
     queryDrawResultUrl,
     queryLogUrl,
-    collectionOpeationUrl
+    collectionOpeationUrl,
+    searchRouletteConfigUrl
 } from "@/config/url.js";
 import {
     openLoading,
@@ -76,6 +77,9 @@ export default {
                 desc: "",
                 picId: 0,
             },
+            
+            //转盘配置
+            rouletteConfigData: []
         }
 
     },
@@ -84,6 +88,7 @@ export default {
         openLoading();
         this.cardPackageList = await this._queryPackageList();
         this.userList = await this._queryUserList();
+        this.rouletteConfigData = await this._queryRouletteConfig();
         closeLoading();
         this.$emit('preloaded');
     },
@@ -266,14 +271,25 @@ export default {
         _checkAnyUsingCoin(data) {
             let result = false;
             for (let i = 0; i < data.length; i++) {
-              let row = data[i]
-              if (row.needCoin > 0) {
-                result = true;
-                return true;
-              }
+                let row = data[i]
+                if (row.needCoin > 0) {
+                    result = true;
+                    return true;
+                }
             }
             return result;
-          },
+        },
+
+        //查询转盘配置
+        _queryRouletteConfig() {
+            return new Promise((resolve) => {
+                axiosPostAsJSON({
+                    url: searchRouletteConfigUrl,
+                }).then((res) => {
+                    resolve(res.data.data);
+                });
+            });
+        },
 
         //检测是否移动端应用
         _checkIfMobile() {
