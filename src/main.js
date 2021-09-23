@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import {Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker, Image, Upload} from 'element-ui'
+import {Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker, Image, Upload, ColorPicker} from 'element-ui'
 import {openLoading, closeLoading} from './utils/loading'
 import {alertDanger, alertInfo, alertSuccess, alertWarning} from './utils/modal'
 import Darkmode from 'darkmode-js'
 Vue.config.productionTip = false
 
-let compArray = [Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker, Image, Upload];
+let compArray = [Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker, Image, Upload, ColorPicker];
 compArray.forEach(item => {
   Vue.use(item)
 })

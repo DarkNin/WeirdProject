@@ -41,6 +41,10 @@ const editDustUrl = BASE_URL + '/user/dust';
 const editAwardUrl = BASE_URL + '/user/award';
 //修改硬币
 const editCoinUrl = BASE_URL + '/user/coin';
+//修改转盘次数
+const editRouletteUrl = BASE_URL + '/user/roulette';
+//修改抽卡计数
+const editRollCountUrl = BASE_URL + '/user/rollCount';
 //查询用户信息
 const searchUserUrl = BASE_URL + '/user/list';
 //编辑用户密码
@@ -60,7 +64,9 @@ const swapUserOwnCardUrl = BASE_URL + '/user/card/swap';
 const changeUserOwnCardUrl = BASE_URL + '/card/exchangeOwn';
 //查询日志
 const queryLogUrl = BASE_URL + '/record/list';
-
+//转盘
+//修改转盘配置
+const editRouletteConfigUrl = BASE_URL + '/roulette/update'
 
 //玩家端
 //尘转卡
@@ -93,6 +99,14 @@ const removeDeckUrl = BASE_URL + '/deck/remove';
 //分享卡组
 const shareDeckUrl = BASE_URL + '/deck/share';
 
+//转盘
+//获取转盘配置
+const searchRouletteConfigUrl = BASE_URL + '/roulette/list';
+//转盘操作
+const runRouletteUrl = BASE_URL + '/roulette/run';
+//转盘记录
+const searchRouletteHistoryUrl = BASE_URL + '/roulette/history';
+
 //需要验证账号密码的地址列表
 const urlNeededValidate = [
     searchCardUrl,
@@ -111,6 +125,8 @@ const urlNeededValidate = [
     editDustUrl,
     editAwardUrl,
     editCoinUrl,
+    editRouletteUrl,
+    editRollCountUrl,
     setDrawResultUrl,
     importDrewResultUrl,
     swapUserOwnCardUrl,
@@ -131,7 +147,10 @@ const urlNeededValidate = [
     queryDeckDetailUrl,
     renameDeckUrl,
     removeDeckUrl,
-    shareDeckUrl
+    shareDeckUrl,
+
+    editRouletteConfigUrl,
+    runRouletteUrl
 ]
 
 
@@ -154,6 +173,8 @@ export {
     editDustUrl,
     editAwardUrl,
     editCoinUrl,
+    editRouletteUrl,
+    editRollCountUrl,
     editUserPasswordUrl,
     validateUserUrl,
     searchUserUrl,
@@ -178,5 +199,10 @@ export {
     queryDeckDetailUrl,
     renameDeckUrl,
     removeDeckUrl,
-    shareDeckUrl
+    shareDeckUrl,
+
+    searchRouletteConfigUrl,
+    editRouletteConfigUrl,
+    runRouletteUrl,
+    searchRouletteHistoryUrl,
 }

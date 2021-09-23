@@ -19,6 +19,7 @@
         <el-menu-item index="4">抽卡记录</el-menu-item>
         <el-menu-item index="5">修改记录</el-menu-item>
         <el-menu-item index="6">卡组</el-menu-item>
+        <el-menu-item index="7">转盘</el-menu-item>
       </el-menu>
       <div class="player-main-content" v-if="showTab === '1'">
         <el-collapse
@@ -720,6 +721,74 @@
           :userList="userList"
         />
       </div>
+
+      <!-- 转盘 -->
+      <div class="player-main-content" v-else-if="showTab === '7'">
+        <div class="half-content">
+          <LuckyWheel
+            ref="LuckyWheel"
+            width="300px"
+            height="300px"
+            :blocks="[
+              { padding: '10px', background: '#ffc27a' },
+              { padding: '10px', background: '#ff4a4c' },
+              { padding: '0px', background: '#fff' }
+            ]"
+            :prizes="roulettePrizes"
+            :buttons="[
+              { radius: '40px', background: '#d64737' },
+              { radius: '35px', background: '#f6c66f', pointer: true },
+              {
+                radius: '30px',
+                background: '#fff',
+                fonts: [{ text: `${this.roulette}\n${this.rollCount}/50`, top: '-50%' }]}
+            ]"
+            @start="startRoulette"
+            @end="endRoulette"
+          />
+        </div>
+        <div class="half-content">
+          <div class="player-main-content-addition-item">
+            <el-button type="primary" size="mini" @click="refreshRouletteHistory"
+              >查询</el-button
+            >
+          </div>
+          <div class="player-main-content-table-wrap">
+            <el-table
+              :data="rouletteHistory"
+              size="mini"
+              height="auto"
+            >
+              <el-table-column
+                :key="'roulette-history-column-' + 1"
+                prop="userName"
+                label="玩家"
+              ></el-table-column>
+              <el-table-column
+                :key="'roulette-history-column-' + 2"
+                prop="time"
+                label="转盘时间"
+              ></el-table-column>
+              <el-table-column
+                :key="'roulette-history-column-' + 3"
+                prop="detail"
+                label="奖品"
+              ></el-table-column>
+            </el-table>
+            <div class="player-main-content-table-pagination">
+              <el-pagination
+                small
+                background
+                layout="prev, pager, next"
+                :total="rouletteHistoryPagination.total"
+                :page-size="rouletteHistoryPagination.pageSize"
+                :current-page="rouletteHistoryPagination.page"
+                @current-change="refreshRouletteHistory"
+              ></el-pagination>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 尘转dialog -->
@@ -856,16 +925,21 @@ import {
   transDustToCardRandomUrl,
   transCardToDustUrl,
   transCoinToCardUrl,
+  runRouletteUrl,
+  searchRouletteHistoryUrl
 } from "@/config/url.js";
 import CardDesc from "@/components/CardDesc";
 import DeckGenerator from "./common/DeckGenerator";
 import { exportToExcelByJson } from "@/utils/xlsx";
+import { LuckyWheel } from "vue-luck-draw";
+import { axiosPostAsJSON } from '../utils/fetch';
 export default {
   name: "Player",
   mixins: [common],
   components: {
     CardDesc,
     DeckGenerator,
+    LuckyWheel,
   },
   data() {
     return {
@@ -873,6 +947,8 @@ export default {
       coin: 0,
       leftAward: 0,
       duelPoint: 0,
+      roulette: 0,
+      rollCount: 0,
 
       showTab: "1",
 
@@ -950,6 +1026,16 @@ export default {
         count: null,
         basicCount: null,
       },
+
+      //转盘
+      roulettePrizes: [],
+      rouletteResult: "",
+      rouletteHistory: [],
+      rouletteHistoryPagination: {
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
     };
   },
   async mounted() {
@@ -963,6 +1049,8 @@ export default {
         this.leftDust = userInfo.dustCount;
         this.leftAward = userInfo.nonawardCount;
         this.coin = userInfo.coin;
+        this.roulette = userInfo.roulette;
+        this.rollCount = userInfo.rollCount;
       }
       if (
         JSON.parse(window.localStorage.getItem("info")).p ===
@@ -978,6 +1066,7 @@ export default {
           })
           .catch(() => {});
       }
+      this.refreshRoulette();
     });
   },
 
@@ -1000,7 +1089,10 @@ export default {
         this.leftDust = userInfo.dustCount;
         this.leftAward = userInfo.nonawardCount;
         this.coin = userInfo.coin;
+        this.roulette = userInfo.roulette;
+        this.rollCount = userInfo.rollCount;
       }
+      this.refreshRoulette();
       this.$closeLoading();
       this.generateCandicateCardList();
     },
@@ -1390,6 +1482,67 @@ export default {
         })
         .catch(() => {});
     },
+
+    // 初始化转盘数据
+    refreshRoulette() {
+      var prizes = []
+      this.rouletteConfigData.forEach((item, index) => {
+        prizes.push({
+          background: item.color,
+          fonts: [{
+            text: item.detail
+          }]
+        })
+      });
+      this.roulettePrizes = prizes;
+    },
+    startRoulette() {
+      if (this.roulette <= 0) {
+        this.$alertWarning("你的转盘次数已用完！");
+        return;
+      }
+      if (this.rouletteConfigData.length <= 0) {
+        this.$alertWarning("转盘未设置，请联系管理员！");
+        return;
+      }
+
+      this.roulette -= 1;
+      this.$refs.LuckyWheel.play();
+      axiosPostAsJSON({
+        url: runRouletteUrl,
+        data: {}
+      }).then((res) => {
+          if (res.data.code === 200) {
+            var data = res.data.data;
+            this.rouletteResult = data.result;
+            this.$refs.LuckyWheel.stop(data.index);
+          } else {
+            this.rouletteResult = res.data.data;
+            this.$refs.LuckyWheel.stop(-1);
+          }
+      });
+    },
+    endRoulette(prize) {
+      this.$alertSuccess(this.rouletteResult);
+      this.refreshRouletteHistory(this.rouletteHistoryPagination);
+    },
+    refreshRouletteHistory(page) {
+      this.$openLoading();
+      //排除默认鼠标事件参数
+      let currPage = typeof page === "number" ? page : undefined;
+      axiosPostAsJSON({
+        url: searchRouletteHistoryUrl,
+        data: {
+            page: currPage || this.defaultPage,
+            pagesize: this.rouletteHistoryPagination.pageSize || this.defaultPageSize,
+        }
+      }).then((data) => {
+        this.rouletteHistoryPagination.page = data.data.data.currPage;
+        this.rouletteHistoryPagination.total = data.data.data.totalCount;
+        this.rouletteHistory = data.data.data.dataList;
+        this.$closeLoading();
+      });
+    },
   },
 };
 </script>
@@ -1508,6 +1661,13 @@ export default {
   padding: 0.5rem 0;
   display: flex;
   flex-wrap: wrap;
+}
+
+.half-content {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  height: 100%;
 }
 
 .player-main-content-addition-item {

@@ -15,6 +15,7 @@
           <el-menu-item index="6">修改记录</el-menu-item>
           <el-menu-item index="7">日志</el-menu-item>
           <el-menu-item index="8">卡组</el-menu-item>
+          <el-menu-item index="9">转盘配置</el-menu-item>
         </el-menu>
         <div class="admin-main-menu-control">
           <el-button
@@ -575,9 +576,21 @@
               }}</el-button>
             </span>
             <span>
-              剩余尘数:
-              <el-button type="text" @click="editUserInfo('剩余尘数')">{{
+              尘数:
+              <el-button type="text" @click="editUserInfo('尘数')">{{
                 userSelectedInfo.dust
+              }}</el-button>
+            </span>
+            <span>
+              转盘:
+              <el-button type="text" @click="editUserInfo('转盘')">{{
+                userSelectedInfo.roulette
+              }}</el-button>
+            </span>
+            <span>
+              计数:
+              <el-button type="text" @click="editUserInfo('计数')">{{
+                userSelectedInfo.rollCount
               }}</el-button>
             </span>
           </div>
@@ -1073,6 +1086,70 @@
           :closeCardDesc="_closeCardDesc"
           :userList="userList"
         />
+      </div>
+
+      <!-- 转盘配置 -->
+      <div class="admin-main-content" v-else-if="showTab === '9'">
+        <div class="admin-main-content-addition">
+          <div class="admin-main-content-addition-item special">
+            <el-button type="primary" size="mini" @click="refreshRouletteConfig"
+              >刷新</el-button
+            >
+            <el-button type="info" size="mini" @click="addRouletteLine"
+              >插入</el-button
+            >
+            <el-button type="warning" size="mini" @click="submitRouletteConfig"
+              >保存</el-button
+            >
+          </div>
+        </div>
+        <div class="admin-main-content-table-wrap">
+          <el-table :data="rouletteConfigData" size="mini" height="auto">
+            <el-table-column
+              :key="'roulette-column-' + 1"
+              label="内容"
+            >
+              <template slot-scope="scope">
+                <el-input
+                  size="mini"
+                  v-model="scope.row.detail"
+                  :placeholder="`转盘内容`"
+                ></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'roulette-column-' + 2"
+              label="比例"
+            >
+              <template slot-scope="scope">
+                <el-input
+                  size="mini"
+                  v-model="scope.row.rate"
+                  :placeholder="`转盘比例(正整数)`"
+                ></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'roulette-column-' + 3"
+              label="背景色"
+            >
+              <template slot-scope="scope">
+                <el-color-picker v-model="scope.row.color"></el-color-picker>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :key="'roulette-column-' + 4"
+              fixed="right"
+              label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button type="danger" size="mini" @click="deleteRouletteLine(scope.$index)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
     </div>
 
@@ -1714,12 +1791,15 @@ import {
   editDustUrl,
   editAwardUrl,
   editCoinUrl,
+  editRouletteUrl,
+  editRollCountUrl,
   setDrawResultUrl,
   importDrewResultUrl,
   exchangeCardsRareUrl,
   editPackageOrderUrl,
   swapUserOwnCardUrl,
-  changeUserOwnCardUrl
+  changeUserOwnCardUrl,
+  editRouletteConfigUrl,
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
@@ -1883,7 +1963,9 @@ export default {
         dust: 0,
         award: 0,
         duelPoint: 0,
-        coin: 0
+        coin: 0,
+        roulette: 0,
+        rollCount: 0
       },
       //编辑玩家数据
       isEditingUserInfoItem: false,
@@ -2449,6 +2531,8 @@ export default {
       this.userSelectedInfo.award = userInfo.nonawardCount;
       this.userSelectedInfo.duelPoint = userInfo.duelPoint;
       this.userSelectedInfo.coin = userInfo.coin;
+      this.userSelectedInfo.roulette = userInfo.roulette;
+      this.userSelectedInfo.rollCount = userInfo.rollCount;
     },
 
     userQuery(page) {
@@ -2576,11 +2660,17 @@ export default {
         case "月见黑":
           this.editingUserInfoItemCount = this.userSelectedInfo.award;
           break;
-        case "剩余尘数":
+        case "尘数":
           this.editingUserInfoItemCount = this.userSelectedInfo.dust;
           break;
         case "硬币":
           this.editingUserInfoItemCount = this.userSelectedInfo.coin;
+          break;
+        case "转盘":
+          this.editingUserInfoItemCount = this.userSelectedInfo.roulette;
+          break;
+        case "计数":
+          this.editingUserInfoItemCount = this.userSelectedInfo.rollCount;
           break;
       }
       this.editingUserInfoItemTips = `正在编辑玩家【${
@@ -2611,13 +2701,21 @@ export default {
             options.url = editAwardUrl;
             options.data.award = this.editingUserInfoItemCount;
             break;
-          case "剩余尘数":
+          case "尘数":
             options.url = editDustUrl;
             options.data.count = this.editingUserInfoItemCount;
             break;
           case "硬币":
             options.url = editCoinUrl;
             options.data.coin = this.editingUserInfoItemCount;
+            break;
+          case "转盘":
+            options.url = editRouletteUrl;
+            options.data.roulette = this.editingUserInfoItemCount;
+            break;
+          case "计数":
+            options.url = editRollCountUrl;
+            options.data.rollCount = this.editingUserInfoItemCount;
             break;
         }
         axiosFetch(options).then(async res => {
@@ -2914,6 +3012,33 @@ export default {
         this.logPagination.total = data.pagination.total;
         this.logTableData = data.data;
         this.$closeLoading();
+      });
+    },
+
+    //转盘配置操作
+    addRouletteLine() {
+      this.rouletteConfigData.push({detail: "", rate: "", color: ""});
+    },
+    deleteRouletteLine(index) {
+      this.rouletteConfigData.splice(index, 1);
+    },
+    async refreshRouletteConfig() {
+      this.$openLoading();
+      this.rouletteConfigData = await this._queryRouletteConfig();
+      this.$closeLoading();
+    },
+    submitRouletteConfig() {
+      this.$openLoading();
+      let param = {
+        url: editRouletteConfigUrl,
+        data: {
+          list: this.rouletteConfigData
+        }
+      }
+      axiosPostAsJSON(param).then(async res => {
+        if (res.data.code === 200) {
+          this.refreshRouletteConfig();
+        }
       });
     }
   }
