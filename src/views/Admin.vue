@@ -1109,7 +1109,7 @@
               :key="'roulette-column-' + 1"
               label="内容"
             >
-              <template scope="scope">
+              <template slot-scope="scope">
                 <el-input
                   size="mini"
                   v-model="scope.row.detail"
@@ -1121,7 +1121,7 @@
               :key="'roulette-column-' + 2"
               label="比例"
             >
-              <template scope="scope">
+              <template slot-scope="scope">
                 <el-input
                   size="mini"
                   v-model="scope.row.rate"
@@ -1133,7 +1133,7 @@
               :key="'roulette-column-' + 3"
               label="背景色"
             >
-              <template scope="scope">
+              <template slot-scope="scope">
                 <el-color-picker v-model="scope.row.color"></el-color-picker>
               </template>
             </el-table-column>
@@ -1142,7 +1142,7 @@
               fixed="right"
               label="操作"
             >
-              <template scope="scope">
+              <template slot-scope="scope">
                 <el-button type="danger" size="mini" @click="deleteRouletteLine(scope.$index)"
                   >删除</el-button
                 >

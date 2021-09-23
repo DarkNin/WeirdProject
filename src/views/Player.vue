@@ -724,27 +724,70 @@
 
       <!-- 转盘 -->
       <div class="player-main-content" v-else-if="showTab === '7'">
-        <LuckyWheel
-          ref="LuckyWheel"
-          width="300px"
-          height="300px"
-          :blocks="[
-            { padding: '10px', background: '#ffc27a' },
-            { padding: '10px', background: '#ff4a4c' },
-            { padding: '0px', background: '#fff' }
-          ]"
-          :prizes="roulettePrizes"
-          :buttons="[
-            { radius: '40px', background: '#d64737' },
-            { radius: '35px', background: '#f6c66f', pointer: true },
-            {
-              radius: '30px',
-              background: '#fff',
-              fonts: [{ text: `${this.roulette}\n${this.rollCount}/50`, top: '-50%' }]}
-          ]"
-          @start="startRoulette"
-          @end="endRoulette"
-        />
+        <div class="half-content">
+          <LuckyWheel
+            ref="LuckyWheel"
+            width="300px"
+            height="300px"
+            :blocks="[
+              { padding: '10px', background: '#ffc27a' },
+              { padding: '10px', background: '#ff4a4c' },
+              { padding: '0px', background: '#fff' }
+            ]"
+            :prizes="roulettePrizes"
+            :buttons="[
+              { radius: '40px', background: '#d64737' },
+              { radius: '35px', background: '#f6c66f', pointer: true },
+              {
+                radius: '30px',
+                background: '#fff',
+                fonts: [{ text: `${this.roulette}\n${this.rollCount}/50`, top: '-50%' }]}
+            ]"
+            @start="startRoulette"
+            @end="endRoulette"
+          />
+        </div>
+        <div class="half-content">
+          <div class="player-main-content-addition-item">
+            <el-button type="primary" size="mini" @click="refreshRouletteHistory"
+              >查询</el-button
+            >
+          </div>
+          <div class="player-main-content-table-wrap">
+            <el-table
+              :data="rouletteHistory"
+              size="mini"
+              height="auto"
+            >
+              <el-table-column
+                :key="'roulette-history-column-' + 1"
+                prop="userName"
+                label="玩家"
+              ></el-table-column>
+              <el-table-column
+                :key="'roulette-history-column-' + 2"
+                prop="time"
+                label="转盘时间"
+              ></el-table-column>
+              <el-table-column
+                :key="'roulette-history-column-' + 3"
+                prop="detail"
+                label="奖品"
+              ></el-table-column>
+            </el-table>
+            <div class="player-main-content-table-pagination">
+              <el-pagination
+                small
+                background
+                layout="prev, pager, next"
+                :total="rouletteHistoryPagination.total"
+                :page-size="rouletteHistoryPagination.pageSize"
+                :current-page="rouletteHistoryPagination.page"
+                @current-change="refreshRouletteHistory"
+              ></el-pagination>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -986,7 +1029,13 @@ export default {
 
       //转盘
       roulettePrizes: [],
-      rouletteResult: ""
+      rouletteResult: "",
+      rouletteHistory: [],
+      rouletteHistoryPagination: {
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
     };
   },
   async mounted() {
@@ -1447,7 +1496,6 @@ export default {
       });
       this.roulettePrizes = prizes;
     },
-
     startRoulette() {
       this.roulette -= 1;
       this.$refs.LuckyWheel.play();
@@ -1465,10 +1513,26 @@ export default {
           }
       });
     },
-
     endRoulette(prize) {
       this.$alertSuccess(this.rouletteResult);
-    }
+    },
+    refreshRouletteHistory(page) {
+      this.$openLoading();
+      //排除默认鼠标事件参数
+      let currPage = typeof page === "number" ? page : undefined;
+      this._queryRecordList(
+        currPage || this.defaultPage,
+        this.defaultPageSize,
+        this.recordQueryAddition.packageName || undefined,
+        this.recordQueryAddition.cardName || undefined,
+        this.recordQueryAddition.rare || undefined
+      ).then((data) => {
+        this.recordPagination.page = data.pagination.page;
+        this.recordPagination.total = data.pagination.total;
+        this.recordTableData = data.data;
+        this.$closeLoading();
+      });
+    },
   },
 };
 </script>
@@ -1587,6 +1651,13 @@ export default {
   padding: 0.5rem 0;
   display: flex;
   flex-wrap: wrap;
+}
+
+.half-content {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  height: 100%;
 }
 
 .player-main-content-addition-item {
