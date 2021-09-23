@@ -1497,6 +1497,15 @@ export default {
       this.roulettePrizes = prizes;
     },
     startRoulette() {
+      if (this.roulette <= 0) {
+        this.$alertWarning("你的转盘次数已用完！");
+        return;
+      }
+      if (this.rouletteConfigData.length <= 0) {
+        this.$alertWarning("转盘未设置，请联系管理员！");
+        return;
+      }
+
       this.roulette -= 1;
       this.$refs.LuckyWheel.play();
       axiosPostAsJSON({
@@ -1515,21 +1524,22 @@ export default {
     },
     endRoulette(prize) {
       this.$alertSuccess(this.rouletteResult);
+      this.refreshRouletteHistory(this.rouletteHistoryPagination);
     },
     refreshRouletteHistory(page) {
       this.$openLoading();
       //排除默认鼠标事件参数
       let currPage = typeof page === "number" ? page : undefined;
-      this._queryRecordList(
-        currPage || this.defaultPage,
-        this.defaultPageSize,
-        this.recordQueryAddition.packageName || undefined,
-        this.recordQueryAddition.cardName || undefined,
-        this.recordQueryAddition.rare || undefined
-      ).then((data) => {
-        this.recordPagination.page = data.pagination.page;
-        this.recordPagination.total = data.pagination.total;
-        this.recordTableData = data.data;
+      axiosPostAsJSON({
+        url: searchRouletteHistoryUrl,
+        data: {
+            page: currPage || this.defaultPage,
+            pagesize: this.rouletteHistoryPagination.pageSize || this.defaultPageSize,
+        }
+      }).then((data) => {
+        this.rouletteHistoryPagination.page = data.data.data.currPage;
+        this.rouletteHistoryPagination.total = data.data.data.totalCount;
+        this.rouletteHistory = data.data.data.dataList;
         this.$closeLoading();
       });
     },
