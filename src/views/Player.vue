@@ -724,70 +724,75 @@
 
       <!-- 转盘 -->
       <div class="player-main-content" v-else-if="showTab === '7'">
-        <div class="half-content">
-          <LuckyWheel
-            ref="LuckyWheel"
-            width="300px"
-            height="300px"
-            :blocks="[
-              { padding: '10px', background: '#ffc27a' },
-              { padding: '10px', background: '#ff4a4c' },
-              { padding: '0px', background: '#fff' }
-            ]"
-            :prizes="roulettePrizes"
-            :buttons="[
-              { radius: '40px', background: '#d64737' },
-              { radius: '35px', background: '#f6c66f', pointer: true },
-              {
-                radius: '30px',
-                background: '#fff',
-                fonts: [{ text: `${this.roulette}\n${this.rollCount}/50`, top: '-50%' }]}
-            ]"
-            @start="startRoulette"
-            @end="endRoulette"
-          />
-        </div>
-        <div class="half-content">
-          <div class="player-main-content-addition-item">
-            <el-button type="primary" size="mini" @click="refreshRouletteHistory"
-              >查询</el-button
-            >
+        <div class="wheel-wrap">
+          <div class="half-content">
+            <LuckyWheel
+              ref="LuckyWheel"
+              width="800px"
+              height="800px"
+              :style="{transform: 'scale(' + windowWidth * 0.3 / 800 +')'}"
+              :blocks="[
+                { padding: '10px', background: '#ffc27a' },
+                { padding: '10px', background: '#ff4a4c' },
+                { padding: '0px', background: '#fff' }
+              ]"
+              :prizes="roulettePrizes"
+              :buttons="[
+                { radius: '40px', background: '#d64737' },
+                { radius: '35px', background: '#f6c66f', pointer: true },
+                {
+                  radius: '30px',
+                  background: '#fff',
+                  fonts: [{ text: `${this.roulette}\n${this.rollCount}/50`, top: '-50%' }]}
+              ]"
+              @start="startRoulette"
+              @end="endRoulette"
+            />
           </div>
-          <div class="player-main-content-table-wrap">
-            <el-table
-              :data="rouletteHistory"
-              size="mini"
-              height="auto"
-            >
-              <el-table-column
-                :key="'roulette-history-column-' + 1"
-                prop="userName"
-                label="玩家"
-              ></el-table-column>
-              <el-table-column
-                :key="'roulette-history-column-' + 2"
-                prop="time"
-                label="转盘时间"
-              ></el-table-column>
-              <el-table-column
-                :key="'roulette-history-column-' + 3"
-                prop="detail"
-                label="奖品"
-              ></el-table-column>
-            </el-table>
-            <div class="player-main-content-table-pagination">
-              <el-pagination
-                small
-                background
-                layout="prev, pager, next"
-                :total="rouletteHistoryPagination.total"
-                :page-size="rouletteHistoryPagination.pageSize"
-                :current-page="rouletteHistoryPagination.page"
-                @current-change="refreshRouletteHistory"
-              ></el-pagination>
+          <div class="half-content">
+            <div class="player-main-content-table-wrap">
+              
+              <div class="player-main-content-addition-item">
+                <el-button type="primary" size="mini" @click="refreshRouletteHistory"
+                  >查询</el-button
+                >
+              </div>
+              <el-table
+                :data="rouletteHistory"
+                size="mini"
+                height="auto"
+              >
+                <el-table-column
+                  :key="'roulette-history-column-' + 1"
+                  prop="userName"
+                  label="玩家"
+                ></el-table-column>
+                <el-table-column
+                  :key="'roulette-history-column-' + 2"
+                  prop="time"
+                  label="转盘时间"
+                ></el-table-column>
+                <el-table-column
+                  :key="'roulette-history-column-' + 3"
+                  prop="detail"
+                  label="奖品"
+                ></el-table-column>
+              </el-table>
+              <div class="player-main-content-table-pagination">
+                <el-pagination
+                  small
+                  background
+                  layout="prev, pager, next"
+                  :total="rouletteHistoryPagination.total"
+                  :page-size="rouletteHistoryPagination.pageSize"
+                  :current-page="rouletteHistoryPagination.page"
+                  @current-change="refreshRouletteHistory"
+                ></el-pagination>
+              </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -1036,6 +1041,8 @@ export default {
         pageSize: 20,
         total: 0,
       },
+
+      windowWidth: 1000,
     };
   },
   async mounted() {
@@ -1068,6 +1075,11 @@ export default {
       }
       this.refreshRoulette();
     });
+    
+    this.windowWidth = document.body.clientWidth;
+    window.onresize = () => {
+      this.windowWidth = document.body.clientWidth;
+    }
   },
 
   methods: {
@@ -1663,11 +1675,17 @@ export default {
   flex-wrap: wrap;
 }
 
-.half-content {
+.wheel-wrap {
   display: flex;
   justify-content: center;
+  height: 100%;
+}
+.half-content {
   width: 50%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .player-main-content-addition-item {
