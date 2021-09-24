@@ -492,6 +492,16 @@
               ></el-option>
             </el-select>
           </div>
+          <div class="player-main-content-addition-item">
+            <el-autocomplete
+              size="mini"
+              v-model="drawRecordQueryAddition.cardName"
+              placeholder="请输入卡名"
+              clearable
+              :fetch-suggestions="querySearchCandicateCardList"
+              @keyup.enter.native="drawRecordQuery"
+            ></el-autocomplete>
+          </div>
           <div class="player-main-content-addition-item special">
             <el-date-picker
               size="mini"
@@ -1008,8 +1018,9 @@ export default {
         total: 0,
       },
       drawRecordQueryAddition: {
-        package: "",
-        user: "",
+        package: [],
+        user: [],
+        cardName: "",
         dateRange: null,
       },
       drawRecordTableData: [],
@@ -1033,7 +1044,6 @@ export default {
       },
 
       //转盘
-      roulettePrizes: [],
       rouletteResult: "",
       rouletteHistory: [],
       rouletteHistoryPagination: {
@@ -1073,7 +1083,7 @@ export default {
           })
           .catch(() => {});
       }
-      this.refreshRoulette();
+      this._refreshRoulette();
     });
     
     this.windowWidth = document.body.clientWidth;
@@ -1093,6 +1103,7 @@ export default {
       this.showTab = tempIndex;
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
+      this.rouletteConfigData = await this._queryRouletteConfig();
       let userInfo = this.userList.find(
         (element) => element.userName === this.username
       );
@@ -1104,9 +1115,14 @@ export default {
         this.roulette = userInfo.roulette;
         this.rollCount = userInfo.rollCount;
       }
-      this.refreshRoulette();
+      this._refreshRoulette();
       this.$closeLoading();
       this.generateCandicateCardList();
+
+      this.windowWidth = document.body.clientWidth;
+      window.onresize = () => {
+        this.windowWidth = document.body.clientWidth;
+      }
     },
 
     //生成输入卡片名字时的输入建议列表
@@ -1324,7 +1340,8 @@ export default {
           : undefined,
         this.drawRecordQueryAddition.dateRange
           ? this.drawRecordQueryAddition.dateRange[1]
-          : undefined
+          : undefined,
+        this.drawRecordQueryAddition.cardName || undefined
       ).then((data) => {
         this.drawRecordPagination.page = data.pagination.page;
         this.drawRecordPagination.total = data.pagination.total;
@@ -1495,19 +1512,6 @@ export default {
         .catch(() => {});
     },
 
-    // 初始化转盘数据
-    refreshRoulette() {
-      var prizes = []
-      this.rouletteConfigData.forEach((item, index) => {
-        prizes.push({
-          background: item.color,
-          fonts: [{
-            text: item.detail
-          }]
-        })
-      });
-      this.roulettePrizes = prizes;
-    },
     startRoulette() {
       if (this.roulette <= 0) {
         this.$alertWarning("你的转盘次数已用完！");

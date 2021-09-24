@@ -18,7 +18,7 @@ import {
     openLoading,
     closeLoading
 } from '@/utils/loading';
-import Moment from 'moment'
+import Moment from 'moment';
 
 //格式化传参时稀有度列表的顺序
 const formatRareListSeq = (arr) => {
@@ -79,7 +79,8 @@ export default {
             },
             
             //转盘配置
-            rouletteConfigData: []
+            rouletteConfigData: [],
+            roulettePrizes: []
         }
 
     },
@@ -190,7 +191,7 @@ export default {
         },
 
         //查询记录列表
-        _queryDrawRecordList(page, pageSize, _package, user, startTime, endTime) {
+        _queryDrawRecordList(page, pageSize, _package, user, startTime, endTime, cardName) {
             return new Promise((resolve) => {
                 axiosPostAsJSON({
                     url: queryDrawResultUrl,
@@ -200,7 +201,8 @@ export default {
                         page: page || this.defaultPage,
                         pagesize: pageSize || this.defaultPageSize,
                         startTime: startTime ? Math.floor(new Date(startTime).getTime() / 1000) : undefined,
-                        endTime: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined
+                        endTime: endTime ? Math.floor(new Date(endTime).getTime() / 1000) : undefined,
+                        cardName: cardName
                     },
                 }).then((res) => {
                     resolve({
@@ -289,6 +291,20 @@ export default {
                     resolve(res.data.data);
                 });
             });
+        },
+        // 刷新转盘数据
+        _refreshRoulette() {
+            var prizes = []
+            this.rouletteConfigData.forEach((item, index) => {
+                prizes.push({
+                    background: item.color,
+                    fonts: [{
+                        text: item.detail,
+                        top: "20px"
+                    }]
+                })
+            });
+            this.roulettePrizes = prizes;
         },
 
         //检测是否移动端应用
