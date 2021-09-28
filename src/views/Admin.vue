@@ -775,6 +775,18 @@
               ></el-option>
             </el-select>
           </div>
+
+          <div class="admin-main-content-addition-item">
+            <el-autocomplete
+              size="mini"
+              v-model="drawRecordQueryAddition.cardName"
+              placeholder="请输入卡名"
+              clearable
+              :fetch-suggestions="querySearchCandicateCardList"
+              @keyup.enter.native="drawRecordQuery"
+            ></el-autocomplete>
+          </div>
+
           <div class="admin-main-content-addition-item special">
             <el-date-picker
               size="mini"
@@ -1092,13 +1104,13 @@
       <div class="admin-main-content" v-else-if="showTab === '9'">
         <div class="admin-main-content-addition">
           <div class="admin-main-content-addition-item special">
-            <el-button type="primary" size="mini" @click="refreshRouletteConfig"
+            <el-button type="warning" size="mini" @click="refreshRouletteConfig"
               >刷新</el-button
             >
-            <el-button type="info" size="mini" @click="addRouletteLine"
-              >插入</el-button
+            <el-button type="primary" size="mini" @click="addRouletteLine"
+              >添加</el-button
             >
-            <el-button type="warning" size="mini" @click="submitRouletteConfig"
+            <el-button type="success" size="mini" @click="submitRouletteConfig"
               >保存</el-button
             >
           </div>
@@ -1114,6 +1126,7 @@
                   size="mini"
                   v-model="scope.row.detail"
                   :placeholder="`转盘内容`"
+                  @input="_refreshRoulette"
                 ></el-input>
               </template>
             </el-table-column>
@@ -1134,7 +1147,9 @@
               label="背景色"
             >
               <template slot-scope="scope">
-                <el-color-picker v-model="scope.row.color"></el-color-picker>
+                <el-color-picker
+                  v-model="scope.row.color"
+                  @input="_refreshRoulette"></el-color-picker>
               </template>
             </el-table-column>
             <el-table-column
@@ -1149,6 +1164,26 @@
               </template>
             </el-table-column>
           </el-table>
+          <LuckyWheel
+            ref="LuckyWheel"
+            width="800px"
+            height="800px"
+            :style="{transform: 'scale(' + windowWidth * 0.3 / 800 +')'}"
+            :blocks="[
+              { padding: '10px', background: '#ffc27a' },
+              { padding: '10px', background: '#ff4a4c' },
+              { padding: '0px', background: '#fff' }
+            ]"
+            :prizes="roulettePrizes"
+            :buttons="[
+              { radius: '40px', background: '#d64737' },
+              { radius: '35px', background: '#f6c66f', pointer: true },
+              {
+                radius: '30px',
+                background: '#fff'
+              }
+            ]"
+          />
         </div>
       </div>
     </div>
@@ -1807,6 +1842,7 @@ import DeckGenerator from "./common/DeckGenerator";
 import draggable from "vuedraggable";
 import { MessageBox } from "element-ui";
 import { exportToExcelByJson } from "@/utils/xlsx";
+import { LuckyWheel } from "vue-luck-draw";
 export default {
   name: "Admin",
   mixins: [common],
@@ -1814,6 +1850,7 @@ export default {
     CardDesc,
     draggable,
     DeckGenerator,
+    LuckyWheel,
   },
   data() {
     return {
@@ -2012,9 +2049,10 @@ export default {
         total: 0
       },
       drawRecordQueryAddition: {
-        package: "",
-        user: "",
-        dateRange: null
+        package: [],
+        user: [],
+        dateRange: null,
+        cardName: ""
       },
       drawRecordTableData: [],
 
@@ -2066,12 +2104,22 @@ export default {
         oldCardName: "",
         newCardName: "",
         count: 0
-      }
+      },
+
+      windowWidth: 1000
     };
   },
 
   mounted() {
     this.generateCandicateCardList();
+    this.windowWidth = document.body.clientWidth;
+    window.onresize = () => {
+      this.windowWidth = document.body.clientWidth;
+    };
+
+    this.$on("preloaded", () => {
+      this._refreshRoulette();
+    });
   },
   methods: {
     handleSelect(index) {
@@ -2752,7 +2800,8 @@ export default {
           : undefined,
         this.drawRecordQueryAddition.dateRange
           ? this.drawRecordQueryAddition.dateRange[1]
-          : undefined
+          : undefined,
+        this.drawRecordQueryAddition.cardName || undefined
       ).then(data => {
         this.drawRecordPagination.page = data.pagination.page;
         this.drawRecordPagination.total = data.pagination.total;
@@ -3018,13 +3067,16 @@ export default {
     //转盘配置操作
     addRouletteLine() {
       this.rouletteConfigData.push({detail: "", rate: "", color: ""});
+      this._refreshRoulette();
     },
     deleteRouletteLine(index) {
       this.rouletteConfigData.splice(index, 1);
+      this._refreshRoulette();
     },
     async refreshRouletteConfig() {
       this.$openLoading();
       this.rouletteConfigData = await this._queryRouletteConfig();
+      this._refreshRoulette();
       this.$closeLoading();
     },
     submitRouletteConfig() {
