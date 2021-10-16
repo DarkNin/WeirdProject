@@ -23,6 +23,8 @@ const exchangeCardsRareUrl = BASE_URL + '/card/exchange';
 const addPackageUrl = BASE_URL + '/package/add';
 //编辑包名
 const editPackageNameUrl = BASE_URL + '/package/update';
+//编辑卡包描述
+const editPackageDetailUrl = BASE_URL + '/package/updateDetail';
 //查询卡包列表
 const queryCardPackageListUrl = BASE_URL + '/package/list';
 //编辑卡包排序
@@ -98,6 +100,8 @@ const renameDeckUrl = BASE_URL + '/deck/rename';
 const removeDeckUrl = BASE_URL + '/deck/remove';
 //分享卡组
 const shareDeckUrl = BASE_URL + '/deck/share';
+//通过ydk导入卡组
+const addUserDeckUrl = BASE_URL + '/deck/importCard';
 
 //转盘
 //获取转盘配置
@@ -116,6 +120,7 @@ const urlNeededValidate = [
 
     addPackageUrl,
     editPackageNameUrl,
+    editPackageDetailUrl,
     editPackageOrderUrl,
 
 
@@ -148,6 +153,7 @@ const urlNeededValidate = [
     renameDeckUrl,
     removeDeckUrl,
     shareDeckUrl,
+    addUserDeckUrl,
 
     editRouletteConfigUrl,
     runRouletteUrl
@@ -165,6 +171,7 @@ export {
     exchangeCardsRareUrl,
     addPackageUrl,
     editPackageNameUrl,
+    editPackageDetailUrl,
     queryCardPackageListUrl,
     editPackageOrderUrl,
     addUserUrl,
@@ -200,6 +207,7 @@ export {
     renameDeckUrl,
     removeDeckUrl,
     shareDeckUrl,
+    addUserDeckUrl,
 
     searchRouletteConfigUrl,
     editRouletteConfigUrl,

@@ -31,8 +31,10 @@
             v-for="(item, index) in cardPackageList"
             :key="index"
             :name="index"
-            :title="item.packageName"
           >
+          <template slot="title">
+            {{item.packageName}}<span class="collapse-title-details">{{item.detail}}</span>
+          </template>
             <div class="collapse-table-wrap">
               <el-table
                 :data="
@@ -740,7 +742,7 @@
               ref="LuckyWheel"
               width="800px"
               height="800px"
-              :style="{transform: 'scale(' + windowWidth * 0.3 / 800 +')'}"
+              :style="{transform: 'scale(' + wheelScaleWidth +')'}"
               :blocks="[
                 { padding: '10px', background: '#ffc27a' },
                 { padding: '10px', background: '#ff4a4c' },
@@ -948,6 +950,7 @@ import DeckGenerator from "./common/DeckGenerator";
 import { exportToExcelByJson } from "@/utils/xlsx";
 import { LuckyWheel } from "vue-luck-draw";
 import { axiosPostAsJSON } from '../utils/fetch';
+import { exchangeCardsRareUrl } from '../config/url';
 export default {
   name: "Player",
   mixins: [common],
@@ -1054,6 +1057,15 @@ export default {
 
       windowWidth: 1000,
     };
+  },
+  computed: {
+    wheelScaleWidth() {
+      if (this.windowWidth < 800) {
+        return this.windowWidth * 0.6 / 800
+      } else {
+        return this.windowWidth * 0.3 / 800
+      }
+    }
   },
   async mounted() {
     this.generateCandicateCardList();
@@ -1636,6 +1648,16 @@ export default {
   font-weight: bold;
 }
 
+.player-main-content /deep/ .el-collapse-item__arrow {
+  margin-left: 10px;
+}
+
+.collapse-title-details {
+  margin-left: auto;
+  display: inline-block;
+  font-weight: normal;
+}
+
 .collapse-table-wrap {
   height: 50vh;
 }
@@ -1682,14 +1704,19 @@ export default {
 .wheel-wrap {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   height: 100%;
 }
 .half-content {
   width: 50%;
+  min-width: 400px;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.wheel-wrap .half-content > div {
+  overflow: unset !important;
 }
 
 .player-main-content-addition-item {

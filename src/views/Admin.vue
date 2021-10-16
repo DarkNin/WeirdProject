@@ -75,8 +75,10 @@
             v-for="(item, index) in cardPackageList"
             :key="index"
             :name="index"
-            :title="item.packageName"
           >
+            <template slot="title">
+              {{item.packageName}}<span class="collapse-title-details">{{item.detail}}</span>
+            </template>
             <div class="collapse-table-wrap">
               <div class="collapse-table-operation">
                 <el-button
@@ -84,6 +86,12 @@
                   size="mini"
                   @click="editPackage(item.packageName)"
                   >编辑卡包</el-button
+                >
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="editPackageDetail(item.packageName, item.detail)"
+                  >编辑描述</el-button
                 >
                 <el-button
                   type="primary"
@@ -560,6 +568,9 @@
             >
             <el-button type="primary" size="mini" @click="addUserCard"
               >添加卡片</el-button
+            >
+            <el-button type="primary" size="mini" @click="addUserCardDeck"
+              >导入卡组</el-button
             >
           </div>
           <div class="special-user-info" v-if="userQueryAddition.target">
@@ -1253,6 +1264,42 @@
       </span>
     </el-dialog>
 
+    <!-- 编辑卡包描述dialog -->
+    <el-dialog
+      title="编辑描述"
+      :visible.sync="isEditingPackageDetail"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelEditingPackageDetail"
+    >
+      <el-form label-position="top">
+        <el-form-item label="卡包" size="small">
+          <el-input
+            disabled
+            v-model.trim="editingPackageDetailData.package"
+            type="text"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="描述" size="small" required>
+          <el-input
+            v-model.trim="editingPackageDetailData.detail"
+            type="text"
+            @keyup.enter.native="submitEditingPackageDetail"
+            clearable
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isEditingPackageDetail = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitEditingPackageDetail" size="small"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+
     <!-- 新增卡牌dialog -->
     <el-dialog
       title="新增卡牌"
@@ -1707,6 +1754,37 @@
       </span>
     </el-dialog>
 
+    <!-- 上传ydk添加用户卡组 -->
+    <el-dialog
+      :title="addingUserCardDeckTips"
+      :visible.sync="isAddingUserCardDeck"
+      width="20rem"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      @close="cancelAddUserCardDeck"
+    >
+      <el-upload
+        ref="deck_uploader"
+        class="deck-uploader"
+        size="mini"
+        action=""
+        accept=".ydk"
+        :auto-upload="false"
+        :on-change="resetUploadCount"
+      >
+        <el-button size="mini" type="primary">选择文件</el-button>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isAddingUserCardDeck = false" size="small"
+          >取 消</el-button
+        >
+        <el-button type="primary" @click="submitAddUserCardDeck" size="small"
+          >上 传</el-button
+        >
+      </span>
+    </el-dialog>
+
+
     <!-- 修改抽卡结果dialog -->
     <el-dialog
       title="确认抽卡结果"
@@ -1819,6 +1897,7 @@ import {
   addCardUrl,
   editCardNameUrl,
   editPackageNameUrl,
+  editPackageDetailUrl,
   addPackageUrl,
   addUserUrl,
   resetPasswordUrl,
@@ -1835,6 +1914,7 @@ import {
   swapUserOwnCardUrl,
   changeUserOwnCardUrl,
   editRouletteConfigUrl,
+  addUserDeckUrl,
 } from "../config/url";
 import { axiosFetch, axiosGet, axiosPostAsJSON } from "../utils/fetch";
 import CardDesc from "@/components/CardDesc";
@@ -1871,6 +1951,12 @@ export default {
       editingPackageData: {
         oldname: "",
         newname: ""
+      },
+      //编辑卡包描述
+      isEditingPackageDetail: false,
+      editingPackageDetailData: {
+        package: "",
+        detail: ""
       },
       //新增卡片
       isAddingCard: false,
@@ -2027,6 +2113,10 @@ export default {
       },
       addingUserCardTips: "",
       editingCardCountTips: "",
+
+      //通过导入ydk批量新增玩家卡片
+      isAddingUserCardDeck: false,
+      addingUserCardDeckTips: "",
 
       //修改记录查询
       recordPagination: {
@@ -2251,6 +2341,35 @@ export default {
         }).then(res => {
           if (res.data.code === 200) {
             this.isEditingPackage = false;
+            this.reloadPage();
+          }
+        });
+      }
+    },
+
+    editPackageDetail(packageName, detail) {
+      this.editingPackageDetailData.package = packageName;
+      this.editingPackageDetailData.detail = detail;
+      this.isEditingPackageDetail = true;
+    },
+
+    cancelEditingPackageDetail() {
+      this.editingPackageDetailData.package = "";
+      this.editingPackageDetailData.detail = "";
+    },
+
+    submitEditingPackageDetail() {
+      if (this.editingPackageDetailData.detail) {
+        this.$openLoading();
+        axiosFetch({
+          url: editPackageDetailUrl,
+          data: {
+            package: this.editingPackageDetailData.package,
+            detail: this.editingPackageDetailData.detail
+          }
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.isEditingPackageDetail = false;
             this.reloadPage();
           }
         });
@@ -2675,6 +2794,59 @@ export default {
         })
         .catch(() => {});
     },
+    //通过
+    addUserCardDeck() {
+      this.addingUserCardDeckTips = `正在为玩家【${
+        this.userQueryAddition.target
+      }】新增卡组`;
+      this.isAddingUserCardDeck = true;
+    },
+    cancelAddUserCardDeck() {
+      this.addingUserCardDeckTips = "";
+      this.$refs["deck_uploader"].clearFiles();
+    },
+    resetUploadCount(file, filesList) {
+      if (filesList.length > 1) {
+        filesList.splice(0, 1);
+      }
+    },
+    submitAddUserCardDeck() {
+      let files = this.$refs["deck_uploader"].uploadFiles;
+      if (files.length === 0) return;
+      this.$openLoading();
+      let fileItem = files[0];
+      if (
+          !(fileItem.name.includes(".ydk") || fileItem.name.includes(".YDK"))
+        ) {
+          this.$alertInfo("存在不支持的文件类型，请移除后提交");
+          this.$closeLoading();
+          return;
+        }
+      const fileReader = new FileReader();
+      fileReader.addEventListener("loadend", () => {
+        axiosPostAsJSON({
+          url: addUserDeckUrl,
+          data: {
+            deck: {
+              userName: this.userQueryAddition.target,
+              ydk: fileReader.result
+            }
+          }
+          
+        }).then(async res => {
+          if (res.data.code === 200) {
+            this.isAddingUserCardDeck = false;
+            this.userList = await this._queryUserList();
+            this.setUserInfo(this.userQueryAddition.target);
+          }
+        }).finally(() => {
+            this.$closeLoading();
+        })
+      })
+      fileReader.readAsText(fileItem.raw)
+    },
+
+    //编辑卡片数量
     submitEditCardCount(callback, arg) {
       if (
         typeof this.editingCardCountData.count === "number" &&
@@ -3184,6 +3356,16 @@ export default {
 .admin-main-content /deep/ .el-collapse-item__header {
   color: #66b1ff;
   font-weight: bold;
+}
+
+.admin-main-content /deep/ .el-collapse-item__arrow {
+  margin-left: 10px;
+}
+
+.collapse-title-details {
+  margin-left: auto;
+  display: inline-block;
+  font-weight: normal;
 }
 
 .collapse-table-wrap {

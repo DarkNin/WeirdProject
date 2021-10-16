@@ -569,7 +569,7 @@ export default {
         .catch(() => {});
     },
 
-    uploadDeck(params) {
+    uploadDeck() {
       let files = this.$refs["deck_uploader"].uploadFiles;
       if (files.length === 0) return;
       this.$openLoading();
@@ -577,6 +577,7 @@ export default {
       for (let fileItem of files) {
         if (tempNameGroup.includes(fileItem.name)) {
           this.$alertInfo("存在相同文件，请移除重复项后提交");
+          this.$closeLoading();
           return;
         }
         tempNameGroup.push(fileItem.name);
@@ -584,6 +585,7 @@ export default {
           !(fileItem.name.includes(".ydk") || fileItem.name.includes(".YDK"))
         ) {
           this.$alertInfo("存在不支持的文件类型，请移除后提交");
+          this.$closeLoading();
           return;
         }
       }
