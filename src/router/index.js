@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 const Home = () => import('../views/Home.vue')
-const Admin = () => import('../views/Admin.vue')
-const Player = () => import('../views/Player.vue')
+const Admin = () => import('../views/admin/Admin.vue')
+const Player = () => import('../views/player/Player.vue')
 const EditPassword = () => import('../views/EditPassword.vue')
 
 Vue.use(VueRouter)

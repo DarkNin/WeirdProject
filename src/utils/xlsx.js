@@ -3,7 +3,7 @@ import {
     saveAs
 } from 'file-saver';
 
-export const exportToExcelByJson = function (jsonGroup, fileName) {
+export function exportToExcelByJson(jsonGroup, fileName) {
     return new Promise((resolve, reject) => {
         let sheetData = XLSX.utils.aoa_to_sheet(jsonGroup);
         sheetData['!cols'] = [{wch: 16},{wch: 30}]
