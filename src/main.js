@@ -5,6 +5,8 @@ import {Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collaps
 import {openLoading, closeLoading} from './utils/loading'
 import {alertDanger, alertInfo, alertSuccess, alertWarning} from './utils/modal'
 import Darkmode from 'darkmode-js'
+import '@/components/svg/index'
+
 Vue.config.productionTip = false
 
 let compArray = [Input, Dialog, Button, Form, FormItem, Checkbox, Menu, MenuItem, Collapse, CollapseItem, Table, TableColumn, Pagination, Select, Option, Autocomplete, Dropdown, DropdownMenu, DropdownItem, Tag, DatePicker, Image, Upload, ColorPicker];

@@ -16,6 +16,8 @@ import { exportToExcelByJson } from "@/utils/xlsx";
 import { LuckyWheel } from "vue-luck-draw";
 import { axiosPostAsJSON } from '../../utils/fetch';
 import { exchangeCardsRareUrl } from '../../config/url';
+import NavTabs from "@/components/navs/NavTabs";
+import NavItem from "@/components/navs/NavItem";
 export default {
   name: "Player",
   mixins: [common],
@@ -23,6 +25,8 @@ export default {
     CardDesc,
     DeckGenerator,
     LuckyWheel,
+    NavTabs,
+    NavItem
   },
   data() {
     return {

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 const Home = () => import('../views/Home.vue')
 const Admin = () => import('../views/admin/Admin.vue')
 const Player = () => import('../views/player/Player.vue')
+const PlayerMobile = () => import('../views/player/PlayerMobile')
 const EditPassword = () => import('../views/EditPassword.vue')
 
 Vue.use(VueRouter)
@@ -27,6 +28,14 @@ const routes = [{
       requireAuth: true,
     },
     component: Player
+  },
+  {
+    path: '/player_mobile',
+    name: 'PlayerMobile',
+    meta: {
+      requireAuth: true,
+    },
+    component: PlayerMobile
   },
   {
     path: '/edit_password',
@@ -68,7 +77,7 @@ router.beforeEach(function (to, from, next) {
   }
 })
 router.beforeEach(function (to, from, next) {
-  if (to.path.includes('player') && JSON.parse(window.localStorage.getItem('isAdmin')) !== false) {
+  if ((to.path.includes('player') || to.path.includes('player_mobile')) && JSON.parse(window.localStorage.getItem('isAdmin')) !== false) {
     next({
       path: '/'
     })
