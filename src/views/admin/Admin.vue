@@ -284,7 +284,7 @@
               placeholder="请填写搜索条件"
               clearable
               :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="libQueryCard"
             ></el-autocomplete>
           </div>
@@ -652,7 +652,7 @@
               placeholder="请填写搜索条件"
               clearable
               :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="userQuery"
             ></el-autocomplete>
           </div>
@@ -793,7 +793,7 @@
               v-model="drawRecordQueryAddition.cardName"
               placeholder="请输入卡名"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="drawRecordQuery"
             ></el-autocomplete>
           </div>
@@ -954,7 +954,7 @@
               placeholder="请填写卡名"
               clearable
               :trigger-on-focus="false"
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="recordQuery"
             ></el-autocomplete>
           </div>
@@ -1484,7 +1484,7 @@
             placeholder="请填写卡名"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="卡2" size="small" required>
@@ -1494,7 +1494,7 @@
             placeholder="请填写卡名"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="是否记录" size="small">
@@ -1583,7 +1583,7 @@
             v-model.trim="editingCardCountData.card"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="数量" size="small" required>
@@ -1621,7 +1621,7 @@
             v-model.trim="exchangeUserCardDetails.oldCardName"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="新卡名" size="small" required>
@@ -1630,7 +1630,7 @@
             v-model.trim="exchangeUserCardDetails.newCardName"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
           ></el-autocomplete>
         </el-form-item>
         <el-form-item label="数量" size="small">
@@ -1713,7 +1713,7 @@
             placeholder="请填写卡名"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
             @keyup.enter.native="submitSwapUserCards"
           ></el-autocomplete>
         </el-form-item>
@@ -1739,7 +1739,7 @@
             placeholder="请填写卡名"
             clearable
             :trigger-on-focus="false"
-            :fetch-suggestions="querySearchCandicateCardList"
+            :fetch-suggestions="querySearchCandidateCardList"
             @keyup.enter.native="submitSwapUserCards"
           ></el-autocomplete>
         </el-form-item>

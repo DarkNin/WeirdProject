@@ -171,7 +171,7 @@
               v-model="libQueryAddition.cardName"
               placeholder="请填写搜索条件"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="libAllQueryCard"
             ></el-autocomplete>
           </div>
@@ -353,7 +353,7 @@
               v-model="libQueryAddition.cardName"
               placeholder="请填写搜索条件"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="libQueryCard"
             ></el-autocomplete>
           </div>
@@ -500,7 +500,7 @@
               v-model="drawRecordQueryAddition.cardName"
               placeholder="请输入卡名"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="drawRecordQuery"
             ></el-autocomplete>
           </div>
@@ -850,7 +850,7 @@
               v-model="fusingCardData.card"
               type="text"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
             ></el-autocomplete>
           </el-form-item>
           <el-form-item

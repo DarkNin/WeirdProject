@@ -46,7 +46,7 @@ export default {
       packageListContent: {},
       activeItemIndex: "",
 
-      cardCandicateList: [],
+      cardCandidateList: [],
 
       //新增卡包
       isAddingPackage: false,
@@ -308,7 +308,7 @@ export default {
   },
 
   mounted() {
-    this.generateCandicateCardList();
+    this.generateCandidateCardList();
     this.windowWidth = document.body.clientWidth;
     window.onresize = () => {
       this.windowWidth = document.body.clientWidth;
@@ -331,11 +331,11 @@ export default {
       this.cardPackageList = await this._queryPackageList();
       this.userList = await this._queryUserList();
       this.$closeLoading();
-      this.generateCandicateCardList();
+      this.generateCandidateCardList();
     },
 
     //生成输入卡片名字时的输入建议列表
-    async generateCandicateCardList() {
+    async generateCandidateCardList() {
       let cardList = await this._queryCardList(
         1,
         65535,
@@ -345,17 +345,17 @@ export default {
         undefined,
         "admin_search"
       );
-      this.cardCandicateList = cardList.data.map(item => {
+      this.cardCandidateList = cardList.data.map(item => {
         return {
           value: item.cardName
         };
       });
     },
 
-    querySearchCandicateCardList(queryString, callback) {
+    querySearchCandidateCardList(queryString, callback) {
       let result = queryString
-        ? this.cardCandicateList.filter(this.listFilter(queryString))
-        : this.cardCandicateList;
+        ? this.cardCandidateList.filter(this.listFilter(queryString))
+        : this.cardCandidateList;
       callback(result);
     },
 

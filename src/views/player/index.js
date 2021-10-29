@@ -18,6 +18,7 @@ import { axiosPostAsJSON } from '../../utils/fetch';
 import { exchangeCardsRareUrl } from '../../config/url';
 import NavTabs from "@/components/navs/NavTabs";
 import NavItem from "@/components/navs/NavItem";
+import {debounce} from "throttle-debounce";
 export default {
   name: "Player",
   mixins: [common],
@@ -42,7 +43,7 @@ export default {
       packageListContent: {},
       activeItemIndex: "",
 
-      cardCandicateList: [],
+      cardCandidateList: [],
 
       libPagination: {
         page: 1,
@@ -125,6 +126,9 @@ export default {
       },
 
       windowWidth: 1000,
+      windowHeight: 2000,
+
+      isScrolledOutScreen_FOR_MOBILE: false
     };
   },
   computed: {
@@ -137,7 +141,7 @@ export default {
     }
   },
   async mounted() {
-    this.generateCandicateCardList();
+    this.generateCandidateCardList();
     this.$on("preloaded", () => {
       let userInfo = this.userList.find(
         (element) => element.userName === this.username
@@ -168,9 +172,15 @@ export default {
     });
 
     this.windowWidth = document.body.clientWidth;
+    this.windowHeight = document.body.clientHeight;
     window.onresize = () => {
       this.windowWidth = document.body.clientWidth;
+      this.windowHeight = document.body.clientHeight;
     }
+    const ele = document.getElementById("player");
+    ele.onscroll = debounce(100, false, () => {
+      this.isScrolledOutScreen_FOR_MOBILE = (ele.scrollTop > ele.clientHeight)
+    })
   },
 
   methods: {
@@ -198,7 +208,7 @@ export default {
       }
       this._refreshRoulette();
       this.$closeLoading();
-      this.generateCandicateCardList();
+      this.generateCandidateCardList();
 
       this.windowWidth = document.body.clientWidth;
       window.onresize = () => {
@@ -206,8 +216,13 @@ export default {
       }
     },
 
+    //滚动至顶
+    scrollToTop() {
+      document.getElementById('player').scrollTop = 0
+    },
+
     //生成输入卡片名字时的输入建议列表
-    async generateCandicateCardList() {
+    async generateCandidateCardList() {
       let cardList = await this._queryCardList(
         1,
         65535,
@@ -217,16 +232,16 @@ export default {
         undefined,
         "admin_search"
       );
-      this.cardCandicateList = cardList.data.map((item) => {
+      this.cardCandidateList = cardList.data.map((item) => {
         return {
           value: item.cardName,
         };
       });
     },
 
-    querySearchCandicateCardList(queryString, callback) {
+    querySearchCandidateCardList(queryString, callback) {
       let result = queryString
-        ? this.cardCandicateList.filter(this.listFilter(queryString))
+        ? this.cardCandidateList.filter(this.listFilter(queryString))
         : [];
       callback(result);
     },
@@ -239,6 +254,7 @@ export default {
 
     //情报页面点击手风琴面板时触发
     async handleItemChange(itemIndex) {
+      console.log(itemIndex)
       if (!!this.packageListContent[itemIndex] || itemIndex === "") {
         return;
       }

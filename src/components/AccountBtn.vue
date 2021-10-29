@@ -1,6 +1,6 @@
 <template>
   <div class="logout-btn-wrap">
-    <el-dropdown placement="top-end" @command="excuteCommand" trigger="click">
+    <el-dropdown placement="top-end" @command="executeCommand" trigger="click">
       <el-button icon="el-icon-user-solid" circle></el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item command="toggle_view">切换夜间模式</el-dropdown-item>
@@ -15,7 +15,7 @@
 export default {
   name: "LogoutBtn",
   methods: {
-    excuteCommand(cmd) {
+    executeCommand(cmd) {
       if (cmd === "logout") {
         this.logout();
       }

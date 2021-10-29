@@ -1,22 +1,17 @@
 <template>
-  <div id="player">
-    <nav-tabs size="small">
-      <nav-item label="首页">
-        <svg-icon icon-class="star"></svg-icon>
-      </nav-item>
-      <nav-item label="查找"></nav-item>
-      <nav-item label="我的"></nav-item>
-    </nav-tabs>
+  <div id="player" ref="player">
+    <div class="player-global-button-group">
+      <el-button circle size="mini" @click="scrollToTop" icon="el-icon-top" v-show="isScrolledOutScreen_FOR_MOBILE"></el-button>
+      <el-button circle size="mini" @click="reloadPage" icon="el-icon-refresh-right"></el-button>
+      <el-button circle size="mini" @click="fuseCard" icon="el-icon-plus"></el-button>
+    </div>
     <div class="player-info">
       <p class="player-info-tips">欢迎来到诡异云，{{ username }}。</p>
-      <span class="player-info-item">
+      <div class="player-info-item">
         <p>硬币: {{ coin }}</p>
         <p>月见黑: {{ leftAward }}</p>
         <p>剩余尘数: {{ leftDust }}</p>
-      </span>
-
-      <el-button type="text" @click="reloadPage">刷新</el-button>
-      <el-button type="text" @click="fuseCard">合成</el-button>
+      </div>
     </div>
     <div class="player-main">
       <el-menu mode="horizontal" default-active="1" @select="handleSelect">
@@ -40,9 +35,12 @@
             :name="index"
           >
           <template slot="title">
-            {{item.packageName}}<span class="collapse-title-details">{{item.detail}}</span>
+            {{item.packageName}}<span class="collapse-title-details" v-show="activeItemIndex !== index">{{item.detail}}</span>
           </template>
             <div class="collapse-table-wrap">
+              <div class="collapse-table-desc" v-show="activeItemIndex === index">
+                卡组内容：{{item.detail}}
+              </div>
               <el-table
                 :data="
                   packageListContent[index]
@@ -50,7 +48,6 @@
                     : []
                 "
                 size="mini"
-                height="48vh"
               >
                 <el-table-column
                   :key="'package-' + item.packageName + '-1'"
@@ -178,7 +175,7 @@
               v-model="libQueryAddition.cardName"
               placeholder="请填写搜索条件"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="libAllQueryCard"
             ></el-autocomplete>
           </div>
@@ -200,7 +197,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="libTableData" size="mini" height="auto">
+          <el-table :data="libTableData" size="mini">
             <el-table-column
               :key="'lib-column-' + 1"
               prop="cardName"
@@ -360,7 +357,7 @@
               v-model="libQueryAddition.cardName"
               placeholder="请填写搜索条件"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="libQueryCard"
             ></el-autocomplete>
           </div>
@@ -380,7 +377,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="playerLibTableData" size="mini" height="auto">
+          <el-table :data="playerLibTableData" size="mini">
             <el-table-column
               :key="'player-lib-column-' + 1"
               prop="cardName"
@@ -507,7 +504,7 @@
               v-model="drawRecordQueryAddition.cardName"
               placeholder="请输入卡名"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
               @keyup.enter.native="drawRecordQuery"
             ></el-autocomplete>
           </div>
@@ -536,7 +533,7 @@
           </div>
         </div>
         <div class="player-main-content-table-wrap">
-          <el-table :data="drawRecordTableData" size="mini" height="auto">
+          <el-table :data="drawRecordTableData" size="mini">
             <el-table-column :key="'draw-record-column-' + 0" type="expand">
               <template slot-scope="scope">
                 <div
@@ -670,7 +667,6 @@
           <el-table
             :data="recordTableData"
             size="mini"
-            height="auto"
             @cell-mouse-enter="recordHighlightRow"
             @cell-mouse-leave="recordCancelHighlightRow"
             :row-class-name="recordHightlightClass"
@@ -779,7 +775,6 @@
               <el-table
                 :data="rouletteHistory"
                 size="mini"
-                height="auto"
               >
                 <el-table-column
                   :key="'roulette-history-column-' + 1"
@@ -857,7 +852,7 @@
               v-model="fusingCardData.card"
               type="text"
               clearable
-              :fetch-suggestions="querySearchCandicateCardList"
+              :fetch-suggestions="querySearchCandidateCardList"
             ></el-autocomplete>
           </el-form-item>
           <el-form-item
@@ -945,11 +940,29 @@
 #player {
   width: 100%;
   height: 100%;
+  overflow-y: auto;
   padding: 1rem;
   box-sizing: border-box;
   font-size: 0.9rem;
   display: flex;
   flex-direction: column;
+}
+.player-global-button-group {
+  position: absolute;
+  padding: 1rem;
+  box-sizing: border-box;
+  bottom: 3rem;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  justify-content: center;
+}
+.player-global-button-group .el-button {
+  margin: 0;
+}
+.player-global-button-group .el-button + .el-button {
+  margin-top: 0.4rem;
 }
 .player-info {
   background: #ffffff;
@@ -957,30 +970,35 @@
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
   flex: initial;
-  padding: 0 1rem;
+  padding: 0.6rem 1rem;
   box-sizing: border-box;
   display: flex;
   align-content: center;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+
 }
 
 .player-info p {
   margin: 0;
   color: #8f8f8f;
-  height: 3rem;
-  line-height: 3rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
 }
 
 .player-info .player-info-item {
-  margin-left: auto;
-  width: 16rem;
-  display: flex;
-  justify-content: space-around;
+  width: auto;
+  display: inline-flex;
+}
+.player-info > p {
+  display: inline-block;
+}
+.player-info p+p {
+  margin-left: 1rem;
 }
 
 .player-info .el-button {
-  margin: 0 10px;
+  align-self: flex-end;
   font-size: 0.9rem;
 }
 
@@ -990,7 +1008,6 @@
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
   flex: auto;
-  min-height: 500px;
   padding: 0 1rem;
   box-sizing: border-box;
   display: flex;
@@ -1004,7 +1021,6 @@
   box-sizing: border-box;
   padding: 1rem;
   flex: auto;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -1022,10 +1038,18 @@
   margin-left: auto;
   display: inline-block;
   font-weight: normal;
+  width: 50%;
+  height: 48px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .collapse-table-wrap {
-  height: 50vh;
+  height: auto;
+}
+
+.collapse-table-desc {
+  color: #66b1ff;
 }
 
 .table-tag {
