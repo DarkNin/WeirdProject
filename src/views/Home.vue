@@ -47,6 +47,7 @@ export default {
     return {
       isLogin: false,
       isAdmin: false,
+      isOnMobile: 'ontouchend' in document.body,
       dialogTitle: null,
       userInfo: {
         username: null,
@@ -67,7 +68,7 @@ export default {
         window.localStorage.getItem("info") &&
         JSON.parse(window.localStorage.getItem("isAdmin")) === isAdmin
       ) {
-        this.$router.push(isAdmin ? "/admin" : "/player");
+        this.$router.push(isAdmin ? "/admin" : (this.isOnMobile ? "/player_mobile" : "/player"));
       }
       this.isAdmin = isAdmin;
       this.isLogin = true;
@@ -95,6 +96,9 @@ export default {
             if (res.data.code === 200) {
               if (res.data.data === "UNLOGIN") {
                 this.$alertInfo("账号或密码错误");
+              } else if (res.data.data === "NORMAL" && this.isAdmin){
+                this.$alertInfo("无法登录管理员页面");
+                this.closePanel();
               } else {
                 if (this.userInfo.isRemember) {
                   let info = JSON.stringify({
@@ -103,8 +107,9 @@ export default {
                   });
                   window.localStorage.setItem("info", info);
                   window.localStorage.setItem("isAdmin", this.isAdmin);
+                  window.localStorage.setItem("timeStamp", new Date().getTime());
                 }
-                this.$router.push(this.isAdmin ? "/admin" : "/player");
+                this.$router.push(this.isAdmin ? "/admin" : (this.isOnMobile ? "/player_mobile" : "/player"));
               }
             }
           });

@@ -138,6 +138,13 @@ export default {
       } else {
         return this.windowWidth * 0.3 / 800
       }
+    },
+    wheelScaleWidth_FOR_MOBILE() {
+      if (this.windowWidth < 800) {
+        return this.windowWidth * 0.8 / 800
+      } else {
+        return this.windowWidth * 0.6 / 800
+      }
     }
   },
   async mounted() {
@@ -254,7 +261,6 @@ export default {
 
     //情报页面点击手风琴面板时触发
     async handleItemChange(itemIndex) {
-      console.log(itemIndex)
       if (!!this.packageListContent[itemIndex] || itemIndex === "") {
         return;
       }

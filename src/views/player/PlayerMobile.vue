@@ -518,6 +518,7 @@
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
               clearable
+              popper-class="datetime-range-mobile"
             ></el-date-picker>
           </div>
           <div class="player-main-content-addition-item special">
@@ -740,12 +741,19 @@
       <!-- 转盘 -->
       <div class="player-main-content" v-else-if="showTab === '7'">
         <div class="wheel-wrap">
-          <div class="half-content">
+          <div class="half-content"
+              :style="{
+                'width': wheelScaleWidth_FOR_MOBILE * 800 + 'px',
+                'height': wheelScaleWidth_FOR_MOBILE * 800 + 'px'
+              }">
             <LuckyWheel
               ref="LuckyWheel"
               width="800px"
               height="800px"
-              :style="{transform: 'scale(' + wheelScaleWidth +')'}"
+              :style="{
+                transform: 'scale(' + wheelScaleWidth_FOR_MOBILE +')'
+              }"
+              
               :blocks="[
                 { padding: '10px', background: '#ffc27a' },
                 { padding: '10px', background: '#ff4a4c' },
@@ -764,7 +772,10 @@
               @end="endRoulette"
             />
           </div>
-          <div class="half-content">
+          <div class="half-content"
+              :style="{
+                'width': wheelScaleWidth_FOR_MOBILE * 800 + 'px'
+              }">
             <div class="player-main-content-table-wrap">
               
               <div class="player-main-content-addition-item">
@@ -941,6 +952,7 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem;
   box-sizing: border-box;
   font-size: 0.9rem;
@@ -955,7 +967,7 @@
   right: 0;
   display: flex;
   flex-direction: column;
-  z-index: 100;
+  z-index: 5;
   justify-content: center;
 }
 .player-global-button-group .el-button {
@@ -1008,13 +1020,18 @@
   box-shadow: #bbbbbb 0 0 5px 0;
   width: 100%;
   flex: auto;
-  padding: 0 1rem;
+  padding: 0.4rem 1rem 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 .player-main .el-menu {
   flex: initial;
+}
+
+.player-main .el-menu .el-menu-item {
+  height: 2.4rem;
+  line-height: 2.4rem;
 }
 
 .player-main-content {
@@ -1098,9 +1115,6 @@
   height: 100%;
 }
 .half-content {
-  width: 50%;
-  min-width: 400px;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1111,11 +1125,19 @@
 
 .player-main-content-addition-item {
   width: 10rem;
-  height: 3rem;
+  min-height: 2.6rem;
   margin-right: 0.6rem;
+}
+.player-main-content-addition-item .el-button {
+  margin-top: 0.4rem;
+  margin-left: 0;
+  margin-right: 0.4rem;
 }
 .player-main-content-addition-item.special {
   width: auto;
+}
+.player-main-content-addition-item.special .el-date-editor{
+  width: 100%;
 }
 .player-main-content-table-wrap {
   flex: 1;
@@ -1189,5 +1211,16 @@
 }
 .player-main-content-addition-item.special .el-checkbox /deep/ * {
   font-size: 12px;
+}
+
+#player::-webkit-scrollbar {
+  display: none
+}
+</style>
+
+<style>
+.datetime-range-mobile {
+  width: 100% !important;
+  overflow: auto;
 }
 </style>

@@ -762,8 +762,7 @@
             />
           </div>
           <div class="half-content">
-            <div class="player-main-content-table-wrap">
-              
+            <div style="width: 100%;">
               <div class="player-main-content-addition-item">
                 <el-button type="primary" size="mini" @click="refreshRouletteHistory"
                   >查询</el-button
@@ -772,7 +771,7 @@
               <el-table
                 :data="rouletteHistory"
                 size="mini"
-                height="auto"
+                height="60vh"
               >
                 <el-table-column
                   :key="'roulette-history-column-' + 1"

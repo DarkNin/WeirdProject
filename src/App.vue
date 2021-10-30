@@ -95,7 +95,7 @@ body.darkmode--activated .darkmode-ignore {
   font-family: 微软雅黑 Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 98vh;
+  height: 100vh;
   max-width: 2000px;
   margin: 0 auto;
   position: relative;
