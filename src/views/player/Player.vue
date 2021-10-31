@@ -809,7 +809,7 @@
 
     <!-- 尘转dialog -->
     <el-dialog
-      title="转卡"
+      title="合成"
       :visible.sync="isFusingCard"
       width="20rem"
       :close-on-click-modal="false"

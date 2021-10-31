@@ -823,7 +823,7 @@
 
     <!-- 尘转dialog -->
     <el-dialog
-      title="转卡"
+      title="合成"
       :visible.sync="isFusingCard"
       width="20rem"
       :close-on-click-modal="false"
@@ -960,7 +960,7 @@
   flex-direction: column;
 }
 .player-global-button-group {
-  position: absolute;
+  position: fixed;
   padding: 1rem;
   box-sizing: border-box;
   bottom: 3rem;
