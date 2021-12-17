@@ -96,7 +96,7 @@
                       :key="scope.row.deckId + '-main-' + mainIndex"
                     >
                       <img
-                        :class="mainItem.count > mainItem.own ? 'img-grayscale' : ''"
+                        :class="mainItem.legal ? '' : 'img-grayscale'"
                         :src="
                           'http://cdn.233.momobako.com/ygopro/pics/' +
                             mainItem.code +
@@ -118,7 +118,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span :class="mainItem.count > mainItem.own ? 'deck-count-illegal' : 'deck-count'">{{mainItem.own + ' / ' + mainItem.count}}</span>
+                      <span :class="mainItem.legal ? 'deck-count' : 'deck-count-illegal'">{{mainItem.own + ' / ' + mainItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -133,7 +133,7 @@
                       :key="scope.row.deckId + '-ex-' + exIndex"
                     >
                       <img
-                        :class="exItem.count > exItem.own ? 'img-grayscale' : ''"
+                        :class="exItem.legal ? '' : 'img-grayscale'"
                         :src="
                           'http://cdn.233.momobako.com/ygopro/pics/' +
                             exItem.code +
@@ -155,7 +155,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span :class="exItem.count > exItem.own ? 'deck-count-illegal' : 'deck-count'">{{exItem.own + ' / ' + exItem.count}}</span>
+                      <span :class="exItem.legal ? 'deck-count' : 'deck-count-illegal'">{{exItem.own + ' / ' + exItem.count}}</span>
                     </div>
                   </div>
                 </div>
@@ -170,7 +170,7 @@
                       :key="scope.row.deckId + '-side-' + sideIndex"
                     >
                       <img
-                        :class="sideItem.count > sideItem.own ? 'img-grayscale' : ''"
+                        :class="sideItem.legal ? '' : 'img-grayscale'"
                         :src="
                           'http://cdn.233.momobako.com/ygopro/pics/' +
                             sideItem.code +
@@ -192,7 +192,7 @@
                         "
                         @mouseleave="closeCardDesc"
                       />
-                      <span :class="sideItem.count > sideItem.own ? 'deck-count-illegal' : 'deck-count'">{{sideItem.own + ' / ' + sideItem.count}}</span>
+                      <span :class="sideItem.legal ? 'deck-count' : 'deck-count-illegal'">{{sideItem.own + ' / ' + sideItem.count}}</span>
                     </div>
                   </div>
                 </div>
