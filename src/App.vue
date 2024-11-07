@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <router-view />
-    <account-btn v-if="$route.path !== '/'" />
+    <account-btn v-if="!($route.path === '/' || $route.path === '/register')" />
   </div>
 </template>
 <script>
